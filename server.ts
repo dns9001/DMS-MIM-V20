@@ -28,8 +28,30 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Credentialed CORS must never reflect arbitrary origins.
+  // Configure production frontend origins through CORS_ORIGINS (comma-separated).
+  const configuredOrigins = (process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  const allowedOrigins = new Set(configuredOrigins);
+
   // Middlewares
-  app.use(cors({ origin: true, credentials: true }));
+  app.use(
+    cors({
+      credentials: true,
+      origin: (origin, callback) => {
+        // Same-origin requests and non-browser tools have no Origin header.
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.has(origin)) return callback(null, true);
+        // Local development convenience; production should use CORS_ORIGINS.
+        if (process.env.NODE_ENV !== "production" && /^https?:\/\/localhost(?::\d+)?$/.test(origin)) {
+          return callback(null, true);
+        }
+        return callback(new Error("Origin tidak diizinkan oleh kebijakan CORS."));
+      },
+    })
+  );
   app.use(express.json({ limit: "20mb" }));
   app.use(express.urlencoded({ extended: true, limit: "20mb" }));
   app.use(cookieParser());
