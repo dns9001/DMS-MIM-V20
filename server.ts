@@ -9,45 +9,49 @@ import { createServer as createViteServer } from "vite";
 import { apiRouter } from "./server/routes.js";
 import authRouter from "./server/auth.routes.js";
 import { db as inMemoryDb, saveDatabaseToDisk } from "./server/data.js";
-import { initializeCloudSqlTables, loadAllFromPostgres, migrateAllToCloudSql } from "./server/cloudsqlSync.js";
+import { initializeCloudSqlTables, loadAllFromPostgres } from "./server/cloudsqlSync.js";
 
 async function startServer() {
-  // 1. Initialize PostgreSQL tables and hydrate primary persistent data from Google Cloud SQL (Single Source of Truth)
+  const production = process.env.NODE_ENV === "production";
+  const postgresRequired = production || process.env.DMS_REQUIRE_POSTGRES === "true";
+
+  // PostgreSQL is authoritative. In production, never silently start in a
+  // memory-only mode because that can acknowledge writes that are not durable.
   try {
     const initialized = await initializeCloudSqlTables();
-    if (initialized) {
-      const loaded = await loadAllFromPostgres(inMemoryDb);
-      if (loaded) {
-        saveDatabaseToDisk(true);
+    if (!initialized) {
+      if (postgresRequired) {
+        throw new Error("PostgreSQL wajib tersedia untuk menjalankan DMS dalam mode produksi.");
       }
+      console.warn("[PostgreSQL] Development mode: running without persistent PostgreSQL.");
+    } else {
+      const loaded = await loadAllFromPostgres(inMemoryDb);
+      if (!loaded && postgresRequired) {
+        throw new Error("PostgreSQL tersedia tetapi data operasional gagal dimuat.");
+      }
+      if (loaded) saveDatabaseToDisk(true);
     }
   } catch (err) {
-    console.warn("[PostgreSQL] Initial Cloud SQL restore notice:", err);
+    console.error("[PostgreSQL] Startup failure:", err);
+    if (postgresRequired) process.exit(1);
   }
 
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT || 3000);
 
-  // Credentialed CORS must never reflect arbitrary origins.
-  // Configure production frontend origins through CORS_ORIGINS (comma-separated).
   const configuredOrigins = (process.env.CORS_ORIGINS || "")
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
   const allowedOrigins = new Set(configuredOrigins);
 
-  // Middlewares
   app.use(
     cors({
       credentials: true,
       origin: (origin, callback) => {
-        // Same-origin requests and non-browser tools have no Origin header.
         if (!origin) return callback(null, true);
         if (allowedOrigins.has(origin)) return callback(null, true);
-        // Local development convenience; production should use CORS_ORIGINS.
-        if (process.env.NODE_ENV !== "production" && /^https?:\/\/localhost(?::\d+)?$/.test(origin)) {
-          return callback(null, true);
-        }
+        if (!production && /^https?:\/\/localhost(?::\d+)?$/.test(origin)) return callback(null, true);
         return callback(new Error("Origin tidak diizinkan oleh kebijakan CORS."));
       },
     })
@@ -56,37 +60,28 @@ async function startServer() {
   app.use(express.urlencoded({ extended: true, limit: "20mb" }));
   app.use(cookieParser());
 
-  // Health check endpoint for monitoring, container probes, and dev verification
   app.get("/health", (req, res) => {
     res.json({
       status: "healthy",
       timestamp: new Date().toISOString(),
       timezone: process.env.TZ || "Asia/Jakarta",
-      system: "DMS MAHAMERU V5",
+      system: "DMS MAHAMERU",
       company: "PT Mahameru Insan Mandiri / PT Mahameru Distribusi Indonesia",
       database: {
         engine: "Google Cloud SQL (PostgreSQL)",
         single_source_of_truth: true,
+        persistence_required: postgresRequired,
         in_memory_cache: true,
-        firestore_status: "UNUSED / LEGACY",
-        ledger_healthy: true,
+        firestore_status: "SECONDARY / LEGACY",
       },
     });
   });
 
-  // Hardened authentication endpoints take precedence over legacy auth handlers.
-  // Authentication uses opaque server-side sessions and HttpOnly cookies.
   app.use("/api/auth", authRouter);
-
-  // Mount API router
   app.use("/api", apiRouter);
 
-  // Vite middleware for development vs static serve for production
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
+  if (!production) {
+    const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
@@ -97,7 +92,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`MAHAMERU DMS Server running on http://0.0.0.0:${PORT} [Primary Database: Google Cloud SQL (PostgreSQL) - Single Source of Truth]`);
+    console.log(`MAHAMERU DMS Server running on port ${PORT} [PostgreSQL authoritative]`);
   });
 }
 
