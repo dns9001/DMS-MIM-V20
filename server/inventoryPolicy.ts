@@ -1,8 +1,11 @@
 export type StockRole = "OWNER" | "ADMIN" | "SUPERVISOR" | "SALES" | "WAREHOUSE";
 
+/** Location types used by the production inventory model. */
 export const STOCK_LOCATION = {
   WAREHOUSE: "WAREHOUSE",
-  SALESMAN: "SALESMAN",
+  SALES: "SALES",
+  OUTLET: "OUTLET",
+  SUPPLIER: "SUPPLIER",
 } as const;
 
 export function assertAdjustmentRole(role: string): void {
@@ -24,10 +27,8 @@ export function assertSufficientStock(availableStock: number, quantity: number):
   }
 }
 
-/**
- * Canonical movement intent. Persistence must execute the source decrement,
- * destination increment, and movement insert in one database transaction.
- */
+/** Canonical transfer intent. Persist source decrement, destination increment,
+ * and movement ledger entry in one database transaction. */
 export function createTransferIntent(args: {
   skuId: string;
   quantity: number;
@@ -62,9 +63,9 @@ export function createSaleDeductionIntent(args: {
     movementType: "SALE",
     skuId: args.skuId,
     quantity: args.quantity,
-    sourceLocationType: STOCK_LOCATION.SALESMAN,
+    sourceLocationType: STOCK_LOCATION.SALES,
     sourceLocationId: args.salesmanId,
-    destLocationType: "OUTLET",
+    destLocationType: STOCK_LOCATION.OUTLET,
     destLocationId: "",
     referenceId: args.transactionId,
     performedBy: args.performedBy,
