@@ -7,6 +7,7 @@ import cors from "cors";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { apiRouter } from "./server/routes.js";
+import authRouter from "./server/auth.routes.js";
 import { db as inMemoryDb, saveDatabaseToDisk } from "./server/data.js";
 import { initializeCloudSqlTables, loadAllFromPostgres, migrateAllToCloudSql } from "./server/cloudsqlSync.js";
 
@@ -50,6 +51,10 @@ async function startServer() {
       },
     });
   });
+
+  // Hardened authentication endpoints take precedence over legacy auth handlers.
+  // Authentication uses opaque server-side sessions and HttpOnly cookies.
+  app.use("/api/auth", authRouter);
 
   // Mount API router
   app.use("/api", apiRouter);
