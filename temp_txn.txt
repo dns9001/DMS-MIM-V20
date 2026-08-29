@@ -1,0 +1,455 @@
+4656:apiRouter.post("/transactions", authMiddleware, async (req: AuthenticatedRequest, res) => {
+4657-  const { outlet_id, visit_id, items, payment_method, latitude, longitude, mock_location } = req.body || {};
+4658-  if (!outlet_id || !items || !items.length) {
+4659-    return res.status(400).json({ detail: "Outlet dan daftar item produk wajib diisi." });
+4660-  }
+4661-
+4662-  // Mock Location / Fake GPS Check
+4663-  const fakeGpsPolicy = db.settings.fake_gps_policy || "REJECT";
+4664-  if (mock_location && fakeGpsPolicy === "REJECT" && !db.settings.allow_fake_gps) {
+4665-    return res.status(400).json({
+4666-      detail: "Penggunaan Fake GPS / Mock Location terdeteksi dan dilarang saat transaksi penjualan.",
+4667-      code: "MOCK_LOCATION_DETECTED",
+4668-    });
+4669-  }
+4670-
+4671-  // Mandatory GPS on Order validation based on settings
+4672-  if (db.settings.require_gps_on_order !== false && (latitude == null || longitude == null)) {
+4673-    return res.status(400).json({
+4674-      detail: "Titik koordinat GPS akurat wajib disertakan saat mencatat transaksi penjualan.",
+4675-      code: "GPS_REQUIRED_ON_ORDER",
+4676-    });
+4677-  }
+4678-
+4679-  // Check Idempotency to prevent duplicate transaction submissions
+4680-  const idempotencyKey = (req.headers["x-idempotency-key"] as string) || req.body?.idempotency_key;
+4681-  const idempCheck = checkIdempotency(idempotencyKey);
+4682-  if (idempCheck.isDuplicate) {
+4683-    return res.json(idempCheck.cachedResponse);
+4684-  }
+4685-
+4686-  // 1. Validate user status
+4687-  if (req.user!.status !== "ACTIVE") {
+4688-    return res.status(403).json({ detail: "Akun Anda tidak aktif.", code: "USER_INACTIVE" });
+4689-  }
+4690-
+4691-  // 2. Validate outlet
+4692-  const outlet = db.outlets.find((o) => o._id === outlet_id);
+4693-  if (!outlet) return res.status(404).json({ detail: "Outlet tidak ditemukan." });
+4694-  if (outlet.status !== "ACTIVE") {
+4695-    return res.status(400).json({ detail: "Outlet tidak aktif." });
+4696-  }
+4697-
+4698-  // 3. FINAL BUSINESS RULE: SALES ASSIGNMENT -> OUTLET ASSIGNMENT
+4699-  if (req.user!.role === "SALES") {
+4700-    const isAssigned = isOutletAssignedToSales(req.user!._id, outlet_id);
+4701-    if (!isAssigned) {
+4702-      return res.status(403).json({
+4703-        detail: `Outlet "${outlet.outlet_name}" (${outlet.outlet_code}) tidak ditugaskan kepada Anda. Transaksi penjualan ditolak.`,
+4704-        code: "OUTLET_NOT_ASSIGNED",
+4705-      });
+4706-    }
+4707-
+4708-    const salesArea = getSalesAreaId(req.user!._id);
+4709-    if (salesArea && outlet.area_id && salesArea !== outlet.area_id) {
+4710-      return res.status(403).json({
+4711-        detail: "Area outlet tidak sesuai dengan area penugasan Anda. Transaksi ditolak.",
+4712-        code: "AREA_MISMATCH",
+4713-      });
+4714-    }
+4715-  }
+4716-
+4717-  const salesmanId = req.user!._id;
+4718-  const lockKey = `stock_lock_${salesmanId}`;
+4719-
+4720-  try {
+4721-    const result = await executeWithMutex(lockKey, async () => {
+4722-      // 4. VALIDATE SALES STOCK (STOK SALES DI LAPANGAN) under lock
+4723-      for (const it of items) {
+4724-        const qty = parseInt(it.quantity) || 0;
+4725-        if (qty <= 0) {
+4726-          throw { status: 400, detail: "Jumlah kuantitas item harus lebih dari 0." };
+4727-        }
+4728-
+4729-        if (req.user!.role === "SALES") {
+4730-          const salesInv = db.inventory.find(
+4731-            (i) => i.location_type === "SALES" && i.location_id === salesmanId && i.sku_id === it.sku_id
+4732-          );
+4733-          const availableSalesStock = salesInv ? salesInv.available_stock : 0;
+4734-          if (availableSalesStock < qty) {
+4735-            const sku = db.skus.find((s) => s._id === it.sku_id);
+4736-            throw {
+4737-              status: 400,
+4738-              detail: `Stok produk "${sku?.name || it.sku_id}" tidak mencukupi pada Sales. Sisa stok yang Anda bawa: ${availableSalesStock} ${sku?.unit || "Unit"}, Diminta: ${qty} ${sku?.unit || "Unit"}.`,
+4739-              code: "INSUFFICIENT_SALES_STOCK",
+4740-            };
+4741-          }
+4742-        }
+4743-      }
+4744-
+4745-      const today = getTodayWIB();
+4746-      const count = db.transactions.length + 1;
+4747-      const invoicePrefix = (db.settings.invoice_prefix || "INV").trim().toUpperCase();
+4748-      const invoiceNumber = `${invoicePrefix}/${today.replace(/-/g, "")}/${String(count).padStart(3, "0")}`;
+4749-      const newTxnId = `txn-${Date.now()}`;
+4750-
+4751-      let subtotal = 0;
+4752-      const processedItems = items.map((it: any, idx: number) => {
+4753-        const sku = db.skus.find((s) => s._id === it.sku_id);
+4754-        const prod = db.products.find((p) => p._id === sku?.product_id);
+4755-        const prc = db.prices.find((p) => p.sku_id === it.sku_id);
+4756-        const price = Number(it.unit_price ?? it.unitPrice ?? prc?.price ?? 0);
+4757-        const qty = parseInt(it.quantity ?? it.volume ?? it.qty, 10) || 1;
+4758-        const disc = parseFloat(it.discount) || 0;
+4759-        const itemTotal = price * qty - disc;
+4760-        subtotal += itemTotal;
+4761-
+4762-        // Deduct stock from SALES inventory (or warehouse fallback if non-sales admin testing)
+4763-        if (req.user!.role === "SALES") {
+4764-          let salesInv = db.inventory.find(
+4765-            (i) => i.location_type === "SALES" && i.location_id === salesmanId && i.sku_id === it.sku_id
+4766-          );
+4767-          if (salesInv) {
+4768-            salesInv.stock_on_hand = Math.max(0, salesInv.stock_on_hand - qty);
+4769-            salesInv.available_stock = Math.max(0, salesInv.available_stock - qty);
+4770-            salesInv.updated_at = new Date().toISOString();
+4771-            syncSingleDoc("inventory", salesInv._id, salesInv);
+4772-          }
+4773-
+4774-          // Record official SALES_OUT stock movement
+4775-          const mvtCount = db.stock_movements.length + 1 + idx;
+4776-          const newMvt: StockMovement = {
+4777-            _id: `mvt-${Date.now()}-${idx}`,
+4778-            movement_code: `MVT-${today.replace(/-/g, "")}-${String(mvtCount).padStart(4, "0")}`,
+4779-            movement_type: "SALES_OUT",
+4780-            source_location_type: "SALES",
+4781-            source_location_id: salesmanId,
+4782-            destination_location_type: "OUTLET",
+4783-            destination_location_id: outlet_id,
+4784-            sku_id: it.sku_id,
+4785-            quantity: qty,
+4786-            salesman_id: salesmanId,
+4787-            outlet_id,
+4788-            reference_id: newTxnId,
+4789-            business_date: today,
+4790-            status: "COMPLETED",
+4791-            notes: `Penjualan ${outlet.outlet_name} (${invoiceNumber}) - Volume: ${qty} ${sku?.unit || 'Unit'}`,
+4792-            created_by: salesmanId,
+4793-            created_at: new Date().toISOString(),
+4794-          };
+4795-          db.stock_movements.push(newMvt);
+4796-          syncSingleDoc("stock_movements", newMvt._id, newMvt);
+4797-        } else {
+4798-          // Non-sales fallback (e.g. admin test order)
+4799-          const whInv = db.inventory.find(
+4800-            (i) => (i.location_type === "WAREHOUSE" || !i.location_type) && i.sku_id === it.sku_id
+4801-          );
+4802-          if (whInv) {
+4803-            whInv.stock_on_hand = Math.max(0, whInv.stock_on_hand - qty);
+4804-            whInv.available_stock = Math.max(0, whInv.available_stock - qty);
+4805-            whInv.updated_at = new Date().toISOString();
+4806-            syncSingleDoc("inventory", whInv._id, whInv);
+--
+5128:apiRouter.post("/transactions/:id/cancel", authMiddleware, requireRoles("SUPERVISOR", "ADMIN", "OWNER", "SALES"), (req: AuthenticatedRequest, res) => {
+5129-  const txn = db.transactions.find((t) => t._id === req.params.id || t.invoice_number === req.params.id);
+5130-  if (!txn) return res.status(404).json({ detail: "Transaksi tidak ditemukan." });
+5131-  if (req.user!.role === "SALES" && txn.salesman_id !== req.user!._id) {
+5132-    return res.status(403).json({ detail: "Akses ditolak. Anda hanya dapat membatalkan transaksi milik Anda sendiri." });
+5133-  }
+5134-  if (txn.status === "CANCELLED") return res.status(400).json({ detail: "Transaksi sudah dibatalkan sebelumnya." });
+5135-
+5136-  const { reason } = req.body || {};
+5137-  if (!reason) return res.status(400).json({ detail: "Alasan pembatalan transaksi wajib diisi." });
+5138-
+5139-  const oldStatus = txn.status;
+5140-  txn.status = "CANCELLED";
+5141-
+5142-  const today = getTodayWIB();
+5143-
+5144-  // Reverse stock back to salesman
+5145-  (txn.items || []).forEach((it: any, idx: number) => {
+5146-    const qty = Number(it.quantity ?? it.volume ?? 0);
+5147-    let salesInv = db.inventory.find(
+5148-      (i) => i.location_type === "SALES" && i.location_id === txn.salesman_id && i.sku_id === it.sku_id
+5149-    );
+5150-    if (salesInv) {
+5151-      salesInv.stock_on_hand += qty;
+5152-      salesInv.available_stock += qty;
+5153-      salesInv.updated_at = new Date().toISOString();
+5154-    }
+5155-
+5156-    // Record official REVERSAL stock movement
+5157-    db.stock_movements.push({
+5158-      _id: `mvt-rev-${Date.now()}-${idx}`,
+5159-      movement_code: `MVT-REV-${today.replace(/-/g, "")}-${String(db.stock_movements.length + 1).padStart(4, "0")}`,
+5160-      movement_type: "REVERSAL",
+5161-      source_location_type: "OUTLET",
+5162-      source_location_id: txn.outlet_id,
+5163-      destination_location_type: "SALES",
+5164-      destination_location_id: txn.salesman_id,
+5165-      sku_id: it.sku_id,
+5166-      quantity: qty,
+5167-      salesman_id: txn.salesman_id,
+5168-      outlet_id: txn.outlet_id,
+5169-      reference_id: txn._id,
+5170-      business_date: today,
+5171-      status: "COMPLETED",
+5172-      notes: `Reversal pembatalan ${txn.invoice_number || txn._id}: ${reason}`,
+5173-      created_by: req.user!._id,
+5174-      created_at: new Date().toISOString(),
+5175-    });
+5176-
+5177-    syncSalesStockLedger(txn.salesman_id, it.sku_id, today);
+5178-  });
+5179-
+5180-  // Recalculate outlet lifecycle status & metrics after cancellation
+5181-  recalculateOutletSummary(txn.outlet_id);
+5182-  const updatedOutletAfterCancel = db.outlets.find((o) => o._id === txn.outlet_id);
+5183-  if (updatedOutletAfterCancel) syncSingleDoc("outlets", updatedOutletAfterCancel._id, updatedOutletAfterCancel);
+5184-  syncSingleDoc("transactions", txn._id, txn);
+5185-
+5186-  // Strict Audit Record
+5187-  recordAuditLog(
+5188-    req.user!._id,
+5189-    "CANCEL_TRANSACTION",
+5190-    "transactions",
+5191-    txn._id,
+5192-    {
+5193-      invoice_number: txn.invoice_number,
+5194-      old_status: oldStatus,
+5195-      new_status: "CANCELLED",
+5196-      old_total_volume: txn.total_volume || (txn.items || []).reduce((acc, it: any) => acc + (it.quantity || 0), 0),
+5197-      new_total_volume: 0,
+5198-      reason,
+5199-      changed_by: req.user!._id,
+5200-      changed_by_name: req.user!.name,
+5201-      timestamp: new Date().toISOString(),
+5202-    }
+5203-  );
+5204-
+5205-  res.json({
+5206-    message: "Transaksi berhasil dibatalkan dan stok telah dikembalikan (reversed) ke salesman.",
+5207-    transaction: txn,
+5208-  });
+5209-});
+5210-
+5211-// SUPERVISOR VOLUME MATRIX & ANALYSIS ENDPOINT
+5212-apiRouter.get("/supervisor/volume-matrix", authMiddleware, requireRoles("SUPERVISOR", "ADMIN", "OWNER"), (req, res) => {
+5213-  const { salesman_id, area_id, outlet_id, product_id, sku_id, date, from, to, status } = req.query as Record<string, string>;
+5214-
+5215-  const fromDate = from || date || new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+5216-  const toDate = to || date || new Date().toISOString().slice(0, 10);
+5217-
+5218-  // Filter completed transactions
+5219-  const validTxns = db.transactions.filter((t) => {
+5220-    if (status) {
+5221-      if (t.status !== status) return false;
+5222-    } else {
+5223-      if (t.status === "CANCELLED" || (t as any).status === "DRAFT") return false;
+5224-    }
+5225-
+5226-    const tDate = (t.transaction_date || "").slice(0, 10);
+5227-    if (tDate < fromDate || tDate > toDate) return false;
+5228-    if (salesman_id && t.salesman_id !== salesman_id) return false;
+5229-    if (outlet_id && t.outlet_id !== outlet_id) return false;
+5230-
+5231-    const outlet = db.outlets.find((o) => o._id === t.outlet_id);
+5232-    if (area_id && outlet?.area_id !== area_id) return false;
+5233-
+5234-    return true;
+5235-  });
+5236-
+5237-  // Flatten items
+5238-  const matrixRows: any[] = [];
+5239-  const skuVolumeTotals: Record<string, { sku_id: string; sku_name: string; product_id: string; product_name: string; volume: number; revenue: number; tx_count: number }> = {};
+5240-  const salesVolumeTotals: Record<string, { salesman_id: string; salesman_name: string; area_name: string; volume: number; revenue: number; tx_count: number }> = {};
+5241-  const areaVolumeTotals: Record<string, { area_id: string; area_name: string; volume: number; revenue: number; tx_count: number }> = {};
+5242-  const outletVolumeTotals: Record<string, { outlet_id: string; outlet_name: string; area_name: string; volume: number; revenue: number; tx_count: number }> = {};
+5243-
+5244-  validTxns.forEach((t) => {
+5245-    const outlet = db.outlets.find((o) => o._id === t.outlet_id);
+5246-    const area = db.areas.find((a) => a._id === outlet?.area_id);
+5247-    const sales = db.users.find((u) => u._id === t.salesman_id);
+5248-
+5249-    (t.items || []).forEach((it: any) => {
+5250-      const sku = db.skus.find((s) => s._id === it.sku_id);
+5251-      const prod = db.products.find((p) => p._id === sku?.product_id || p._id === it.product_id);
+5252-
+5253-      if (sku_id && it.sku_id !== sku_id) return;
+5254-      if (product_id && prod?._id !== product_id && it.product_id !== product_id) return;
+5255-
+5256-      const vol = Number(it.quantity ?? it.volume ?? 0);
+5257-      const price = Number(it.unit_price ?? it.price ?? 0);
+5258-      const sub = Number(it.subtotal ?? (vol * price));
+5259-
+5260-      // Row entry
+5261-      matrixRows.push({
+5262-        transaction_id: t._id,
+5263-        invoice_number: t.invoice_number || t.transaction_code,
+5264-        date: (t.transaction_date || "").slice(0, 10),
+5265-        timestamp: t.transaction_date,
+5266-        salesman_id: t.salesman_id,
+5267-        salesman_name: sales?.name || "-",
+5268-        area_id: area?._id || "-",
+5269-        area_name: area?.name || "-",
+5270-        outlet_id: t.outlet_id,
+5271-        outlet_name: outlet?.outlet_name || "-",
+5272-        product_id: prod?._id || "-",
+5273-        product_name: prod?.name || "Produk",
+5274-        sku_id: it.sku_id,
+5275-        sku_name: sku?.name || it.sku_name || "SKU",
+5276-        unit: sku?.unit || "Unit",
+5277-        volume: vol, // Volume = Qty
+5278-        unit_price: price,
+--
+11623:apiRouter.post("/transactions/:id/void", authMiddleware, requireRoles("SUPERVISOR", "ADMIN", "OWNER", "SALES"), (req: AuthenticatedRequest, res) => {
+11624-  const txn = db.transactions.find((t) => t._id === req.params.id || t.invoice_number === req.params.id);
+11625-  if (!txn) return res.status(404).json({ detail: "Transaksi tidak ditemukan." });
+11626-  if (req.user!.role === "SALES" && txn.salesman_id !== req.user!._id) {
+11627-    return res.status(403).json({ detail: "Akses ditolak. Anda hanya dapat membatalkan transaksi milik Anda sendiri." });
+11628-  }
+11629-  if (txn.status === "CANCELLED") return res.status(400).json({ detail: "Transaksi sudah dibatalkan sebelumnya." });
+11630-
+11631-  const { reason } = req.body || {};
+11632-  if (!reason) return res.status(400).json({ detail: "Alasan void/pembatalan transaksi wajib diisi." });
+11633-
+11634-  txn.status = "CANCELLED";
+11635-  const today = getTodayWIB();
+11636-
+11637-  // Reverse stock back to salesman
+11638-  (txn.items || []).forEach((it: any, idx: number) => {
+11639-    const qty = Number(it.quantity ?? it.volume ?? 0);
+11640-    let salesInv = db.inventory.find(
+11641-      (i) => i.location_type === "SALES" && i.location_id === txn.salesman_id && i.sku_id === it.sku_id
+11642-    );
+11643-    if (salesInv) {
+11644-      salesInv.stock_on_hand += qty;
+11645-      salesInv.available_stock += qty;
+11646-      salesInv.updated_at = new Date().toISOString();
+11647-    }
+11648-
+11649-    db.stock_movements.push({
+11650-      _id: `mvt-rev-${Date.now()}-${idx}`,
+11651-      movement_code: `MVT-REV-${today.replace(/-/g, "")}-${String(db.stock_movements.length + 1).padStart(4, "0")}`,
+11652-      movement_type: "REVERSAL",
+11653-      source_location_type: "OUTLET",
+11654-      source_location_id: txn.outlet_id,
+11655-      destination_location_type: "SALES",
+11656-      destination_location_id: txn.salesman_id,
+11657-      sku_id: it.sku_id,
+11658-      quantity: qty,
+11659-      salesman_id: txn.salesman_id,
+11660-      outlet_id: txn.outlet_id,
+11661-      reference_id: txn._id,
+11662-      business_date: today,
+11663-      status: "COMPLETED",
+11664-      notes: `Void/Reversal pembatalan ${txn.invoice_number || txn._id}: ${reason}`,
+11665-      created_by: req.user!._id,
+11666-      created_at: new Date().toISOString(),
+11667-    });
+11668-
+11669-    syncSalesStockLedger(txn.salesman_id, it.sku_id, today);
+11670-  });
+11671-
+11672-  // Cancel associated receivable if exists
+11673-  const rec = (db.receivables || []).find((r) => r.invoice_id === txn._id || r.invoice_number === txn.invoice_number);
+11674-  if (rec) {
+11675-    rec.status = "OVERDUE";
+11676-    syncSingleDoc("receivables", rec._id, rec);
+11677-  }
+11678-
+11679-  recalculateOutletSummary(txn.outlet_id);
+11680-  const updatedOutlet = db.outlets.find((o) => o._id === txn.outlet_id);
+11681-  if (updatedOutlet) syncSingleDoc("outlets", updatedOutlet._id, updatedOutlet);
+11682-  syncSingleDoc("transactions", txn._id, txn);
+11683-
+11684-  recordAuditLog(
+11685-    req.user!._id,
+11686-    "VOID_TRANSACTION",
+11687-    "transactions",
+11688-    txn._id,
+11689-    {
+11690-      invoice_number: txn.invoice_number,
+11691-      outlet_id: txn.outlet_id,
+11692-      reason,
+11693-      items: txn.items,
+11694-    }
+11695-  );
+11696-
+11697-  res.json({
+11698-    message: `Transaksi ${txn.invoice_number || txn._id} berhasil di-void dan stok sales berhasil dikembalikan.`,
+11699-    transaction: txn,
+11700-  });
+11701-});
+11702-
+11703-// ================= NOO (NEW OUTLET OPENING) APPROVAL WORKFLOW =================
+11704-apiRouter.post("/outlets/:id/approve", authMiddleware, requireRoles("SUPERVISOR", "ADMIN", "OWNER"), (req: AuthenticatedRequest, res) => {
+11705-  const outlet = db.outlets.find((o) => o._id === req.params.id);
+11706-  if (!outlet) return res.status(404).json({ detail: "Outlet tidak ditemukan." });
+11707-
+11708-  outlet.status = "ACTIVE";
+11709-  outlet.lifecycle_status = "NOO";
+11710-  (outlet as any).approved_by = req.user!._id;
+11711-  (outlet as any).approved_at = new Date().toISOString();
+11712-  outlet.updated_at = new Date().toISOString();
+11713-
+11714-  syncSingleDoc("outlets", outlet._id, outlet);
+11715-  saveDatabaseToDisk();
+11716-
+11717-  recordAuditLog(
+11718-    req.user!._id,
+11719-    "APPROVE_OUTLET_NOO",
+11720-    "outlets",
+11721-    outlet._id,
+11722-    { outlet_code: outlet.outlet_code, outlet_name: outlet.outlet_name }
+11723-  );
+11724-
+11725-  res.json({
+11726-    message: `Outlet "${outlet.outlet_name}" (${outlet.outlet_code}) berhasil disetujui.`,
+11727-    outlet,
+11728-  });
+11729-});
+11730-
+11731-apiRouter.post("/outlets/:id/reject", authMiddleware, requireRoles("SUPERVISOR", "ADMIN", "OWNER"), (req: AuthenticatedRequest, res) => {
+11732-  const outlet = db.outlets.find((o) => o._id === req.params.id);
+11733-  if (!outlet) return res.status(404).json({ detail: "Outlet tidak ditemukan." });
+11734-
+11735-  const { reason } = req.body || {};
+11736-  outlet.status = "INACTIVE";
+11737-  outlet.lifecycle_status = "DORMANT";
+11738-  (outlet as any).rejection_reason = reason || "Ditolak saat verifikasi NOO";
+11739-  (outlet as any).rejected_by = req.user!._id;
+11740-  (outlet as any).rejected_at = new Date().toISOString();
+11741-  outlet.updated_at = new Date().toISOString();
+11742-
+11743-  syncSingleDoc("outlets", outlet._id, outlet);
+11744-  saveDatabaseToDisk();
+11745-
+11746-  recordAuditLog(
+11747-    req.user!._id,
+11748-    "REJECT_OUTLET_NOO",
+11749-    "outlets",
+11750-    outlet._id,
+11751-    { outlet_code: outlet.outlet_code, outlet_name: outlet.outlet_name, reason }
+11752-  );
+11753-
+11754-  res.json({
+11755-    message: `Pendaftaran outlet "${outlet.outlet_name}" telah ditolak.`,
+11756-    outlet,
+11757-  });
+11758-});
+11759-
+11760-// ================= CASH SETTLEMENT / DEPOSITS (SETORAN UANG SALES) =================
+11761-apiRouter.get("/deposits", authMiddleware, (req: AuthenticatedRequest, res) => {
+11762-  const salesmanId = req.user!.role === "SALES" ? req.user!._id : (req.query.salesman_id as string);
+11763-  const businessDate = req.query.business_date as string;
+11764-  const status = req.query.status as string;
+11765-
+11766-  let deposits = (db.cash_deposits || []).filter((d) => {
+11767-    if (salesmanId && d.salesman_id !== salesmanId) return false;
+11768-    if (businessDate && d.business_date !== businessDate) return false;
+11769-    if (status && d.status !== status) return false;
+11770-    return true;
+11771-  });
+11772-
+11773-  const enriched = deposits.map((d) => {

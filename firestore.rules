@@ -1,0 +1,189 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner() {
+      return isSignedIn() && (
+        request.auth.token.email == "andismochsolihin@gmail.com" ||
+        request.auth.token.email == "dinasapitri9001@gmail.com"
+      );
+    }
+
+    // Default match-all (Allows read/write for integrated server and authenticated client apps)
+    match /{document=**} {
+      allow read, write: if true;
+    }
+
+    // Explicit entity collection security rules
+    match /companies/{companyId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /system_settings/{settingId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /offices/{officeId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /provinces/{provinceId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /regencies/{regencyId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /districts/{districtId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /villages/{villageId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /areas/{areaId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /channels/{channelId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /routes/{routeId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /salesmen/{salesmanId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /open_call_reasons/{reasonId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /outlets/{outletId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /sales_outlets/{assignmentId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /skus/{skuId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /prices/{priceId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /promos/{promoId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /call_plans/{callPlanId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /call_plan_items/{itemId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /attendance/{attendanceId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /visits/{visitId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /transactions/{txnId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /audit_logs/{logId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isOwner();
+    }
+
+    match /inventory/{invId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /stock_movements/{movId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /stock_handovers/{handoverId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /stock_returns/{returnId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /stock_receivings/{receivingId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /sales_stock_ledgers/{ledgerId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /targets/{targetId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+
+    match /gps_events/{eventId} {
+      allow read: if true;
+      allow write: if isSignedIn() || isOwner();
+    }
+  }
+}

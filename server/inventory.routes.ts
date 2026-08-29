@@ -1,0 +1,142 @@
+import { Router } from "express";
+import { authMiddleware, requireRoles } from "./auth.js";
+import { AuthenticatedRequest } from "./auth.js";
+import { sqlDb } from "../src/db/index.js";
+import { inventory, stockMovements } from "../src/db/schema.js";
+import { eq, and, desc, gte, lte } from "drizzle-orm";
+import { InventoryService } from "./inventory.service.js";
+import { db } from "./data.js";
+import { resolveSkuInfo } from "./skuResolver.js";
+
+const router = Router();
+
+// Get Inventory
+router.get("/", authMiddleware, async (req: AuthenticatedRequest, res) => {
+  const { location_type, location_id, sku_id } = req.query as Record<string, string>;
+  
+  let conditions = [];
+  if (location_type) conditions.push(eq(inventory.locationType, location_type));
+  if (location_id) conditions.push(eq(inventory.locationId, location_id));
+  if (sku_id) conditions.push(eq(inventory.skuId, sku_id));
+  
+  const items = await sqlDb.select().from(inventory).where(and(...conditions));
+  
+  const enriched = items.map((inv) => {
+    const skuInfo = resolveSkuInfo(inv.skuId);
+    const office = db.offices.find((o) => o._id === inv.locationId);
+    const sales = inv.locationType === "SALES" ? db.users.find((u) => u._id === inv.locationId) : null;
+    const prc = db.prices.find((p) => p.sku_id === inv.skuId && p.status === "ACTIVE");
+
+    return {
+      _id: inv.id,
+      location_type: inv.locationType,
+      location_id: inv.locationId,
+      sku_id: inv.skuId,
+      stock_on_hand: inv.stockOnHand,
+      available_stock: inv.availableStock,
+      allocated_stock: inv.allocatedStock,
+      status: inv.status,
+      updated_at: inv.updatedAt,
+      sku_code: skuInfo.sku_code || "-",
+      sku_name: skuInfo.resolved_name,
+      unit: skuInfo.uom || "Unit",
+      price: prc?.price || 0,
+      office_name: office?.office_name || "Gudang Pusat",
+      location_name: inv.locationType === "SALES" ? `Sales: ${sales?.name || inv.locationId}` : (office?.office_name || "Gudang Pusat"),
+      salesman_name: sales?.name || "-",
+    };
+  });
+  
+  res.json({ items: enriched, total: enriched.length });
+});
+
+// Get Movements
+router.get("/movements", authMiddleware, async (req: AuthenticatedRequest, res) => {
+  const { from_date, to_date, sku_id, movement_type, salesman_id, warehouse_id } = req.query as Record<string, string>;
+  
+  let conditions = [];
+  if (from_date) conditions.push(gte(stockMovements.createdAt, new Date(from_date)));
+  if (to_date) {
+    const toDate = new Date(to_date);
+    toDate.setHours(23, 59, 59, 999);
+    conditions.push(lte(stockMovements.createdAt, toDate));
+  }
+  if (sku_id) conditions.push(eq(stockMovements.skuId, sku_id));
+  if (movement_type) conditions.push(eq(stockMovements.movementType, movement_type));
+  if (salesman_id) conditions.push(eq(stockMovements.performedBy, salesman_id));
+  
+  const movements = await sqlDb.select().from(stockMovements).where(and(...conditions)).orderBy(desc(stockMovements.createdAt));
+  
+  const enriched = movements.map(m => {
+    const skuInfo = resolveSkuInfo(m.skuId);
+    return {
+      _id: m.id,
+      movement_code: m.id,
+      movement_type: m.movementType,
+      source_location_type: m.sourceLocationType,
+      source_location_id: m.sourceLocationId,
+      destination_location_type: m.destLocationType,
+      destination_location_id: m.destLocationId,
+      sku_id: m.skuId,
+      quantity: m.quantity,
+      reference_id: m.referenceId,
+      business_date: m.createdAt?.toISOString().slice(0, 10),
+      notes: m.notes,
+      created_by: m.performedBy,
+      created_at: m.createdAt?.toISOString(),
+      sku_name: skuInfo.resolved_name,
+      sku_code: skuInfo.sku_code
+    }
+  });
+
+  res.json({ items: enriched, total: enriched.length });
+});
+
+export default router;
+
+// Opname
+router.post("/opname", authMiddleware, requireRoles("WAREHOUSE", "ADMIN", "OWNER"), async (req: AuthenticatedRequest, res) => {
+  const { warehouse_id, items, notes } = req.body || {};
+  if (!warehouse_id || !items || !items.length) {
+    return res.status(400).json({ detail: "Warehouse dan item wajib diisi." });
+  }
+
+  try {
+    const result = await sqlDb.transaction(async (tx) => {
+      let totalAdjusted = 0;
+      for (const it of items) {
+        const diff = Number(it.physical_count) - Number(it.system_stock);
+        if (diff !== 0) {
+          await InventoryService.processOpname(warehouse_id, it.sku_id, diff, req.user!._id, notes || "Stock Opname", tx);
+          totalAdjusted++;
+        }
+      }
+      return totalAdjusted;
+    });
+    res.json({ message: "Stock Opname berhasil.", total_adjusted: result });
+  } catch (err: any) {
+    res.status(400).json({ detail: err.message });
+  }
+});
+
+// Adjustments
+router.post("/adjustments", authMiddleware, requireRoles("WAREHOUSE", "ADMIN", "OWNER"), async (req: AuthenticatedRequest, res) => {
+  const { warehouse_id, items, adjustment_type, notes } = req.body || {};
+  if (!warehouse_id || !items || !items.length || !adjustment_type) {
+    return res.status(400).json({ detail: "Semua field wajib diisi." });
+  }
+
+  try {
+    const result = await sqlDb.transaction(async (tx) => {
+      for (const it of items) {
+        const diff = adjustment_type === "IN" ? Math.abs(it.quantity) : -Math.abs(it.quantity);
+        await InventoryService.processOpname(warehouse_id, it.sku_id, diff, req.user!._id, notes || "Stock Adjustment", tx);
+      }
+      return items.length;
+    });
+    res.json({ message: "Stock Adjustment berhasil.", total_adjusted: result });
+  } catch (err: any) {
+    res.status(400).json({ detail: err.message });
+  }
+});
+

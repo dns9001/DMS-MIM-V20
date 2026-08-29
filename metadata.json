@@ -1,0 +1,11 @@
+{
+  "name": "DMS Mahameru",
+  "description": "Distribution Management System (DMS) for PT Mahameru Insan Mandiri with GPS Geofencing validation, multi-tier roles, real-time inventory, stock handover, order transactions, and Cloud SQL PostgreSQL enterprise database.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

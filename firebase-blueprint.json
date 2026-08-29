@@ -1,0 +1,669 @@
+{
+  "entities": {
+    "Company": {
+      "title": "Company",
+      "description": "Company profile and organizational settings managed by the OWNER",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "companyId": { "type": "string", "maxLength": 128 },
+        "companyName": { "type": "string", "maxLength": 150 },
+        "companyLegalName": { "type": "string", "maxLength": 200 },
+        "companyCode": { "type": "string", "maxLength": 50 },
+        "companyAddress": { "type": "string", "maxLength": 500 },
+        "address": { "type": "string", "maxLength": 500 },
+        "companyPhone": { "type": "string", "maxLength": 50 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "companyEmail": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 100 },
+        "companyWebsite": { "type": "string", "maxLength": 200 },
+        "website": { "type": "string", "maxLength": 200 },
+        "companyDescription": { "type": "string", "maxLength": 1000 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "companyLogo": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "logoStoragePath": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["companyName", "companyCode"]
+    },
+    "SystemSettings": {
+      "title": "SystemSettings",
+      "description": "Global distribution and operational parameters",
+      "type": "object",
+      "properties": {
+        "allow_fake_gps": { "type": "boolean" },
+        "max_geofence_m": { "type": "number" },
+        "office_radius_m": { "type": "number" },
+        "outlet_radius_m": { "type": "number" },
+        "min_visit_minutes": { "type": "number" },
+        "late_tolerance_min": { "type": "number" },
+        "work_start_time": { "type": "string" },
+        "work_end_time": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "User": {
+      "title": "User",
+      "description": "User profile with role, contact info, and status",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["OWNER", "ADMIN", "SUPERVISOR", "SALES", "WAREHOUSE"] },
+        "phone": { "type": "string", "maxLength": 20 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] },
+        "office_id": { "type": "string", "maxLength": 128 },
+        "area_id": { "type": "string", "maxLength": 128 },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "role", "status"]
+    },
+    "Office": {
+      "title": "Office",
+      "description": "Branch or Headquarters office location",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "office_code": { "type": "string", "maxLength": 50 },
+        "office_name": { "type": "string", "maxLength": 150 },
+        "address": { "type": "string", "maxLength": 300 },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "radius_m": { "type": "number" },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["office_code", "office_name", "latitude", "longitude"]
+    },
+    "Province": {
+      "title": "Province",
+      "description": "Administrative Province",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 150 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["code", "name"]
+    },
+    "Regency": {
+      "title": "Regency",
+      "description": "Administrative Regency or City (Kabupaten / Kota)",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "province_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 150 },
+        "type": { "type": "string", "enum": ["KOTA", "KABUPATEN"] },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["province_id", "code", "name"]
+    },
+    "District": {
+      "title": "District",
+      "description": "Administrative District (Kecamatan)",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "regency_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 150 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["regency_id", "code", "name"]
+    },
+    "Village": {
+      "title": "Village",
+      "description": "Administrative Village or Urban Ward (Kelurahan / Desa)",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "district_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 150 },
+        "postal_code": { "type": "string", "maxLength": 20 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["district_id", "code", "name"]
+    },
+    "Area": {
+      "title": "Area",
+      "description": "Sales coverage territory",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 100 },
+        "office_id": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["code", "name"]
+    },
+    "Channel": {
+      "title": "Channel",
+      "description": "Trade channel taxonomy (e.g. General Trade, Modern Trade)",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 100 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["code", "name"]
+    },
+    "Route": {
+      "title": "Route",
+      "description": "Sales route operational grouping",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 100 },
+        "area_id": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["code", "name"]
+    },
+    "Salesman": {
+      "title": "Salesman",
+      "description": "Sales representative operational profile",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "user_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "office_id": { "type": "string", "maxLength": 128 },
+        "area_id": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["code", "name", "status"]
+    },
+    "OpenCallReason": {
+      "title": "OpenCallReason",
+      "description": "Reason catalog for non-transaction / unvisited call",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 300 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["code", "name"]
+    },
+    "Outlet": {
+      "title": "Outlet",
+      "description": "Retail outlet store details, GPS coordinates, and area",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "outlet_code": { "type": "string", "maxLength": 50 },
+        "outlet_name": { "type": "string", "maxLength": 150 },
+        "owner_name": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "address": { "type": "string", "maxLength": 300 },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "area_id": { "type": "string", "maxLength": 128 },
+        "channel_id": { "type": "string", "maxLength": 128 },
+        "route_id": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE", "PENDING"] },
+        "created_by": { "type": "string", "maxLength": 128 },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["outlet_name", "address", "latitude", "longitude", "status"]
+    },
+    "SalesOutlet": {
+      "title": "SalesOutlet",
+      "description": "Active mapping linking an assigned Sales rep to an Outlet",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "sales_id": { "type": "string", "maxLength": 128 },
+        "outlet_id": { "type": "string", "maxLength": 128 },
+        "area_id": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] },
+        "assigned_at": { "type": "string", "format": "date-time" },
+        "assigned_by": { "type": "string", "maxLength": 128 },
+        "notes": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["sales_id", "outlet_id", "status", "assigned_at", "assigned_by"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Product brand and category grouping",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["code", "name"]
+    },
+    "SKU": {
+      "title": "SKU",
+      "description": "Stock Keeping Unit item details",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 100 },
+        "product_id": { "type": "string", "maxLength": 128 },
+        "unit": { "type": "string", "maxLength": 20 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["code", "name"]
+    },
+    "Price": {
+      "title": "Price",
+      "description": "SKU Price master record",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "sku_id": { "type": "string", "maxLength": 128 },
+        "price_name": { "type": "string", "maxLength": 100 },
+        "price": { "type": "number" },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      },
+      "required": ["sku_id", "price"]
+    },
+    "Promo": {
+      "title": "Promo",
+      "description": "Trade promotional schemes and discounts",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 100 },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+      }
+    },
+    "CallPlan": {
+      "title": "CallPlan",
+      "description": "Scheduled route plan for field sales",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "salesman_id": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 10 },
+        "status": { "type": "string", "enum": ["DRAFT", "APPROVED", "PUBLISHED", "COMPLETED", "CANCELLED"] },
+        "notes": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["salesman_id", "date", "status"]
+    },
+    "CallPlanItem": {
+      "title": "CallPlanItem",
+      "description": "Itemized outlet stop within a call plan",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "call_plan_id": { "type": "string", "maxLength": 128 },
+        "outlet_id": { "type": "string", "maxLength": 128 },
+        "sequence": { "type": "number" },
+        "status": { "type": "string", "enum": ["PENDING", "VISITED", "SKIPPED"] }
+      },
+      "required": ["call_plan_id", "outlet_id"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Daily GPS clock in and clock out log",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "salesman_id": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 10 },
+        "clock_in_time": { "type": "string", "format": "date-time" },
+        "clock_out_time": { "type": "string", "format": "date-time" },
+        "clock_in_lat": { "type": "number" },
+        "clock_in_lng": { "type": "number" },
+        "status": { "type": "string", "enum": ["PRESENT", "LATE", "ABSENT"] }
+      },
+      "required": ["salesman_id", "date", "clock_in_time"]
+    },
+    "Visit": {
+      "title": "Visit",
+      "description": "Sales visit record with check-in, geofence, and call result",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "salesman_id": { "type": "string", "maxLength": 128 },
+        "outlet_id": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 10 },
+        "check_in_time": { "type": "string", "format": "date-time" },
+        "check_out_time": { "type": "string", "format": "date-time" },
+        "check_in_lat": { "type": "number" },
+        "check_in_lng": { "type": "number" },
+        "distance_m": { "type": "number" },
+        "status": { "type": "string", "enum": ["IN_PROGRESS", "COMPLETED", "CANCELLED"] },
+        "call_result": { "type": "string", "enum": ["EFFECTIVE", "OPEN"] },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["salesman_id", "outlet_id", "date", "check_in_time", "status"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Sales transaction order created for assigned outlet",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "invoice_number": { "type": "string", "maxLength": 50 },
+        "salesman_id": { "type": "string", "maxLength": 128 },
+        "outlet_id": { "type": "string", "maxLength": 128 },
+        "visit_id": { "type": "string", "maxLength": 128 },
+        "transaction_date": { "type": "string", "format": "date-time" },
+        "subtotal": { "type": "number" },
+        "total": { "type": "number" },
+        "payment_method": { "type": "string", "enum": ["CASH", "CREDIT", "TRANSFER"] },
+        "status": { "type": "string", "enum": ["PENDING", "PAID", "DELIVERED", "CANCELLED"] },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["invoice_number", "salesman_id", "outlet_id", "total", "status"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable system audit trail",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "user_id": { "type": "string", "maxLength": 128 },
+        "action": { "type": "string", "maxLength": 50 },
+        "entity": { "type": "string", "maxLength": 50 },
+        "entity_id": { "type": "string", "maxLength": 128 },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["user_id", "action", "entity", "created_at"]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "Partitioned stock balance record by location type (WAREHOUSE/SALES), location id, and SKU",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "location_type": { "type": "string", "enum": ["WAREHOUSE", "SALES"] },
+        "location_id": { "type": "string", "maxLength": 128 },
+        "office_id": { "type": "string", "maxLength": 128 },
+        "sku_id": { "type": "string", "maxLength": 128 },
+        "stock_on_hand": { "type": "number" },
+        "allocated_stock": { "type": "number" },
+        "available_stock": { "type": "number" },
+        "reorder_level": { "type": "number" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["location_type", "location_id", "sku_id", "stock_on_hand", "available_stock"]
+    },
+    "StockMovement": {
+      "title": "StockMovement",
+      "description": "Atomic stock movement ledger transaction across warehouse, sales, outlets, and adjustments",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "movement_code": { "type": "string", "maxLength": 50 },
+        "movement_type": { "type": "string", "enum": ["PURCHASE_IN", "TRANSFER_OUT", "TRANSFER_IN", "SALES_OUT", "RETURN_IN", "ADJUSTMENT_IN", "ADJUSTMENT_OUT", "REVERSAL"] },
+        "source_location_type": { "type": "string", "enum": ["WAREHOUSE", "SALES", "SUPPLIER", "NONE"] },
+        "source_location_id": { "type": "string", "maxLength": 128 },
+        "destination_location_type": { "type": "string", "enum": ["WAREHOUSE", "SALES", "OUTLET", "NONE"] },
+        "destination_location_id": { "type": "string", "maxLength": 128 },
+        "sku_id": { "type": "string", "maxLength": 128 },
+        "quantity": { "type": "number" },
+        "salesman_id": { "type": "string", "maxLength": 128 },
+        "warehouse_id": { "type": "string", "maxLength": 128 },
+        "outlet_id": { "type": "string", "maxLength": 128 },
+        "reference_id": { "type": "string", "maxLength": 128 },
+        "business_date": { "type": "string", "maxLength": 10 },
+        "status": { "type": "string", "enum": ["COMPLETED", "CANCELLED"] },
+        "notes": { "type": "string", "maxLength": 500 },
+        "created_by": { "type": "string", "maxLength": 128 },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["movement_code", "movement_type", "sku_id", "quantity", "business_date", "status"]
+    },
+    "DailyStockHandover": {
+      "title": "DailyStockHandover",
+      "description": "Morning stock handover record transferring physical stock from warehouse to sales rep",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "handover_code": { "type": "string", "maxLength": 50 },
+        "business_date": { "type": "string", "maxLength": 10 },
+        "warehouse_id": { "type": "string", "maxLength": 128 },
+        "salesman_id": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["DRAFT", "PREPARED", "CONFIRMED", "CANCELLED"] },
+        "is_additional": { "type": "boolean" },
+        "notes": { "type": "string", "maxLength": 500 },
+        "prepared_by": { "type": "string", "maxLength": 128 },
+        "confirmed_by": { "type": "string", "maxLength": 128 },
+        "created_by": { "type": "string", "maxLength": 128 },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["handover_code", "business_date", "warehouse_id", "salesman_id", "status"]
+    },
+    "DailyStockReturn": {
+      "title": "DailyStockReturn",
+      "description": "Evening stock return record transferring unsold stock from sales rep back to warehouse",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "return_code": { "type": "string", "maxLength": 50 },
+        "business_date": { "type": "string", "maxLength": 10 },
+        "warehouse_id": { "type": "string", "maxLength": 128 },
+        "salesman_id": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["DRAFT", "CONFIRMED", "CANCELLED"] },
+        "notes": { "type": "string", "maxLength": 500 },
+        "confirmed_by": { "type": "string", "maxLength": 128 },
+        "created_by": { "type": "string", "maxLength": 128 },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["return_code", "business_date", "warehouse_id", "salesman_id", "status"]
+    },
+    "StockReceiving": {
+      "title": "StockReceiving",
+      "description": "Inbound stock receiving from suppliers/principals to warehouse",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "receive_code": { "type": "string", "maxLength": 50 },
+        "business_date": { "type": "string", "maxLength": 10 },
+        "warehouse_id": { "type": "string", "maxLength": 128 },
+        "supplier_name": { "type": "string", "maxLength": 150 },
+        "status": { "type": "string", "enum": ["DRAFT", "CONFIRMED", "CANCELLED"] },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["receive_code", "business_date", "warehouse_id", "status"]
+    },
+    "SalesStockLedger": {
+      "title": "SalesStockLedger",
+      "description": "Daily ledger per sales rep and SKU tracking opening balance, transfers, sales, returns, and discrepancies",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "salesman_id": { "type": "string", "maxLength": 128 },
+        "business_date": { "type": "string", "maxLength": 10 },
+        "sku_id": { "type": "string", "maxLength": 128 },
+        "opening_balance": { "type": "number" },
+        "transfers_in": { "type": "number" },
+        "sales_out": { "type": "number" },
+        "returns_out": { "type": "number" },
+        "closing_balance": { "type": "number" },
+        "expected_balance": { "type": "number" },
+        "discrepancy": { "type": "number" },
+        "status": { "type": "string", "enum": ["BALANCED", "SURPLUS", "DEFICIT"] },
+        "last_movement_id": { "type": "string", "maxLength": 128 },
+        "notes": { "type": "string", "maxLength": 500 },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["salesman_id", "business_date", "sku_id", "opening_balance", "transfers_in", "sales_out", "returns_out", "closing_balance", "status"]
+    },
+    "Target": {
+      "title": "Target",
+      "description": "Sales target by period, salesman, or SKU",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "period": { "type": "string", "maxLength": 7 },
+        "salesman_id": { "type": "string", "maxLength": 128 },
+        "sku_id": { "type": "string", "maxLength": 128 },
+        "target_volume": { "type": "number" },
+        "target_revenue": { "type": "number" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["period", "target_volume"]
+    },
+    "GpsEvent": {
+      "title": "GpsEvent",
+      "description": "Real-time field telemetry and tracking event",
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string", "maxLength": 128 },
+        "salesman_id": { "type": "string", "maxLength": 128 },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/companies/{companyId}": {
+      "schema": "Company",
+      "description": "Company profile details with name, address, contact, and logo path"
+    },
+    "/system_settings/{settingId}": {
+      "schema": "SystemSettings",
+      "description": "Global operational rules and distribution constraints"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles collection"
+    },
+    "/offices/{officeId}": {
+      "schema": "Office",
+      "description": "Office branches and headquarters"
+    },
+    "/provinces/{provinceId}": {
+      "schema": "Province",
+      "description": "Provinces master administrative list"
+    },
+    "/regencies/{regencyId}": {
+      "schema": "Regency",
+      "description": "Regencies and Cities master administrative list"
+    },
+    "/districts/{districtId}": {
+      "schema": "District",
+      "description": "Districts (Kecamatan) master administrative list"
+    },
+    "/villages/{villageId}": {
+      "schema": "Village",
+      "description": "Villages (Kelurahan/Desa) master administrative list"
+    },
+    "/areas/{areaId}": {
+      "schema": "Area",
+      "description": "Sales operational territories"
+    },
+    "/channels/{channelId}": {
+      "schema": "Channel",
+      "description": "Trade channels classification (GT, MT, HOREKA, WS)"
+    },
+    "/routes/{routeId}": {
+      "schema": "Route",
+      "description": "Sales distribution routes"
+    },
+    "/salesmen/{salesmanId}": {
+      "schema": "Salesman",
+      "description": "Field sales personnel records"
+    },
+    "/open_call_reasons/{reasonId}": {
+      "schema": "OpenCallReason",
+      "description": "Standard catalog of reasons for unvisited or non-productive calls"
+    },
+    "/outlets/{outletId}": {
+      "schema": "Outlet",
+      "description": "Retail outlet stores master list"
+    },
+    "/sales_outlets/{assignmentId}": {
+      "schema": "SalesOutlet",
+      "description": "Active and historical Sales-to-Outlet assignment relationship"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Products catalog"
+    },
+    "/skus/{skuId}": {
+      "schema": "SKU",
+      "description": "SKU item catalog"
+    },
+    "/prices/{priceId}": {
+      "schema": "Price",
+      "description": "SKU price definitions"
+    },
+    "/promos/{promoId}": {
+      "schema": "Promo",
+      "description": "Active promotional schemes"
+    },
+    "/call_plans/{callPlanId}": {
+      "schema": "CallPlan",
+      "description": "Scheduled sales visit plans"
+    },
+    "/call_plan_items/{itemId}": {
+      "schema": "CallPlanItem",
+      "description": "Specific outlet items within a call plan"
+    },
+    "/attendance/{attendanceId}": {
+      "schema": "Attendance",
+      "description": "Daily attendance and geofence verification records"
+    },
+    "/visits/{visitId}": {
+      "schema": "Visit",
+      "description": "Field sales visit tracking"
+    },
+    "/transactions/{txnId}": {
+      "schema": "Transaction",
+      "description": "Sales order transactions"
+    },
+    "/audit_logs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Immutable security and assignment audit logs"
+    },
+    "/inventory/{invId}": {
+      "schema": "InventoryItem",
+      "description": "Warehouse and Sales physical inventory balances"
+    },
+    "/stock_movements/{movId}": {
+      "schema": "StockMovement",
+      "description": "Immutable stock movement ledger"
+    },
+    "/stock_handovers/{handoverId}": {
+      "schema": "DailyStockHandover",
+      "description": "Morning stock handover requests and confirmations"
+    },
+    "/stock_returns/{returnId}": {
+      "schema": "DailyStockReturn",
+      "description": "Evening stock return requests and confirmations"
+    },
+    "/stock_receivings/{receivingId}": {
+      "schema": "StockReceiving",
+      "description": "Warehouse stock receiving records from suppliers"
+    },
+    "/sales_stock_ledgers/{ledgerId}": {
+      "schema": "SalesStockLedger",
+      "description": "Sales rep daily SKU stock ledgers"
+    },
+    "/targets/{targetId}": {
+      "schema": "Target",
+      "description": "Monthly and period sales targets"
+    },
+    "/gps_events/{eventId}": {
+      "schema": "GpsEvent",
+      "description": "Salesman live telemetry location trace events"
+    }
+  }
+}
