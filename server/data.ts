@@ -94,6 +94,7 @@ export interface MasterEntity {
 export type OutletLifecycleStatus = "PROSPECT" | "NOO" | "REPEAT" | "ACTIVE" | "DORMANT";
 
 export interface Outlet {
+  notes?: string;
   _id: string;
   outlet_code: string;
   outlet_name: string;
@@ -168,6 +169,7 @@ export interface CallPlanItem {
 }
 
 export interface Attendance {
+  notes?: string;
   _id: string;
   salesman_id: string;
   date: string;
@@ -236,6 +238,7 @@ export interface TransactionItem {
 }
 
 export interface Transaction {
+  notes?: string;
   _id: string;
   invoice_number: string;
   transaction_code?: string;
@@ -928,7 +931,7 @@ export function saveDatabaseToDisk(immediate = false) {
         audit_logs: db.audit_logs,
         settings: db.settings,
       };
-      fs.writeFileSync(DB_FILE_PATH, JSON.stringify(serialized, null, 2), "utf-8");
+      fs.promises.writeFile(DB_FILE_PATH, JSON.stringify(serialized, null, 2), "utf-8").catch(e => console.error("Async save error", e));
     } catch (err) {
       console.error("Failed to save database to disk:", err);
     }
@@ -945,7 +948,7 @@ export function saveDatabaseToDisk(immediate = false) {
       saveDiskTimeout = setTimeout(() => {
         saveDiskTimeout = null;
         writeNow();
-      }, 50);
+      }, 5000);
     }
   }
 }
