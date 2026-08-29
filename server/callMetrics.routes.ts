@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { getCallMetrics, getCallMetricsRange, getProductEcMetrics } from "./callMetrics.service.js";
+import visitCanonicalRouter from "./visitCanonical.routes.js";
+import { apiRouter } from "./routes.js";
 
 const router = Router();
 
@@ -51,5 +53,9 @@ router.get("/ec-product", async (req, res) => {
     return res.status(400).json({ message: error instanceof Error ? error.message : "Invalid request" });
   }
 });
+
+// The canonical visit route is mounted on /api/visits via the existing apiRouter.
+// It is imported here because server.ts already loads this router before apiRouter starts handling requests.
+apiRouter.use("/visits", visitCanonicalRouter);
 
 export default router;
