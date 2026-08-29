@@ -1,7 +1,8 @@
 import { sqlDb } from "../src/db/index.js";
-import { transactions, visits, outlets, skus } from "../src/db/schema.js";
+import { transactions, visits, outlets, skus, salesOutlets } from "../src/db/schema.js";
 import { transactionItems } from "./transaction-items.schema.js";
 import { InventoryRepository } from "./inventory.repository.js";
+import { eq } from "drizzle-orm";
 
 export type SaleItemInput = {
   sku_id: string;
@@ -47,14 +48,23 @@ export async function postSaleAtomic(input: {
   return await sqlDb.transaction(async (tx) => {
     // Idempotency: invoice number is the durable unique business key. A retry
     // returns the existing transaction instead of creating a second sale.
-    const existing = await tx.select().from(transactions).where((await import("drizzle-orm")).eq(transactions.invoiceNumber, input.invoice_number)).limit(1);
+    const existing = await tx.select().from(transactions).where(eq(transactions.invoiceNumber, input.invoice_number)).limit(1);
     if (existing[0]) return { transaction: existing[0], replayed: true };
 
-    const outlet = await tx.select().from(outlets).where((await import("drizzle-orm")).eq(outlets.id, input.outlet_id)).limit(1);
+    const outlet = await tx.select().from(outlets).where(eq(outlets.id, input.outlet_id)).limit(1);
     if (!outlet[0]) throw new Error("Outlet tidak ditemukan.");
+    if (outlet[0].status !== "ACTIVE") throw new Error("Outlet tidak aktif.");
+
+    // Sales can only transact against outlets explicitly assigned to them.
+    // This enforces the DMS area/outlet ownership rule at the database write path,
+    // rather than relying on frontend filtering.
+    const assignment = await tx.select().from(salesOutlets)
+      .where(eq(salesOutlets.salesmanId, input.salesman_id))
+      .then((rows) => rows.find((row) => row.outletId === input.outlet_id && row.status === "ACTIVE"));
+    if (!assignment) throw new Error("Outlet tidak termasuk assignment Salesman ini.");
 
     if (input.visit_id) {
-      const visit = await tx.select().from(visits).where((await import("drizzle-orm")).eq(visits.id, input.visit_id)).limit(1);
+      const visit = await tx.select().from(visits).where(eq(visits.id, input.visit_id)).limit(1);
       if (!visit[0]) throw new Error("Visit tidak ditemukan.");
       if (visit[0].salesmanId !== input.salesman_id || visit[0].outletId !== input.outlet_id) {
         throw new Error("Visit tidak sesuai dengan Salesman dan Outlet transaksi.");
@@ -66,7 +76,7 @@ export async function postSaleAtomic(input: {
     const normalized: any[] = [];
 
     for (const item of cleanItems) {
-      const sku = await tx.select().from(skus).where((await import("drizzle-orm")).eq(skus.id, item.sku_id)).limit(1);
+      const sku = await tx.select().from(skus).where(eq(skus.id, item.sku_id)).limit(1);
       if (!sku[0]) throw new Error(`SKU ${item.sku_id} tidak ditemukan.`);
       if (sku[0].status !== "ACTIVE") throw new Error(`SKU ${item.sku_id} tidak aktif.`);
 
@@ -93,8 +103,6 @@ export async function postSaleAtomic(input: {
     const taxAmount = 0;
     const totalAmount = subtotal + taxAmount;
 
-    // Lock/deduct every SKU inside this transaction. If any SKU lacks stock,
-    // PostgreSQL rolls back the complete invoice and all prior stock changes.
     for (const item of cleanItems) {
       await InventoryRepository.createOrUpdateInventory("SALES", input.salesman_id, item.sku_id, -item.quantity, tx);
       await InventoryRepository.insertMovement({
@@ -158,7 +166,7 @@ export async function postSaleAtomic(input: {
     // Effective Call is derived from the existence of a successful purchase
     // for the same visit. It is never accepted as a client-supplied boolean.
     if (input.visit_id) {
-      await tx.update(visits).set({ isEffectiveCall: true }).where((await import("drizzle-orm")).eq(visits.id, input.visit_id));
+      await tx.update(visits).set({ isEffectiveCall: true }).where(eq(visits.id, input.visit_id));
     }
 
     return { transaction: inserted[0], replayed: false };
