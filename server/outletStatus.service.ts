@@ -1,12 +1,13 @@
 import { sqlDb } from "../src/db/index.js";
 import { sql } from "drizzle-orm";
 
-export type OutletLifecycleStatus = "NOO" | "Repeat" | "Active" | "Dormant";
+export type OutletLifecycleStatus = "PROSPECT" | "NOO" | "Repeat" | "Active" | "Dormant";
 
 /**
  * Canonical outlet lifecycle derived from valid PostgreSQL transactions.
- * Transaction count is based on distinct transaction records, not invoices/items.
- * Dormant takes precedence once the outlet has had no valid purchase for 8 weeks.
+ * 0 purchases = PROSPECT (not NOO).
+ * 1st purchase = NOO, 2nd = Repeat, 3rd+ = Active.
+ * Dormant takes precedence when the last valid purchase is at least 56 days old.
  */
 export async function getOutletLifecycleStatus(outletId: string, asOfDate?: string) {
   const result = await sqlDb.execute(sql`
@@ -26,9 +27,8 @@ export async function getOutletLifecycleStatus(outletId: string, asOfDate?: stri
       last_purchase_date,
       CASE
         WHEN last_purchase_date IS NOT NULL
-          AND (${asOfDate ? sql`${asOfDate}::date` : sql`CURRENT_DATE`} - last_purchase_date) >= 56
-          THEN 'Dormant'
-        WHEN purchase_count = 0 THEN 'NOO'
+          AND (${asOfDate ? sql`${asOfDate}::date` : sql`CURRENT_DATE`} - last_purchase_date) >= 56 THEN 'Dormant'
+        WHEN purchase_count = 0 THEN 'PROSPECT'
         WHEN purchase_count = 1 THEN 'NOO'
         WHEN purchase_count = 2 THEN 'Repeat'
         ELSE 'Active'
@@ -39,7 +39,7 @@ export async function getOutletLifecycleStatus(outletId: string, asOfDate?: stri
   const row = result.rows[0] as any;
   return {
     outlet_id: outletId,
-    status: String(row?.status || "NOO") as OutletLifecycleStatus,
+    status: String(row?.status || "PROSPECT") as OutletLifecycleStatus,
     transaction_count: Number(row?.purchase_count || 0),
     last_purchase_date: row?.last_purchase_date ? String(row.last_purchase_date).slice(0, 10) : null,
   };
@@ -64,7 +64,8 @@ export async function getOutletLifecycleStatuses(outletIds: string[], asOfDate?:
       CASE
         WHEN last_purchase_date IS NOT NULL
           AND (${asOfDate ? sql`${asOfDate}::date` : sql`CURRENT_DATE`} - last_purchase_date) >= 56 THEN 'Dormant'
-        WHEN purchase_count <= 1 THEN 'NOO'
+        WHEN purchase_count = 0 THEN 'PROSPECT'
+        WHEN purchase_count = 1 THEN 'NOO'
         WHEN purchase_count = 2 THEN 'Repeat'
         ELSE 'Active'
       END AS status
@@ -76,7 +77,7 @@ export async function getOutletLifecycleStatuses(outletIds: string[], asOfDate?:
     const row = found.get(outletId) as any;
     return {
       outlet_id: outletId,
-      status: String(row?.status || "NOO") as OutletLifecycleStatus,
+      status: String(row?.status || "PROSPECT") as OutletLifecycleStatus,
       transaction_count: Number(row?.purchase_count || 0),
       last_purchase_date: row?.last_purchase_date ? String(row.last_purchase_date).slice(0, 10) : null,
     };
