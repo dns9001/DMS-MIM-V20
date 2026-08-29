@@ -14,19 +14,22 @@ export interface SessionRecord {
   expiresAt: number;
 }
 
-// In-memory active session store mapped by token string
+// Server-side session registry. Tokens are opaque random credentials and never
+// contain user IDs or other user-controlled identity data.
 export const activeSessions = new Map<string, SessionRecord>();
 
 const SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const REFRESH_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-export function generateTokens(user: User) {
-  const randomPart = crypto.randomBytes(32).toString("hex");
-  const token = `mhm_sess_${user._id}_${Date.now()}_${randomPart}`;
-  const refreshPart = crypto.randomBytes(32).toString("hex");
-  const refreshToken = `mhm_ref_${user._id}_${Date.now()}_${refreshPart}`;
+function createOpaqueToken(prefix: string): string {
+  return `${prefix}${crypto.randomBytes(32).toString("base64url")}`;
+}
 
+export function generateTokens(user: User) {
+  const token = createOpaqueToken("mhm_sess_");
+  const refreshToken = createOpaqueToken("mhm_ref_");
   const now = Date.now();
+
   activeSessions.set(token, {
     userId: user._id,
     email: user.email,
@@ -44,12 +47,14 @@ export function setAuthCookies(res: Response, token: string, refreshToken: strin
     secure: true,
     sameSite: "none",
     maxAge: SESSION_TTL_MS,
+    path: "/",
   });
   res.cookie("refresh_token", refreshToken, {
     httpOnly: true,
     secure: true,
     sameSite: "none",
     maxAge: REFRESH_TTL_MS,
+    path: "/",
   });
 }
 
@@ -58,11 +63,13 @@ export function clearAuthCookies(res: Response) {
     httpOnly: true,
     secure: true,
     sameSite: "none",
+    path: "/",
   });
   res.clearCookie("refresh_token", {
     httpOnly: true,
     secure: true,
     sameSite: "none",
+    path: "/",
   });
 }
 
@@ -71,52 +78,53 @@ export function authMiddleware(req: AuthenticatedRequest, res: Response, next: N
   let token = req.cookies?.access_token;
 
   if (!token && authHeader?.startsWith("Bearer ")) {
-    token = authHeader.slice(7);
+    token = authHeader.slice(7).trim();
   }
 
   if (!token) {
     return res.status(401).json({ detail: "Sesi tidak ditemukan. Silakan login kembali." });
   }
 
-  // 1. Check in active session registry
   const session = activeSessions.get(token);
-  if (session) {
-    if (Date.now() > session.expiresAt) {
+
+  // No token parsing fallback is allowed. A server restart invalidates active
+  // sessions unless a future persistent session store is explicitly configured.
+  if (!session) {
+    return res.status(401).json({ detail: "Sesi tidak valid atau telah kedaluwarsa." });
+  }
+
+  if (Date.now() >= session.expiresAt) {
+    activeSessions.delete(token);
+    return res.status(401).json({ detail: "Sesi telah kedaluwarsa. Silakan login kembali." });
+  }
+
+  const user = db.users.find((u) => u._id === session.userId && u.status === "ACTIVE");
+  if (!user) {
+    activeSessions.delete(token);
+    return res.status(401).json({ detail: "Pengguna tidak aktif atau tidak ditemukan." });
+  }
+
+  // Refresh role/email from the current database record so permission changes
+  // take effect immediately without waiting for token/session regeneration.
+  session.email = user.email;
+  session.role = user.role;
+  req.user = user;
+  return next();
+}
+
+export function revokeSession(token: string | undefined): void {
+  if (token) activeSessions.delete(token);
+}
+
+export function revokeAllUserSessions(userId: string): number {
+  let revoked = 0;
+  for (const [token, session] of activeSessions.entries()) {
+    if (session.userId === userId) {
       activeSessions.delete(token);
-      return res.status(401).json({ detail: "Sesi telah kedaluwarsa. Silakan login kembali." });
-    }
-
-    const user = db.users.find((u) => u._id === session.userId && u.status === "ACTIVE");
-    if (!user) {
-      return res.status(401).json({ detail: "Pengguna tidak aktif atau tidak ditemukan." });
-    }
-
-    req.user = user;
-    return next();
-  }
-
-  // 2. Structured fallback for token parsing if server restarted
-  if (typeof token === "string" && token.startsWith("mhm_sess_")) {
-    const parts = token.split("_");
-    if (parts.length >= 4) {
-      const userId = parts[2];
-      const user = db.users.find((u) => u._id === userId && u.status === "ACTIVE");
-      if (user) {
-        // Re-establish session record
-        activeSessions.set(token, {
-          userId: user._id,
-          email: user.email,
-          role: user.role,
-          createdAt: Date.now(),
-          expiresAt: Date.now() + SESSION_TTL_MS,
-        });
-        req.user = user;
-        return next();
-      }
+      revoked++;
     }
   }
-
-  return res.status(401).json({ detail: "Sesi tidak valid atau telah kedaluwarsa." });
+  return revoked;
 }
 
 export function requireRoles(...roles: string[]) {
@@ -130,4 +138,3 @@ export function requireRoles(...roles: string[]) {
     next();
   };
 }
-
