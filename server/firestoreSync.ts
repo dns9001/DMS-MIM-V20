@@ -1,6 +1,6 @@
 import { db, saveDatabaseToDisk } from "./data.js";
 import { getFirestoreDB } from "./firebase.js";
-import { doc, setDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
+import { doc, setDoc, deleteDoc } from "firebase/firestore";
 import { syncDocToPostgres, deleteDocFromPostgres } from "./cloudsqlSync.js";
 
 let isRestoring = false;
@@ -9,40 +9,23 @@ let lastSyncStatus: "SUCCESS" | "SYNCING" | "ERROR" | "IDLE" = "SUCCESS";
 let lastSyncError: string | null = null;
 
 export const ALL_SYNC_COLLECTIONS: Array<{ key: keyof typeof db; colName: string }> = [
-  { key: "users", colName: "users" },
-  { key: "offices", colName: "offices" },
-  { key: "provinces", colName: "provinces" },
-  { key: "regencies", colName: "regencies" },
-  { key: "districts", colName: "districts" },
-  { key: "villages", colName: "villages" },
-  { key: "areas", colName: "areas" },
-  { key: "channels", colName: "channels" },
-  { key: "routes", colName: "routes" },
-  { key: "products", colName: "products" },
-  { key: "skus", colName: "skus" },
-  { key: "prices", colName: "prices" },
-  { key: "promos", colName: "promos" },
-  { key: "salesmen", colName: "salesmen" },
-  { key: "open_call_reasons", colName: "open_call_reasons" },
-  { key: "outlets", colName: "outlets" },
-  { key: "sales_outlets", colName: "sales_outlets" },
-  { key: "call_plans", colName: "call_plans" },
-  { key: "call_plan_items", colName: "call_plan_items" },
-  { key: "attendance", colName: "attendance" },
-  { key: "visits", colName: "visits" },
-  { key: "transactions", colName: "transactions" },
-  { key: "inventory", colName: "inventory" },
-  { key: "stock_movements", colName: "stock_movements" },
-  { key: "stock_handovers", colName: "stock_handovers" },
-  { key: "stock_returns", colName: "stock_returns" },
-  { key: "stock_receivings", colName: "stock_receivings" },
-  { key: "sales_stock_ledgers", colName: "sales_stock_ledgers" },
-  { key: "targets", colName: "targets" },
-  { key: "cash_deposits", colName: "cash_deposits" },
-  { key: "receivables", colName: "receivables" },
-  { key: "daily_reconciliations", colName: "daily_reconciliations" },
-  { key: "audit_logs", colName: "audit_logs" },
-  { key: "gps_events", colName: "gps_events" },
+  { key: "users", colName: "users" }, { key: "offices", colName: "offices" },
+  { key: "provinces", colName: "provinces" }, { key: "regencies", colName: "regencies" },
+  { key: "districts", colName: "districts" }, { key: "villages", colName: "villages" },
+  { key: "areas", colName: "areas" }, { key: "channels", colName: "channels" },
+  { key: "routes", colName: "routes" }, { key: "products", colName: "products" },
+  { key: "skus", colName: "skus" }, { key: "prices", colName: "prices" },
+  { key: "promos", colName: "promos" }, { key: "salesmen", colName: "salesmen" },
+  { key: "open_call_reasons", colName: "open_call_reasons" }, { key: "outlets", colName: "outlets" },
+  { key: "sales_outlets", colName: "sales_outlets" }, { key: "call_plans", colName: "call_plans" },
+  { key: "call_plan_items", colName: "call_plan_items" }, { key: "attendance", colName: "attendance" },
+  { key: "visits", colName: "visits" }, { key: "transactions", colName: "transactions" },
+  { key: "inventory", colName: "inventory" }, { key: "stock_movements", colName: "stock_movements" },
+  { key: "stock_handovers", colName: "stock_handovers" }, { key: "stock_returns", colName: "stock_returns" },
+  { key: "stock_receivings", colName: "stock_receivings" }, { key: "sales_stock_ledgers", colName: "sales_stock_ledgers" },
+  { key: "targets", colName: "targets" }, { key: "cash_deposits", colName: "cash_deposits" },
+  { key: "receivables", colName: "receivables" }, { key: "daily_reconciliations", colName: "daily_reconciliations" },
+  { key: "audit_logs", colName: "audit_logs" }, { key: "gps_events", colName: "gps_events" },
 ];
 
 export function getSyncStats() {
@@ -51,7 +34,6 @@ export function getSyncStats() {
     const arr = (db as any)[key];
     collectionCounts[colName] = Array.isArray(arr) ? arr.length : 0;
   }
-
   return {
     databaseEngine: "Google Cloud SQL (PostgreSQL)",
     isCloudConnected: !!process.env.SQL_HOST && !!process.env.SQL_USER,
@@ -67,45 +49,31 @@ export function getSyncStats() {
   };
 }
 
-/**
- * Legacy Firestore loader retained for compatibility. PostgreSQL is the
- * authoritative startup source and is loaded by cloudsqlSync.ts.
- */
+// PostgreSQL is the startup source. Firestore is no longer loaded into the operational cache.
 export async function loadAllFromFirestore(_inMemoryDb: any): Promise<boolean> {
   return false;
 }
 
-/**
- * Persist a document to PostgreSQL BEFORE acknowledging the mutation.
- * Firestore is retained only as an optional secondary copy.
- */
+/** PostgreSQL persistence is completed before the caller receives success. */
 export async function syncSingleDoc(colName: string, docId: string, data: any): Promise<boolean> {
   if (isRestoring || !docId) return false;
-
   lastSyncStatus = "SYNCING";
   lastSyncError = null;
-
   try {
-    const persisted = await syncDocToPostgres(colName, String(docId), data);
-    if (!persisted) {
+    if (!(await syncDocToPostgres(colName, String(docId), data))) {
       lastSyncStatus = "ERROR";
       lastSyncError = "PostgreSQL persistence failed";
       return false;
     }
 
-    // Secondary Firestore copy; failure here must not hide a successful
-    // PostgreSQL commit.
+    // Optional secondary replica only; PostgreSQL remains authoritative.
     try {
       const fdb = getFirestoreDB();
-      if (fdb) {
-        const sanitized = JSON.parse(JSON.stringify(data));
-        await setDoc(doc(fdb, colName, String(docId)), sanitized, { merge: true });
-      }
+      if (fdb) await setDoc(doc(fdb, colName, String(docId)), JSON.parse(JSON.stringify(data)), { merge: true });
     } catch (err: any) {
       if (process.env.DEBUG_SYNC) console.warn(`[Firestore secondary sync ${colName}/${docId}]:`, err?.message);
     }
 
-    // Local JSON is backup/debug only, never the source of truth.
     saveDatabaseToDisk();
     lastSyncTimestamp = new Date().toISOString();
     lastSyncStatus = "SUCCESS";
@@ -119,25 +87,19 @@ export async function syncSingleDoc(colName: string, docId: string, data: any): 
 
 export async function deleteSingleDoc(colName: string, docId: string): Promise<boolean> {
   if (isRestoring || !docId) return false;
-
   lastSyncStatus = "SYNCING";
-  lastSyncError = null;
-
   try {
-    const deleted = await deleteDocFromPostgres(colName, String(docId));
-    if (!deleted) {
+    if (!(await deleteDocFromPostgres(colName, String(docId)))) {
       lastSyncStatus = "ERROR";
       lastSyncError = "PostgreSQL deletion failed";
       return false;
     }
-
     try {
       const fdb = getFirestoreDB();
       if (fdb) await deleteDoc(doc(fdb, colName, String(docId)));
     } catch (err: any) {
       if (process.env.DEBUG_SYNC) console.warn(`[Firestore secondary delete ${colName}/${docId}]:`, err?.message);
     }
-
     saveDatabaseToDisk();
     lastSyncTimestamp = new Date().toISOString();
     lastSyncStatus = "SUCCESS";
@@ -149,11 +111,22 @@ export async function deleteSingleDoc(colName: string, docId: string): Promise<b
   }
 }
 
-/**
- * One-time migration utility. It copies the current in-memory snapshot into
- * PostgreSQL inside one transaction; normal mutations must use syncSingleDoc.
- */
-export async function migrateAllToCloudSql(): Promise<{ success: boolean; totalRecords: number; collectionCounts: Record<string, number>; message: string }> {
-  const { migrateSnapshotToPostgres } = await import("./cloudsqlSync.js");
-  return migrateSnapshotToPostgres();
+/** One-time snapshot migration helper. Normal writes must use syncSingleDoc. */
+export async function migrateAllToCloudSql() {
+  const hasSql = !!process.env.SQL_HOST && !!process.env.SQL_USER;
+  if (!hasSql) return { success: false, totalRecords: 0, collectionCounts: {}, message: "Kredensial PostgreSQL belum dikonfigurasi." };
+  let totalRecords = 0;
+  const collectionCounts: Record<string, number> = {};
+  for (const { key, colName } of ALL_SYNC_COLLECTIONS) {
+    const records = (db as any)[key];
+    if (!Array.isArray(records)) continue;
+    collectionCounts[colName] = records.length;
+    for (const item of records) {
+      const id = String(item?._id || item?.id || "");
+      if (id && await syncDocToPostgres(colName, id, item)) totalRecords++;
+    }
+  }
+  if (db.settings) await syncDocToPostgres("system_settings", "global", db.settings);
+  if (db.company_profile) await syncDocToPostgres("company_profile", "main", db.company_profile);
+  return { success: true, totalRecords, collectionCounts, message: `Snapshot berhasil dipersist ke PostgreSQL: ${totalRecords} record.` };
 }
