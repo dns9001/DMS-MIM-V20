@@ -15,11 +15,13 @@ function id(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
 }
 
+const SALEABLE_OUTLET_STATUSES = new Set(["PROSPECT", "NOO", "REPEAT", "ACTIVE", "DORMANT"]);
+
 /**
  * Posts a sale as one PostgreSQL transaction. The legacy JSONB `items` field is
  * retained for compatibility, while normalized transaction_items are written
- * in the same DB transaction. Stock, movement, invoice and EC are committed
- * together or rolled back together.
+ * in the same DB transaction. Stock, movement, invoice and transaction items
+ * are committed together or rolled back together.
  */
 export async function postSaleAtomic(input: {
   invoice_number: string;
@@ -46,29 +48,28 @@ export async function postSaleAtomic(input: {
   });
 
   return await sqlDb.transaction(async (tx) => {
-    // Idempotency: invoice number is the durable unique business key. A retry
-    // returns the existing transaction instead of creating a second sale.
     const existing = await tx.select().from(transactions).where(eq(transactions.invoiceNumber, input.invoice_number)).limit(1);
     if (existing[0]) return { transaction: existing[0], replayed: true };
 
     const outlet = await tx.select().from(outlets).where(eq(outlets.id, input.outlet_id)).limit(1);
     if (!outlet[0]) throw new Error("Outlet tidak ditemukan.");
-    if (outlet[0].status !== "ACTIVE") throw new Error("Outlet tidak aktif.");
+    if (!SALEABLE_OUTLET_STATUSES.has(String(outlet[0].status || "").toUpperCase())) {
+      throw new Error("Outlet tidak dapat menerima transaksi pada status saat ini.");
+    }
 
-    // Sales can only transact against outlets explicitly assigned to them.
-    // This enforces the DMS area/outlet ownership rule at the database write path,
-    // rather than relying on frontend filtering.
-    const assignment = await tx.select().from(salesOutlets)
-      .where(eq(salesOutlets.salesmanId, input.salesman_id))
-      .then((rows) => rows.find((row) => row.outletId === input.outlet_id && row.status === "ACTIVE"));
+    const assignments = await tx.select().from(salesOutlets).where(eq(salesOutlets.salesmanId, input.salesman_id));
+    const assignment = assignments.find((row) => row.outletId === input.outlet_id && row.status === "ACTIVE");
     if (!assignment) throw new Error("Outlet tidak termasuk assignment Salesman ini.");
 
+    let validVisit: typeof visits.$inferSelect | undefined;
     if (input.visit_id) {
       const visit = await tx.select().from(visits).where(eq(visits.id, input.visit_id)).limit(1);
       if (!visit[0]) throw new Error("Visit tidak ditemukan.");
       if (visit[0].salesmanId !== input.salesman_id || visit[0].outletId !== input.outlet_id) {
         throw new Error("Visit tidak sesuai dengan Salesman dan Outlet transaksi.");
       }
+      if (visit[0].status === "CANCELLED") throw new Error("Visit dibatalkan dan tidak dapat menjadi Effective Call.");
+      validVisit = visit[0];
     }
 
     let subtotal = 0;
@@ -163,10 +164,11 @@ export async function postSaleAtomic(input: {
       await tx.insert(transactionItems).values(item);
     }
 
-    // Effective Call is derived from the existence of a successful purchase
-    // for the same visit. It is never accepted as a client-supplied boolean.
-    if (input.visit_id) {
-      await tx.update(visits).set({ isEffectiveCall: true }).where(eq(visits.id, input.visit_id));
+    if (validVisit) {
+      const visitDate = new Date(validVisit.checkInTime);
+      if (visitDate.toDateString() === now.toDateString()) {
+        await tx.update(visits).set({ isEffectiveCall: true }).where(eq(visits.id, validVisit.id));
+      }
     }
 
     return { transaction: inserted[0], replayed: false };
