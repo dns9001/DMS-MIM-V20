@@ -1,45 +1,75 @@
 import { sqlDb } from "../src/db/index.js";
 import { sql } from "drizzle-orm";
 
-/**
- * Canonical DMS call metrics. Metrics are derived from PostgreSQL facts,
- * never from client-supplied effective-call flags.
- */
+/** Canonical DMS call metrics, derived from PostgreSQL facts. */
 export async function getCallMetrics(date: string, salesmanId?: string) {
-  const salesmanFilter = salesmanId ? sql`AND v.salesman_id = ${salesmanId}` : sql``;
+  const rows = await getCallMetricsRange(date, date, salesmanId);
+  return rows[0] ?? { date, outlet_call: 0, effective_call: 0, ec_product_rows: 0 };
+}
+
+/** One database query for an inclusive date range, returning one row per day. */
+export async function getCallMetricsRange(from: string, to: string, salesmanId?: string) {
+  const salesmanVisitFilter = salesmanId ? sql`AND v.salesman_id = ${salesmanId}` : sql``;
+  const salesmanTxnFilter = salesmanId ? sql`AND t.salesman_id = ${salesmanId}` : sql``;
 
   const result = await sqlDb.execute(sql`
-    WITH visits_day AS (
-      SELECT DISTINCT v.salesman_id, v.outlet_id
+    WITH RECURSIVE days AS (
+      SELECT ${from}::date AS date
+      UNION ALL
+      SELECT (date + INTERVAL '1 day')::date FROM days WHERE date < ${to}::date
+    ),
+    visits_day AS (
+      SELECT DATE(v.check_in_time) AS date, v.salesman_id, v.outlet_id
       FROM visits v
       WHERE v.status <> 'CANCELLED'
-        AND DATE(v.check_in_time) = ${date}
-        ${salesmanFilter}
+        AND DATE(v.check_in_time) BETWEEN ${from}::date AND ${to}::date
+        ${salesmanVisitFilter}
+      GROUP BY DATE(v.check_in_time), v.salesman_id, v.outlet_id
     ),
     purchases_day AS (
-      SELECT DISTINCT t.salesman_id, t.outlet_id
+      SELECT DATE(t.created_at) AS date, t.salesman_id, t.outlet_id
       FROM transactions t
-      WHERE DATE(t.created_at) = ${date}
+      WHERE DATE(t.created_at) BETWEEN ${from}::date AND ${to}::date
         AND COALESCE(t.payment_status, 'UNPAID') <> 'CANCELLED'
-        ${salesmanId ? sql`AND t.salesman_id = ${salesmanId}` : sql``}
+        ${salesmanTxnFilter}
+      GROUP BY DATE(t.created_at), t.salesman_id, t.outlet_id
     ),
     product_purchases AS (
-      SELECT DISTINCT t.salesman_id, t.outlet_id, item->>'sku_id' AS sku_id
+      SELECT DISTINCT DATE(t.created_at) AS date, t.salesman_id, t.outlet_id, item->>'sku_id' AS sku_id
       FROM transactions t
-      CROSS JOIN LATERAL jsonb_array_elements(t.items) item
-      WHERE DATE(t.created_at) = ${date}
+      CROSS JOIN LATERAL jsonb_array_elements(COALESCE(t.items, '[]'::jsonb)) item
+      WHERE DATE(t.created_at) BETWEEN ${from}::date AND ${to}::date
         AND COALESCE(t.payment_status, 'UNPAID') <> 'CANCELLED'
         AND NULLIF(item->>'sku_id', '') IS NOT NULL
-        ${salesmanId ? sql`AND t.salesman_id = ${salesmanId}` : sql``}
+        ${salesmanTxnFilter}
+    ),
+    daily AS (
+      SELECT
+        d.date,
+        COUNT(DISTINCT (v.salesman_id, v.outlet_id))::int AS outlet_call,
+        COUNT(DISTINCT (v.salesman_id, v.outlet_id)) FILTER (
+          WHERE p.outlet_id IS NOT NULL
+        )::int AS effective_call,
+        (SELECT COUNT(*) FROM product_purchases pp WHERE pp.date = d.date)::int AS ec_product_rows
+      FROM days d
+      LEFT JOIN visits_day v ON v.date = d.date
+      LEFT JOIN purchases_day p
+        ON p.date = v.date
+       AND p.salesman_id = v.salesman_id
+       AND p.outlet_id = v.outlet_id
+      GROUP BY d.date
     )
-    SELECT
-      (SELECT COUNT(*) FROM visits_day)::int AS outlet_call,
-      (SELECT COUNT(*) FROM visits_day v JOIN purchases_day p
-         ON p.salesman_id = v.salesman_id AND p.outlet_id = v.outlet_id)::int AS effective_call,
-      (SELECT COUNT(*) FROM product_purchases)::int AS ec_product_rows
+    SELECT date, outlet_call, effective_call, ec_product_rows
+    FROM daily
+    ORDER BY date
   `);
 
-  return result.rows[0] ?? { outlet_call: 0, effective_call: 0, ec_product_rows: 0 };
+  return result.rows.map((row: any) => ({
+    date: String(row.date).slice(0, 10),
+    outlet_call: Number(row.outlet_call || 0),
+    effective_call: Number(row.effective_call || 0),
+    ec_product_rows: Number(row.ec_product_rows || 0),
+  }));
 }
 
 export async function getProductEcMetrics(date: string, salesmanId?: string) {
@@ -51,8 +81,8 @@ export async function getProductEcMetrics(date: string, salesmanId?: string) {
       SUM(COALESCE((item->>'quantity')::numeric, 0))::numeric AS volume,
       COUNT(*)::int AS transaction_item_count
     FROM transactions t
-    CROSS JOIN LATERAL jsonb_array_elements(t.items) item
-    WHERE DATE(t.created_at) = ${date}
+    CROSS JOIN LATERAL jsonb_array_elements(COALESCE(t.items, '[]'::jsonb)) item
+    WHERE DATE(t.created_at) = ${date}::date
       AND COALESCE(t.payment_status, 'UNPAID') <> 'CANCELLED'
       AND NULLIF(item->>'sku_id', '') IS NOT NULL
       ${salesmanId ? sql`AND t.salesman_id = ${salesmanId}` : sql``}
