@@ -5,31 +5,18 @@ export const API =
     ? `${process.env.REACT_APP_BACKEND_URL}/api`
     : "/api";
 
+// Authentication is carried by HttpOnly cookies. JavaScript never reads or stores credentials.
 const api = axios.create({ baseURL: API, withCredentials: true });
 
-// Attach JWT bearer token automatically
-api.interceptors.request.use((config) => {
+// Clear any legacy browser token left by older releases. The new auth flow never reads it.
+if (typeof window !== "undefined") {
   try {
-    const token = typeof window !== "undefined" ? localStorage.getItem("mhm_token") : null;
-    if (token && !config.headers.Authorization) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    localStorage.removeItem("mhm_token");
+    localStorage.removeItem("mhm_refresh_token");
   } catch (err) {
-    console.warn("Gagal menyematkan token:", err);
+    console.warn("Gagal membersihkan credential legacy:", err);
   }
-  return config;
-});
-
-// Clear stale token on auth failure to avoid stuck sessions
-api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err?.response?.status === 401 && typeof window !== "undefined") {
-      localStorage.removeItem("mhm_token");
-    }
-    return Promise.reject(err);
-  }
-);
+}
 
 export function errDetail(e) {
   return e?.response?.data?.detail;
