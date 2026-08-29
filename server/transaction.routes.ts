@@ -39,8 +39,8 @@ router.post("/post-atomic", authMiddleware, requireRoles("SALES", "SUPERVISOR", 
 
 /**
  * Product Effective Call: one EC per distinct outlet/product/day.
- * A second invoice for the same outlet and product on the same day does not
- * increase EC. This is derived from posted transaction_items, never from UI flags.
+ * A second invoice for the same outlet and SKU on the same day does not
+ * increase EC. The metric is derived from posted transaction_items.
  */
 router.get("/ec-product", authMiddleware, requireRoles("SALES", "SUPERVISOR", "ADMIN", "OWNER"), async (req: AuthenticatedRequest, res) => {
   try {
@@ -48,6 +48,8 @@ router.get("/ec-product", authMiddleware, requireRoles("SALES", "SUPERVISOR", "A
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return res.status(400).json({ detail: "Format date harus YYYY-MM-DD." });
 
     const salesmanId = req.user!.role === "SALES" ? req.user!._id : String(req.query.salesman_id || "");
+    const salesmanFilter = salesmanId ? sql`AND t.salesman_id = ${salesmanId}` : sql``;
+
     const rows = await sqlDb.execute(sql`
       SELECT
         ti.sku_id,
@@ -60,14 +62,14 @@ router.get("/ec-product", authMiddleware, requireRoles("SALES", "SUPERVISOR", "A
       LEFT JOIN skus s ON s.id = ti.sku_id
       WHERE t.created_at >= ${date}::date
         AND t.created_at < (${date}::date + INTERVAL '1 day')
-        AND t.salesman_id = ${salesmanId}
+        ${salesmanFilter}
       GROUP BY ti.sku_id, COALESCE(ti.product_id, s.product_id)
       ORDER BY effective_call DESC, volume DESC, ti.sku_id
     `);
 
     return res.json({
       date,
-      salesman_id: salesmanId,
+      salesman_id: salesmanId || null,
       definition: "EC Product = jumlah outlet unik yang membeli SKU tersebut pada hari yang sama.",
       items: rows.rows,
       total: rows.rows.length,
