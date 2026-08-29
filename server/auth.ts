@@ -14,9 +14,10 @@ export interface SessionRecord {
   expiresAt: number;
 }
 
-// Server-side session registry. Tokens are opaque random credentials and never
-// contain user IDs or other user-controlled identity data.
+// Server-side session registry. Access and refresh tokens are opaque random
+// credentials and never contain user IDs or other user-controlled identity data.
 export const activeSessions = new Map<string, SessionRecord>();
+export const activeRefreshSessions = new Map<string, SessionRecord>();
 
 const SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const REFRESH_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -30,15 +31,41 @@ export function generateTokens(user: User) {
   const refreshToken = createOpaqueToken("mhm_ref_");
   const now = Date.now();
 
-  activeSessions.set(token, {
+  const session: SessionRecord = {
     userId: user._id,
     email: user.email,
     role: user.role,
     createdAt: now,
     expiresAt: now + SESSION_TTL_MS,
+  };
+
+  activeSessions.set(token, session);
+  activeRefreshSessions.set(refreshToken, {
+    ...session,
+    expiresAt: now + REFRESH_TTL_MS,
   });
 
   return { token, refreshToken };
+}
+
+export function rotateRefreshToken(refreshToken: string | undefined) {
+  if (!refreshToken) return null;
+
+  const existing = activeRefreshSessions.get(refreshToken);
+  if (!existing || Date.now() >= existing.expiresAt) {
+    if (existing) activeRefreshSessions.delete(refreshToken);
+    return null;
+  }
+
+  const user = db.users.find((u) => u._id === existing.userId && u.status === "ACTIVE");
+  if (!user) {
+    activeRefreshSessions.delete(refreshToken);
+    return null;
+  }
+
+  // One-time refresh token rotation prevents replay of an already-used token.
+  activeRefreshSessions.delete(refreshToken);
+  return generateTokens(user);
 }
 
 export function setAuthCookies(res: Response, token: string, refreshToken: string) {
@@ -104,8 +131,6 @@ export function authMiddleware(req: AuthenticatedRequest, res: Response, next: N
     return res.status(401).json({ detail: "Pengguna tidak aktif atau tidak ditemukan." });
   }
 
-  // Refresh role/email from the current database record so permission changes
-  // take effect immediately without waiting for token/session regeneration.
   session.email = user.email;
   session.role = user.role;
   req.user = user;
@@ -116,6 +141,10 @@ export function revokeSession(token: string | undefined): void {
   if (token) activeSessions.delete(token);
 }
 
+export function revokeRefreshSession(token: string | undefined): void {
+  if (token) activeRefreshSessions.delete(token);
+}
+
 export function revokeAllUserSessions(userId: string): number {
   let revoked = 0;
   for (const [token, session] of activeSessions.entries()) {
@@ -123,6 +152,9 @@ export function revokeAllUserSessions(userId: string): number {
       activeSessions.delete(token);
       revoked++;
     }
+  }
+  for (const [token, session] of activeRefreshSessions.entries()) {
+    if (session.userId === userId) activeRefreshSessions.delete(token);
   }
   return revoked;
 }
