@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getCallMetrics, getProductEcMetrics } from "./callMetrics.service.js";
+import { getCallMetrics, getCallMetricsRange, getProductEcMetrics } from "./callMetrics.service.js";
 
 const router = Router();
 
@@ -14,6 +14,24 @@ function dateOnly(value: unknown): string {
 /** Canonical DMS metrics. Mount this router under /api/metrics. */
 router.get("/calls", async (req, res) => {
   try {
+    if (req.query.from || req.query.to) {
+      const from = dateOnly(req.query.from);
+      const to = dateOnly(req.query.to);
+      if (from > to) return res.status(400).json({ message: "from must be less than or equal to to" });
+      const salesmanId = req.query.salesman_id ? String(req.query.salesman_id) : undefined;
+      const daily = await getCallMetricsRange(from, to, salesmanId);
+      const outletCall = daily.reduce((sum, x) => sum + x.outlet_call, 0);
+      const effectiveCall = daily.reduce((sum, x) => sum + x.effective_call, 0);
+      return res.json({
+        from,
+        to,
+        outlet_call: outletCall,
+        effective_call: effectiveCall,
+        ec_rate: outletCall ? Number(((effectiveCall / outletCall) * 100).toFixed(2)) : 0,
+        daily,
+      });
+    }
+
     const date = dateOnly(req.query.date);
     const salesmanId = req.query.salesman_id ? String(req.query.salesman_id) : undefined;
     const metrics = await getCallMetrics(date, salesmanId);
