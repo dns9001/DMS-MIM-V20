@@ -8,14 +8,22 @@ import { transactions, skus } from "../src/db/schema.js";
 
 const router = Router();
 
+function durableInvoiceNumber(idempotencyKey?: string) {
+  const suffix = String(idempotencyKey || `${Date.now()}-${Math.random()}`).replace(/[^a-zA-Z0-9]/g, "").slice(-20).toUpperCase();
+  return `DMS-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${suffix}`;
+}
+
 router.post("/post-atomic", authMiddleware, requireRoles("SALES", "SUPERVISOR", "ADMIN", "OWNER"), async (req: AuthenticatedRequest, res) => {
   try {
     const body = req.body || {};
     const salesmanId = req.user!.role === "SALES" ? req.user!._id : String(body.salesman_id || "");
     if (!salesmanId) return res.status(400).json({ detail: "Salesman wajib ditentukan." });
 
+    const idempotencyKey = String(body.idempotency_key || "").trim() || undefined;
+    const invoiceNumber = String(body.invoice_number || "").trim() || durableInvoiceNumber(idempotencyKey);
+
     const result = await postSaleAtomic({
-      invoice_number: String(body.invoice_number || "").trim(),
+      invoice_number: invoiceNumber,
       salesman_id: salesmanId,
       outlet_id: String(body.outlet_id || ""),
       visit_id: body.visit_id ? String(body.visit_id) : undefined,
@@ -23,7 +31,7 @@ router.post("/post-atomic", authMiddleware, requireRoles("SALES", "SUPERVISOR", 
       transaction_type: body.transaction_type,
       items: Array.isArray(body.items) ? body.items : [],
       notes: body.notes,
-      idempotency_key: body.idempotency_key,
+      idempotency_key: idempotencyKey,
     });
 
     return res.status(result.replayed ? 200 : 201).json({
