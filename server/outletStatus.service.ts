@@ -22,9 +22,7 @@ export async function getOutletLifecycleStatus(outletId: string, asOfDate?: stri
       SELECT COUNT(*)::int AS purchase_count, MAX(purchase_date) AS last_purchase_date
       FROM purchases
     )
-    SELECT
-      purchase_count,
-      last_purchase_date,
+    SELECT purchase_count, last_purchase_date,
       CASE
         WHEN last_purchase_date IS NOT NULL
           AND (${asOfDate ? sql`${asOfDate}::date` : sql`CURRENT_DATE`} - last_purchase_date) >= 56 THEN 'Dormant'
