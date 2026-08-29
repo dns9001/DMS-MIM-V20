@@ -15,6 +15,7 @@ import { initializeCloudSqlTables, loadAllFromPostgres } from "./server/cloudsql
 import { applyDatabaseIntegrity } from "./server/databaseIntegrity.js";
 import { ensurePhase4Integrity } from "./server/phase4Integrity.js";
 import { ensureTransactionItemsTable } from "./server/transaction-items.migration.js";
+import { upsertTargetToPostgres, deleteTargetFromPostgres } from "./server/targetPersistence.js";
 
 async function startServer() {
   const production = process.env.NODE_ENV === "production";
@@ -58,6 +59,28 @@ async function startServer() {
   app.use("/api/auth", authRouter);
   app.use("/api/transactions", transactionRouter);
   app.use("/api/metrics", callMetricsRouter);
+
+  // Reconcile successful target mutations with canonical PostgreSQL target_volume.
+  app.use("/api/targets", (req, res, next) => {
+    if (!["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) return next();
+    res.on("finish", () => {
+      if (res.statusCode < 200 || res.statusCode >= 400) return;
+      void (async () => {
+        try {
+          if (req.method === "DELETE" && req.path.startsWith("/") && req.path.split("/").filter(Boolean).length === 1) {
+            const targetId = req.path.split("/").filter(Boolean)[0];
+            await deleteTargetFromPostgres(targetId);
+            return;
+          }
+          for (const target of inMemoryDb.targets) await upsertTargetToPostgres(target);
+        } catch (error: any) {
+          console.error("[Target PostgreSQL Sync]", error?.message || error);
+        }
+      })();
+    });
+    next();
+  });
+
   app.use("/api", apiRouter);
 
   if (production) {
