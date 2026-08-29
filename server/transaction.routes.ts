@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { authMiddleware, requireRoles, AuthenticatedRequest } from "./auth.js";
 import { postSaleAtomic } from "./transaction.service.js";
+import { sqlDb } from "../src/db/index.js";
+import { sql } from "drizzle-orm";
+import { transactionItems } from "./transaction-items.schema.js";
+import { transactions, skus } from "../src/db/schema.js";
 
 const router = Router();
 
-// Atomic posting endpoint. Existing legacy transaction routes remain untouched
-// for compatibility; clients can migrate to this endpoint incrementally.
 router.post("/post-atomic", authMiddleware, requireRoles("SALES", "SUPERVISOR", "ADMIN", "OWNER"), async (req: AuthenticatedRequest, res) => {
   try {
     const body = req.body || {};
@@ -32,6 +34,47 @@ router.post("/post-atomic", authMiddleware, requireRoles("SALES", "SUPERVISOR", 
   } catch (err: any) {
     console.error("Atomic transaction failed:", err);
     return res.status(400).json({ detail: err?.message || "Transaksi gagal diposting." });
+  }
+});
+
+/**
+ * Product Effective Call: one EC per distinct outlet/product/day.
+ * A second invoice for the same outlet and product on the same day does not
+ * increase EC. This is derived from posted transaction_items, never from UI flags.
+ */
+router.get("/ec-product", authMiddleware, requireRoles("SALES", "SUPERVISOR", "ADMIN", "OWNER"), async (req: AuthenticatedRequest, res) => {
+  try {
+    const date = String(req.query.date || new Date().toISOString().slice(0, 10));
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return res.status(400).json({ detail: "Format date harus YYYY-MM-DD." });
+
+    const salesmanId = req.user!.role === "SALES" ? req.user!._id : String(req.query.salesman_id || "");
+    const rows = await sqlDb.execute(sql`
+      SELECT
+        ti.sku_id,
+        COALESCE(ti.product_id, s.product_id) AS product_id,
+        COUNT(DISTINCT t.outlet_id)::int AS effective_call,
+        COALESCE(SUM(ti.quantity), 0)::int AS volume,
+        COUNT(DISTINCT t.id)::int AS transaction_count
+      FROM transaction_items ti
+      INNER JOIN transactions t ON t.id = ti.transaction_id
+      LEFT JOIN skus s ON s.id = ti.sku_id
+      WHERE t.created_at >= ${date}::date
+        AND t.created_at < (${date}::date + INTERVAL '1 day')
+        AND t.salesman_id = ${salesmanId}
+      GROUP BY ti.sku_id, COALESCE(ti.product_id, s.product_id)
+      ORDER BY effective_call DESC, volume DESC, ti.sku_id
+    `);
+
+    return res.json({
+      date,
+      salesman_id: salesmanId,
+      definition: "EC Product = jumlah outlet unik yang membeli SKU tersebut pada hari yang sama.",
+      items: rows.rows,
+      total: rows.rows.length,
+    });
+  } catch (err: any) {
+    console.error("EC product report failed:", err);
+    return res.status(500).json({ detail: err?.message || "Gagal mengambil EC per product." });
   }
 });
 
