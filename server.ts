@@ -11,6 +11,7 @@ import authRouter from "./server/auth.routes.js";
 import { db as inMemoryDb, saveDatabaseToDisk } from "./server/data.js";
 import { initializeCloudSqlTables, loadAllFromPostgres } from "./server/cloudsqlSync.js";
 import { applyDatabaseIntegrity } from "./server/databaseIntegrity.js";
+import { ensurePhase4Integrity } from "./server/phase4Integrity.js";
 
 async function startServer() {
   const production = process.env.NODE_ENV === "production";
@@ -29,6 +30,7 @@ async function startServer() {
       // Apply idempotent FK, uniqueness, index and data-quality constraints
       // before the application starts accepting requests.
       await applyDatabaseIntegrity();
+      await ensurePhase4Integrity();
       const loaded = await loadAllFromPostgres(inMemoryDb);
       if (!loaded && postgresRequired) {
         throw new Error("PostgreSQL tersedia tetapi data operasional gagal dimuat.");
@@ -47,3 +49,38 @@ async function startServer() {
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
+
+  app.use(cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (configuredOrigins.includes(origin)) return callback(null, true);
+      if (!production && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return callback(null, true);
+      return callback(new Error("CORS origin not allowed"));
+    },
+    credentials: true,
+  }));
+  app.use(express.json({ limit: "10mb" }));
+  app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+  app.use(cookieParser());
+
+  app.use("/api/auth", authRouter);
+  app.use("/api", apiRouter);
+
+  if (production) {
+    const distPath = path.resolve(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    app.get("*", (_req, res) => res.sendFile(path.join(distPath, "index.html")));
+  } else {
+    const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
+    app.use(vite.middlewares);
+  }
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`[DMS] Server running on port ${PORT}`);
+  });
+}
+
+startServer().catch((err) => {
+  console.error("[DMS] Fatal startup error:", err);
+  process.exit(1);
+});
