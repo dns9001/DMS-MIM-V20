@@ -48,7 +48,7 @@ router.post("/post-atomic", authMiddleware, requireRoles("SALES", "SUPERVISOR", 
 /**
  * Product Effective Call: one EC per distinct outlet/product/day.
  * A second invoice for the same outlet and SKU on the same day does not
- * increase EC. The metric is derived from posted transaction_items.
+ * increase EC. Only valid/non-cancelled posted transactions are counted.
  */
 router.get("/ec-product", authMiddleware, requireRoles("SALES", "SUPERVISOR", "ADMIN", "OWNER"), async (req: AuthenticatedRequest, res) => {
   try {
@@ -70,6 +70,7 @@ router.get("/ec-product", authMiddleware, requireRoles("SALES", "SUPERVISOR", "A
       LEFT JOIN skus s ON s.id = ti.sku_id
       WHERE t.created_at >= ${date}::date
         AND t.created_at < (${date}::date + INTERVAL '1 day')
+        AND COALESCE(t.payment_status, 'UNPAID') <> 'CANCELLED'
         ${salesmanFilter}
       GROUP BY ti.sku_id, COALESCE(ti.product_id, s.product_id)
       ORDER BY effective_call DESC, volume DESC, ti.sku_id
