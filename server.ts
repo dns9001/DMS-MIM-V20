@@ -9,6 +9,7 @@ import { createServer as createViteServer } from "vite";
 import { apiRouter } from "./server/routes.js";
 import authRouter from "./server/auth.routes.js";
 import transactionRouter from "./server/transaction.routes.js";
+import callMetricsRouter from "./server/callMetrics.routes.js";
 import { db as inMemoryDb, saveDatabaseToDisk } from "./server/data.js";
 import { initializeCloudSqlTables, loadAllFromPostgres } from "./server/cloudsqlSync.js";
 import { applyDatabaseIntegrity } from "./server/databaseIntegrity.js";
@@ -56,6 +57,7 @@ async function startServer() {
 
   app.use("/api/auth", authRouter);
   app.use("/api/transactions", transactionRouter);
+  app.use("/api/metrics", callMetricsRouter);
   app.use("/api", apiRouter);
 
   if (production) {
