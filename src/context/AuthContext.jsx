@@ -3,6 +3,10 @@ import api from "../lib/api";
 
 const AuthCtx = createContext(null);
 
+function normalizeUser(payload) {
+  return payload?.user || payload || null;
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,19 +14,17 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let active = true;
     (async () => {
-      const token = typeof window !== "undefined" ? localStorage.getItem("mhm_token") : null;
-      if (!token) {
-        if (active) {
-          setUser(null);
-          setLoading(false);
-        }
-        return;
-      }
       try {
-        const { data } = await api.get("/auth/me");
-        if (active) setUser(data);
+        let response;
+        try {
+          response = await api.get("/auth/me");
+        } catch (firstError) {
+          if (firstError?.response?.status !== 401) throw firstError;
+          await api.post("/auth/refresh");
+          response = await api.get("/auth/me");
+        }
+        if (active) setUser(normalizeUser(response.data));
       } catch (e) {
-        if (typeof window !== "undefined") localStorage.removeItem("mhm_token");
         if (active) setUser(null);
       } finally {
         if (active) setLoading(false);
@@ -35,15 +37,12 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const { data } = await api.post("/auth/login", { email, password });
-    if (data.token && typeof window !== "undefined") {
-      localStorage.setItem("mhm_token", data.token);
-    }
-    setUser(data.user);
-    return data.user;
+    const nextUser = normalizeUser(data);
+    setUser(nextUser);
+    return nextUser;
   };
 
   const logout = async () => {
-    if (typeof window !== "undefined") localStorage.removeItem("mhm_token");
     try {
       await api.post("/auth/logout");
     } catch (e) {
@@ -60,10 +59,10 @@ export function AuthProvider({ children }) {
   const refreshUser = async () => {
     try {
       const { data } = await api.get("/auth/me");
-      setUser(data);
-      return data;
+      const nextUser = normalizeUser(data);
+      setUser(nextUser);
+      return nextUser;
     } catch (e) {
-      console.warn("Gagal memperbarui data user:", e);
       return null;
     }
   };
