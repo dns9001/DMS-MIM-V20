@@ -37,6 +37,10 @@ export async function getCallMetricsRange(from: string, to: string, salesmanId?:
     product_purchases AS (
       SELECT DISTINCT DATE(t.created_at) AS date, t.salesman_id, t.outlet_id, item->>'sku_id' AS sku_id
       FROM transactions t
+      INNER JOIN visits_day v
+        ON v.date = DATE(t.created_at)
+       AND v.salesman_id = t.salesman_id
+       AND v.outlet_id = t.outlet_id
       CROSS JOIN LATERAL jsonb_array_elements(COALESCE(t.items, '[]'::jsonb)) item
       WHERE DATE(t.created_at) BETWEEN ${from}::date AND ${to}::date
         AND COALESCE(t.payment_status, 'UNPAID') <> 'CANCELLED'
@@ -74,6 +78,14 @@ export async function getCallMetricsRange(from: string, to: string, salesmanId?:
 
 export async function getProductEcMetrics(date: string, salesmanId?: string) {
   const result = await sqlDb.execute(sql`
+    WITH visits_day AS (
+      SELECT DATE(v.check_in_time) AS date, v.salesman_id, v.outlet_id
+      FROM visits v
+      WHERE v.status <> 'CANCELLED'
+        AND DATE(v.check_in_time) = ${date}::date
+        ${salesmanId ? sql`AND v.salesman_id = ${salesmanId}` : sql``}
+      GROUP BY DATE(v.check_in_time), v.salesman_id, v.outlet_id
+    )
     SELECT
       t.salesman_id,
       item->>'sku_id' AS sku_id,
@@ -81,6 +93,10 @@ export async function getProductEcMetrics(date: string, salesmanId?: string) {
       SUM(COALESCE((item->>'quantity')::numeric, 0))::numeric AS volume,
       COUNT(*)::int AS transaction_item_count
     FROM transactions t
+    INNER JOIN visits_day v
+      ON v.date = DATE(t.created_at)
+     AND v.salesman_id = t.salesman_id
+     AND v.outlet_id = t.outlet_id
     CROSS JOIN LATERAL jsonb_array_elements(COALESCE(t.items, '[]'::jsonb)) item
     WHERE DATE(t.created_at) = ${date}::date
       AND COALESCE(t.payment_status, 'UNPAID') <> 'CANCELLED'
