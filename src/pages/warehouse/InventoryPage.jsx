@@ -4,7 +4,7 @@ import {
   Loader2, Plus, Package, ArrowRightLeft, RotateCcw,
   CheckCircle2, AlertTriangle, Building2, User, Search, Eye,
   Truck, ArrowDownLeft, ShieldAlert, Download, RefreshCw,
-  FileSpreadsheet, Layers, Filter, Check, X
+  FileSpreadsheet, Layers, Filter, Check, X, PlusCircle
 } from "lucide-react";
 import api, { errMsg } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
@@ -671,14 +671,14 @@ export default function InventoryPage() {
           />
 
           <Button
-            onClick={handleOpenNewReceiving}
+            onClick={() => handleOpenNewReceiving()}
             className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold gap-1.5 shadow-sm"
           >
             <Truck size={15} /> + Inbound PO
           </Button>
 
           <Button
-            onClick={handleOpenNewHandover}
+            onClick={() => handleOpenNewHandover(false)}
             className="bg-navy hover:bg-navy-dark text-white text-xs font-bold gap-1.5 shadow-sm"
           >
             <ArrowRightLeft size={15} /> Serah Terima Pagi
@@ -693,7 +693,7 @@ export default function InventoryPage() {
           </Button>
 
           <Button
-            onClick={handleOpenOpname}
+            onClick={() => handleOpenOpname()}
             variant="outline"
             className="border-emerald-300 text-emerald-800 text-xs font-bold gap-1.5 bg-emerald-50 hover:bg-emerald-100 shadow-sm"
           >
@@ -849,7 +849,7 @@ export default function InventoryPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={exportStockToCsv}
+                onClick={() => exportStockToCsv()}
                 className="text-xs bg-white border-slate-300 text-slate-700 hover:bg-slate-50 gap-1.5 h-9"
               >
                 <Download size={14} /> Export CSV
@@ -963,7 +963,7 @@ export default function InventoryPage() {
               </Select>
             </div>
 
-            <Button onClick={handleOpenNewReceiving} className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold gap-1 h-9">
+            <Button onClick={() => handleOpenNewReceiving()} className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold gap-1 h-9">
               <Plus size={14} /> + Penerimaan Barang Baru (PO)
             </Button>
           </div>
@@ -1290,7 +1290,7 @@ export default function InventoryPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={loadAll}
+              onClick={() => loadAll()}
               className="text-xs bg-white text-navy font-semibold gap-1"
             >
               <RefreshCw size={13} /> Refresh Data
@@ -1610,7 +1610,7 @@ export default function InventoryPage() {
             <Button variant="outline" onClick={() => setReceivingDialogOpen(false)} className="text-xs">
               Batal
             </Button>
-            <Button disabled={busy} onClick={submitReceiving} className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold">
+            <Button disabled={busy} onClick={() => submitReceiving()} className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold">
               {busy ? <Loader2 className="animate-spin mr-1" size={14} /> : <CheckCircle2 className="mr-1" size={14} />}
               Simpan Penerimaan
             </Button>
@@ -1786,7 +1786,7 @@ export default function InventoryPage() {
             <Button variant="outline" onClick={() => setHandoverDialogOpen(false)} className="text-xs">
               Batal
             </Button>
-            <Button disabled={busy} onClick={submitHandover} className={`${handoverForm.is_additional ? "bg-purple-700 hover:bg-purple-800" : "bg-navy hover:bg-slate-800"} text-white text-xs font-bold`}>
+            <Button disabled={busy} onClick={() => submitHandover()} className={`${handoverForm.is_additional ? "bg-purple-700 hover:bg-purple-800" : "bg-navy hover:bg-slate-800"} text-white text-xs font-bold`}>
               {busy ? <Loader2 className="animate-spin mr-1" size={14} /> : <CheckCircle2 className="mr-1" size={14} />}
               {handoverForm.is_additional ? "Konfirmasi & Tambahkan Stok Sales" : "Konfirmasi & Serahkan Stok Pagi"}
             </Button>
@@ -1911,7 +1911,7 @@ export default function InventoryPage() {
             <Button variant="outline" onClick={() => setReturnDialogOpen(false)} className="text-xs">
               Batal
             </Button>
-            <Button disabled={busy} onClick={submitReturn} className="bg-navy text-white text-xs font-bold">
+            <Button disabled={busy} onClick={() => submitReturn()} className="bg-navy text-white text-xs font-bold">
               {busy ? <Loader2 className="animate-spin mr-1" size={14} /> : <RotateCcw className="mr-1" size={14} />}
               Verifikasi & Terima ke Gudang
             </Button>
@@ -2100,7 +2100,7 @@ export default function InventoryPage() {
             <Button variant="outline" onClick={() => setOpnameDialogOpen(false)} className="text-xs">
               Batal
             </Button>
-            <Button disabled={busy} onClick={submitOpname} className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold">
+            <Button disabled={busy} onClick={() => submitOpname()} className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold">
               {busy ? <Loader2 className="animate-spin mr-1" size={14} /> : <CheckCircle2 className="mr-1" size={14} />}
               Proses Rekonsiliasi & Simpan Opname
             </Button>
@@ -2263,7 +2263,7 @@ export default function InventoryPage() {
             <Button variant="outline" onClick={() => setAdjustDialogOpen(false)} className="text-xs">
               Batal
             </Button>
-            <Button disabled={busy || !canAdjust} onClick={submitAdjustment} className="bg-navy text-white text-xs font-bold">
+            <Button disabled={busy || !canAdjust} onClick={() => submitAdjustment()} className="bg-navy text-white text-xs font-bold">
               {busy ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
               Simpan Penyesuaian
             </Button>

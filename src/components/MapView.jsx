@@ -492,7 +492,7 @@ export default function MapView({
   height = "400px",
   onClick,
   onMarkerClick,
-  showLayerToggle = true,
+  showLayerToggle = false,
   showUserLocation = true,
   showSearch = false,
   showFitBounds = true,
@@ -502,35 +502,18 @@ export default function MapView({
   className = "",
 }) {
   const { coords: liveUserCoords, accuracy: userAccuracy, isTracking } = useLiveLocation();
-  const [tileType, setTileType] = useState("voyager"); // voyager | standard | satellite
   const [followUser, setFollowUser] = useState(false);
   const [shouldFitBounds, setShouldFitBounds] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const containerRef = useRef(null);
 
-  // Tile configurations
-  const tileConfig = useMemo(() => {
-    switch (tileType) {
-      case "satellite":
-        return {
-          url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-          attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
-          hybridOverlay: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png",
-        };
-      case "standard":
-        return {
-          url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        };
-      case "voyager":
-      default:
-        return {
-          url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-          attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
-        };
-    }
-  }, [tileType]);
+  // Dedicated OpenStreetMap tile configuration
+  const osmTileConfig = {
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  };
 
   // Filtered markers when search query is typed
   const displayedMarkers = useMemo(() => {
@@ -653,26 +636,6 @@ export default function MapView({
             </button>
           )}
 
-          {/* Map Layer Switcher */}
-          {showLayerToggle && (
-            <button
-              onClick={() =>
-                setTileType((prev) => {
-                  if (prev === "voyager") return "satellite";
-                  if (prev === "satellite") return "standard";
-                  return "voyager";
-                })
-              }
-              title="Ganti Lapisan Peta (Voyager / Satelit / Standar)"
-              className="p-1.5 text-slate-700 hover:bg-slate-100 hover:text-navy rounded-lg transition-colors text-[11px] font-semibold flex items-center gap-1"
-            >
-              <Layers size={14} />
-              <span className="hidden sm:inline capitalize">
-                {tileType === "voyager" ? "Voyager" : tileType === "satellite" ? "Satelit" : "Standard"}
-              </span>
-            </button>
-          )}
-
           {/* Fullscreen Toggle */}
           <button
             onClick={toggleFullscreen}
@@ -737,18 +700,10 @@ export default function MapView({
         />
 
         <TileLayer
-          url={tileConfig.url}
-          attribution={tileConfig.attribution}
-          maxZoom={19}
+          url={osmTileConfig.url}
+          attribution={osmTileConfig.attribution}
+          maxZoom={osmTileConfig.maxZoom}
         />
-
-        {tileConfig.hybridOverlay && (
-          <TileLayer
-            url={tileConfig.hybridOverlay}
-            maxZoom={19}
-            opacity={0.85}
-          />
-        )}
 
         {/* Real-time User GPS Location Marker */}
         {showUserLocation && liveUserCoords && !isNaN(liveUserCoords.lat) && !isNaN(liveUserCoords.lng) && (

@@ -1,3 +1,4 @@
+import { isCloudSqlConnected } from "./cloudsqlSync.js";
 import { sqlDb } from "../src/db/index.js";
 import { sql } from "drizzle-orm";
 
@@ -8,7 +9,7 @@ import { sql } from "drizzle-orm";
 export async function syncOutletLifecycleStatuses(asOfDate?: string) {
   const asOf = asOfDate ? sql`${asOfDate}::date` : sql`CURRENT_DATE`;
 
-  return sqlDb.transaction(async (tx) => {
+  const runner = isCloudSqlConnected ? (cb: any) => sqlDb.transaction(cb) : (cb: any) => cb(null); return runner(async (tx: any) => {
     const result = await tx.execute(sql`
       WITH summary AS (
         SELECT

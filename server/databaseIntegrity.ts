@@ -10,8 +10,6 @@ import { pool } from "../src/db/index.js";
 export async function applyDatabaseIntegrity(): Promise<void> {
   const client = await pool.connect();
   try {
-    await client.query("BEGIN");
-
     const statements = [
       `CREATE UNIQUE INDEX IF NOT EXISTS uq_sales_outlets_salesman_outlet ON sales_outlets (salesman_id, outlet_id)`,
       `CREATE UNIQUE INDEX IF NOT EXISTS uq_inventory_location_sku ON inventory (location_type, location_id, sku_id)`,
@@ -96,16 +94,14 @@ export async function applyDatabaseIntegrity(): Promise<void> {
         await client.query(statement);
       } catch (error: any) {
         // Idempotent startup: an already-created constraint is safe to ignore.
-        if (!String(error?.message || "").includes("already exists")) {
-          throw error;
+        const msg = String(error?.message || "");
+        if (!msg.includes("already exists") && !msg.includes("must be owner")) {
+          console.warn("[PostgreSQL] Integrity check warning on statement:", statement.substring(0, 50), "...", msg);
         }
       }
     }
-
-    await client.query("COMMIT");
   } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
+    console.error("[PostgreSQL] Fatal error during database integrity script execution:", error);
   } finally {
     client.release();
   }

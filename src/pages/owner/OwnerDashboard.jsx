@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import api, { errMsg } from "../../lib/api";
 import StatCard from "../../components/StatCard";
-import { rupiah, todayLocal } from "../../lib/format";
+import { rupiah, todayLocal, fmtDate } from "../../lib/format";
 import { Input } from "../../components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table";
 
@@ -33,25 +33,36 @@ export default function OwnerDashboard() {
     setLoading(true);
     setCallMetricsError(false);
     try {
-      const [{ data: dashboard }, { data: metrics }] = await Promise.all([
+      const [dashResult, metricsResult] = await Promise.allSettled([
         api.get("/dashboard/owner", { params: range }),
         api.get("/metrics/calls", { params: range }),
       ]);
-      setData(dashboard);
-      const daily = Array.isArray(metrics.daily) ? metrics.daily : [];
-      const dailyMap = Object.fromEntries(daily.map((x) => [x.date, x]));
-      setCallMetrics({
-        outlet_call: Number(metrics.outlet_call || 0),
-        effective_call: Number(metrics.effective_call || 0),
-        ec_rate: Number(metrics.ec_rate || 0),
-        daily: dailyMap,
-      });
+
+      if (dashResult.status === "fulfilled") {
+        setData(dashResult.value.data);
+      } else {
+        toast.error(errMsg(dashResult.reason));
+      }
+
+      if (metricsResult.status === "fulfilled") {
+        const metrics = metricsResult.value.data || {};
+        const daily = Array.isArray(metrics.daily) ? metrics.daily : [];
+        const dailyMap = Object.fromEntries(daily.map((x) => [x.date, x]));
+        setCallMetrics({
+          outlet_call: Number(metrics.outlet_call || 0),
+          effective_call: Number(metrics.effective_call || 0),
+          ec_rate: Number(metrics.ec_rate || 0),
+          daily: dailyMap,
+        });
+      } else {
+        setCallMetrics(null);
+        setCallMetricsError(true);
+      }
     } catch (e) {
       toast.error(errMsg(e));
-      setCallMetrics(null);
-      setCallMetricsError(true);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [range]);
 
   useEffect(() => { load(); }, [load]);
@@ -59,10 +70,14 @@ export default function OwnerDashboard() {
   if (loading && !data) return <div className="flex flex-col items-center justify-center py-24 gap-3" data-testid="owner-loading"><Loader2 className="animate-spin text-navy" size={32} /><span className="text-sm font-medium text-slate-500">Memuat data dashboard...</span></div>;
 
   const t = data?.totals || {};
-  const canonicalOutletCall = callMetricsError ? null : (callMetrics?.outlet_call ?? null);
-  const canonicalEffectiveCall = callMetricsError ? null : (callMetrics?.effective_call ?? null);
-  const canonicalEcRate = callMetricsError ? null : (callMetrics?.ec_rate ?? null);
-  const canonicalTrend = (data?.trend || []).map((row) => ({ ...row, ...(callMetrics?.daily?.[row.date] ? { outlet_calls: callMetrics.daily[row.date].outlet_call, effective_calls: callMetrics.daily[row.date].effective_call } : {}) }));
+  const canonicalOutletCall = callMetrics?.outlet_call ?? t.outlet_calls ?? (callMetricsError ? 0 : null);
+  const canonicalEffectiveCall = callMetrics?.effective_call ?? t.effective_calls ?? (callMetricsError ? 0 : null);
+  const canonicalEcRate = callMetrics?.ec_rate ?? t.ec_rate ?? (callMetricsError ? 0 : null);
+  const canonicalTrend = (data?.trend || []).map((row) => ({
+    ...row,
+    outlet_calls: callMetrics?.daily?.[row.date]?.outlet_call ?? row.outlet_calls ?? 0,
+    effective_calls: callMetrics?.daily?.[row.date]?.effective_call ?? row.effective_calls ?? 0,
+  }));
 
   return (
     <div className="space-y-6" data-testid="owner-dashboard">
@@ -83,12 +98,50 @@ export default function OwnerDashboard() {
         <StatCard label="EC Rate" value={canonicalEcRate == null ? "—" : `${canonicalEcRate}%`} testid="kpi-ec-rate" />
         <StatCard label="Missed Call" value={t.missed ?? 0} testid="kpi-missed" />
         <StatCard label="Coverage Outlet" value={`${t.coverage ?? 0}%`} testid="kpi-coverage" />
-        <StatCard label="Outlet Baru" value={t.new_outlets ?? 0} testid="kpi-new-outlets" />
+        
+        <StatCard label="NOO (Outlet Baru)" value={t.noo_count ?? 0} />
+        <StatCard label="Repeat" value={t.repeat_count ?? 0} />
+        <StatCard label="Active Outlet" value={t.active_count ?? 0} />
+        
+        <StatCard label="Dormant Outlet" value={t.dormant_count ?? 0} />
+        
+        <StatCard label="Total Stock" value={(t.stock_on_hand ?? 0).toLocaleString("id-ID")} />
+        <StatCard label="Stock Warehouse" value={(t.warehouse_stock ?? 0).toLocaleString("id-ID")} />
+        <StatCard label="Stock Salesman" value={(t.salesman_stock ?? 0).toLocaleString("id-ID")} />
+
+
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6"><div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-xs"><div className="flex items-center justify-between"><h3 className="font-heading font-bold text-navy text-sm">Tren Penjualan (Revenue)</h3><span className="text-[11px] font-semibold text-slate-500">Omset Harian</span></div><div className="h-64"><ResponsiveContainer width="100%" height="100%"><AreaChart data={data?.trend || []}><defs><linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#C5A059" stopOpacity={0.4}/><stop offset="95%" stopColor="#C5A059" stopOpacity={0.0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" /><XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748B' }} tickFormatter={(d) => d.slice(5)} /><YAxis tick={{ fontSize: 10, fill: '#64748B' }} tickFormatter={(v) => `${Math.round(v / 1000)}rb`} /><Tooltip formatter={(v) => rupiah(v)} /><Area type="monotone" dataKey="sales_value" name="Penjualan" stroke="#0A2540" fill="url(#colorSales)" strokeWidth={2.5} /></AreaChart></ResponsiveContainer></div></div><div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-xs"><div className="flex items-center justify-between"><h3 className="font-heading font-bold text-navy text-sm">Tren Kunjungan (Outlet Call vs Effective Call)</h3><span className="text-[11px] font-semibold text-slate-500">Aktivitas Kunjungan</span></div><div className="h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={canonicalTrend}><CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" /><XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748B' }} tickFormatter={(d) => d.slice(5)} /><YAxis tick={{ fontSize: 10, fill: '#64748B' }} allowDecimals={false} /><Tooltip /><Legend wrapperStyle={{ fontSize: 11, paddingTop: '4px' }} /><Bar dataKey="outlet_calls" name="Outlet Call" fill="#3B82F6" radius={[4, 4, 0, 0]} /><Bar dataKey="effective_calls" name="Effective Call" fill="#10B981" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer></div></div></div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6"><div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-xs"><div className="flex items-center justify-between"><h3 className="font-heading font-bold text-navy text-sm">Tren Penjualan (Revenue)</h3><span className="text-[11px] font-semibold text-slate-500">Omset Harian</span></div><div className="h-64"><ResponsiveContainer width="100%" height="100%"><AreaChart data={data?.trend || []}><defs><linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#C5A059" stopOpacity={0.4}/><stop offset="95%" stopColor="#C5A059" stopOpacity={0.0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" /><XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748B' }} tickFormatter={(d) => d.slice(5)} /><YAxis tick={{ fontSize: 10, fill: '#64748B' }} tickFormatter={(v) => v >= 1000000 ? `${(v / 1000000).toFixed(1).replace(/\.0$/, "")}jt` : `${Math.round(v / 1000)}rb`} /><Tooltip formatter={(v) => rupiah(v)} labelFormatter={(d) => fmtDate(d)} /><Area type="monotone" dataKey="sales_value" name="Penjualan" stroke="#0A2540" fill="url(#colorSales)" strokeWidth={2.5} /></AreaChart></ResponsiveContainer></div></div><div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-xs"><div className="flex items-center justify-between"><h3 className="font-heading font-bold text-navy text-sm">Tren Kunjungan (Outlet Call vs Effective Call)</h3><span className="text-[11px] font-semibold text-slate-500">Aktivitas Kunjungan</span></div><div className="h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={canonicalTrend}><CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" /><XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748B' }} tickFormatter={(d) => d.slice(5)} /><YAxis tick={{ fontSize: 10, fill: '#64748B' }} allowDecimals={false} /><Tooltip labelFormatter={(d) => fmtDate(d)} /><Legend wrapperStyle={{ fontSize: 11, paddingTop: '4px' }} /><Bar dataKey="outlet_calls" name="Outlet Call" fill="#3B82F6" radius={[4, 4, 0, 0]} /><Bar dataKey="effective_calls" name="Effective Call" fill="#10B981" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer></div></div></div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6"><div className="bg-white border border-slate-200 rounded-xl p-5"><h3 className="font-heading font-bold text-navy text-sm">Performa Area &amp; Volume Target</h3><div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>Area</TableHead><TableHead>Target</TableHead><TableHead>Actual</TableHead><TableHead>Ach %</TableHead><TableHead>Revenue</TableHead></TableRow></TableHeader><TableBody>{(data?.area_performance || []).map((a, i) => <TableRow key={i}><TableCell>{a.area || "-"}</TableCell><TableCell>{a.target_volume ? `${a.target_volume} Qty` : "-"}</TableCell><TableCell>{a.volume ?? 0} Qty</TableCell><TableCell>{a.achievement_formatted || (a.target_volume ? `${a.achievement_percentage}%` : "-")}</TableCell><TableCell>{rupiah(a.sales_value ?? 0)}</TableCell></TableRow>)}</TableBody></Table></div></div><div className="bg-white border border-slate-200 rounded-xl p-5"><h3 className="font-heading font-bold text-navy text-sm">Target vs Actual Volume Produk</h3><div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>SKU</TableHead><TableHead>Target</TableHead><TableHead>Actual</TableHead><TableHead>Ach %</TableHead><TableHead>Nilai</TableHead></TableRow></TableHeader><TableBody>{(data?.product_coverage || []).map((s, i) => <TableRow key={i}><TableCell>{s.sku || "-"}</TableCell><TableCell>{s.target_volume ? `${s.target_volume} Qty` : "-"}</TableCell><TableCell>{s.qty ?? 0} Qty</TableCell><TableCell>{s.achievement_formatted || (s.target_volume ? `${s.achievement_percentage}%` : "-")}</TableCell><TableCell>{rupiah(s.value ?? 0)}</TableCell></TableRow>)}</TableBody></Table></div></div><div className="bg-white border border-slate-200 rounded-xl p-5"><h3 className="font-heading font-bold text-navy text-sm">Performa Salesman &amp; Volume Target</h3><div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>Sales</TableHead><TableHead>Target</TableHead><TableHead>Actual</TableHead><TableHead>Ach %</TableHead><TableHead>Revenue</TableHead></TableRow></TableHeader><TableBody>{(data?.salesman_performance || []).map((s, i) => <TableRow key={i}><TableCell>{s.name || "-"}</TableCell><TableCell>{s.target_volume ? `${s.target_volume} Qty` : "-"}</TableCell><TableCell>{s.volume ?? 0} Qty</TableCell><TableCell>{s.achievement_formatted || (s.target_volume ? `${s.achievement_percentage}%` : "-")}</TableCell><TableCell>{rupiah(s.value ?? 0)}</TableCell></TableRow>)}</TableBody></Table></div></div></div>
+      
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6"><div className="bg-white border border-slate-200 rounded-xl p-5"><h3 className="font-heading font-bold text-navy text-sm">Performa Area &amp; Volume Target</h3><div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>Area</TableHead><TableHead>Target</TableHead><TableHead>Actual</TableHead><TableHead>Ach %</TableHead><TableHead>Revenue</TableHead></TableRow></TableHeader><TableBody>{(data?.area_performance || []).map((a, i) => <TableRow key={i}><TableCell>{a.area || "-"}</TableCell><TableCell>{a.target_volume != null ? `${a.target_volume.toLocaleString("id-ID")} Qty` : "-"}</TableCell><TableCell>{(a.volume ?? 0).toLocaleString("id-ID")} Qty</TableCell><TableCell>{a.achievement_formatted || (a.target_volume != null ? `${a.achievement_percentage}%` : "-")}</TableCell><TableCell>{rupiah(a.sales_value ?? 0)}</TableCell></TableRow>)}</TableBody></Table></div></div><div className="bg-white border border-slate-200 rounded-xl p-5"><h3 className="font-heading font-bold text-navy text-sm">Target vs Actual Volume Produk</h3><div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>SKU</TableHead><TableHead>Target</TableHead><TableHead>Actual</TableHead><TableHead>Ach %</TableHead><TableHead>Nilai</TableHead></TableRow></TableHeader><TableBody>{(data?.product_coverage || []).map((s, i) => <TableRow key={i}><TableCell>{s.sku || "-"}</TableCell><TableCell>{s.target_volume != null ? `${s.target_volume.toLocaleString("id-ID")} Qty` : "-"}</TableCell><TableCell>{(s.qty ?? 0).toLocaleString("id-ID")} Qty</TableCell><TableCell>{s.achievement_formatted || (s.target_volume != null ? `${s.achievement_percentage}%` : "-")}</TableCell><TableCell>{rupiah(s.value ?? 0)}</TableCell></TableRow>)}</TableBody></Table></div></div><div className="bg-white border border-slate-200 rounded-xl p-5"><h3 className="font-heading font-bold text-navy text-sm">Performa Salesman &amp; Volume Target</h3><div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>Sales</TableHead><TableHead>Target</TableHead><TableHead>Actual</TableHead><TableHead>Ach %</TableHead><TableHead>Revenue</TableHead></TableRow></TableHeader><TableBody>{(data?.salesman_performance || []).map((s, i) => <TableRow key={i}><TableCell>{s.name || "-"}</TableCell><TableCell>{s.target_volume != null ? `${s.target_volume.toLocaleString("id-ID")} Qty` : "-"}</TableCell><TableCell>{(s.volume ?? 0).toLocaleString("id-ID")} Qty</TableCell><TableCell>{s.achievement_formatted || (s.target_volume != null ? `${s.achievement_percentage}%` : "-")}</TableCell><TableCell>{rupiah(s.value ?? 0)}</TableCell></TableRow>)}</TableBody></Table></div></div></div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
+        <div className="bg-white border border-slate-200 rounded-xl p-5">
+          <h3 className="font-heading font-bold text-navy text-sm">Top 20 Outlets by Revenue</h3>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Outlet Name</TableHead>
+                  <TableHead>Volume</TableHead>
+                  <TableHead>Revenue</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(data?.top_outlets || []).map((o, i) => (
+                  <TableRow key={i}>
+                    <TableCell>{o.name || "-"}</TableCell>
+                    <TableCell>{(o.volume ?? 0).toLocaleString("id-ID")} Qty</TableCell>
+                    <TableCell>{rupiah(o.value ?? 0)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }

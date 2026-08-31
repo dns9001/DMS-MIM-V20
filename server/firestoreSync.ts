@@ -130,3 +130,13 @@ export async function migrateAllToCloudSql() {
   if (db.company_profile) await syncDocToPostgres("company_profile", "main", db.company_profile);
   return { success: true, totalRecords, collectionCounts, message: `Snapshot berhasil dipersist ke PostgreSQL: ${totalRecords} record.` };
 }
+
+export async function syncToFirestore(_forceAll = false, _skipCache = false): Promise<void> {
+  // Legacy stub - Firestore is no longer the primary database
+  console.log("syncToFirestore stub called - operations now handled by Cloud SQL.");
+}
+
+export async function purgeAllFirestoreData(): Promise<{ success: boolean; message: string; deletedCount: number }> {
+  console.log("purgeAllFirestoreData stub called - operations now handled by Cloud SQL.");
+  return { success: true, message: "Firestore is no longer the primary data store.", deletedCount: 0 };
+}

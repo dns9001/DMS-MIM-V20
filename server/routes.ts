@@ -1,6 +1,5 @@
+import { getOwnerDashboardData } from "./ownerDashboard.service.js";
 import { Router, Response } from "express";
-import inventoryRouter from "./inventory.routes.js";
-import stockRouter from "./stock.routes.js";
 import { InventoryService } from "./inventory.service.js";
 import { InventoryRepository } from "./inventory.repository.js";
 import bcrypt from "bcryptjs";
@@ -59,30 +58,42 @@ import { haversineMeters } from "./geo.js";
 import { validatePhotoPayload, MAX_SERVER_PHOTO_BYTES } from "./imageValidator";
 
 export const apiRouter = Router();
-apiRouter.use("/inventory", inventoryRouter);
 
 import { inventory as inventorySchema } from "../src/db/schema.js";
 import { sqlDb } from "../src/db/index.js";
 
+import { isCloudSqlConnected } from "./cloudsqlSync.js";
+
 async function refreshInventoryCache() {
-  const rows = await sqlDb.select().from(inventorySchema);
-  db.inventory.length = 0;
-  for (const r of rows) {
-    db.inventory.push({
-      _id: r.id,
-      location_type: r.locationType as any,
-      location_id: r.locationId,
-      office_id: r.locationType === "WAREHOUSE" ? r.locationId : "",
-      sku_id: r.skuId,
-      stock_on_hand: r.stockOnHand,
-      available_stock: r.availableStock,
-      allocated_stock: r.allocatedStock,
-      status: r.status as any,
-      updated_at: r.updatedAt?.toISOString() || "",
-      created_at: r.updatedAt?.toISOString() || ""
-    });
+  if (!isCloudSqlConnected) return;
+  try {
+    const rows = await sqlDb.select().from(inventorySchema);
+    if (rows && rows.length > 0) {
+      db.inventory.length = 0;
+      for (const r of rows) {
+        const invItem = {
+          _id: r.id,
+          location_type: (r.locationType as any) || "WAREHOUSE",
+          location_id: r.locationId,
+          office_id: r.locationType === "WAREHOUSE" ? r.locationId : "",
+          sku_id: r.skuId,
+          stock_on_hand: Number(r.stockOnHand) || 0,
+          available_stock: Number(r.availableStock) || 0,
+          allocated_stock: Number(r.allocatedStock) || 0,
+          status: (r.status as any) || "ACTIVE",
+          updated_at: r.updatedAt?.toISOString() || new Date().toISOString(),
+          created_at: r.createdAt?.toISOString() || new Date().toISOString()
+        };
+        db.inventory.push(invItem);
+        syncSingleDoc("inventory", invItem._id, invItem).catch(() => {});
+      }
+    }
+  } catch (e: any) {
+    console.warn("[refreshInventoryCache]", e?.message);
   }
 }
+
+
 
 // Automatic DB persistence hook for all mutating operations (PostgreSQL as Single Source of Truth)
 let postgresSyncTimer: NodeJS.Timeout | null = null;
@@ -482,7 +493,10 @@ apiRouter.post("/system/import-db", authMiddleware, requireRoles("ADMIN", "OWNER
     // Persist to local disk JSON backup
     saveDatabaseToDisk(true);
 
-    // Sync all updated documents to Primary Database: Google Cloud Firestore
+    // Sync all updated documents to Primary Database: Google Cloud SQL
+    const cloudSqlMigration = await migrateAllToCloudSql();
+
+    // Sync all updated documents to Legacy Database: Google Cloud Firestore (stub)
     await syncToFirestore(true, true);
 
     // Audit log the upload action
@@ -502,11 +516,12 @@ apiRouter.post("/system/import-db", authMiddleware, requireRoles("ADMIN", "OWNER
 
     res.json({
       success: true,
-      message: `Database berhasil diunggah & dipulihkan! Total ${totalImported} data berhasil disinkronkan ke Google Cloud Firestore.`,
+      message: `Database berhasil diunggah & dipulihkan! Total ${totalImported} data berhasil disinkronkan ke PostgreSQL.`,
       data: {
         totalImported,
         summary,
         repairResult,
+        cloudSqlMigration,
         syncStats: getSyncStats(),
       },
     });
@@ -521,13 +536,19 @@ apiRouter.post("/system/import-db", authMiddleware, requireRoles("ADMIN", "OWNER
 // Trigger immediate real-time synchronization to Google Cloud Firestore
 apiRouter.post("/system/sync-now", async (req, res) => {
   try {
-    saveDatabaseToDisk();
+    saveDatabaseToDisk(true);
+    const cloudSqlMigration = await migrateAllToCloudSql();
+    
     const forceAll = req.body && req.body.forceAll === true;
     await syncToFirestore(true, forceAll);
+    
     res.json({
       success: true,
-      message: "Sinkronisasi database dengan Google Cloud Firestore selesai.",
-      data: getSyncStats(),
+      message: "Sinkronisasi database dengan PostgreSQL (Primary) dan Firestore (Legacy) selesai.",
+      data: {
+        cloudSqlMigration,
+        syncStats: getSyncStats(),
+      }
     });
   } catch (error: any) {
     res.status(500).json({
@@ -541,12 +562,17 @@ apiRouter.post("/system/sync-now", async (req, res) => {
 apiRouter.post("/system/repair-database", authMiddleware, requireRoles("ADMIN", "OWNER"), async (req: AuthenticatedRequest, res) => {
   try {
     const result = auditAndRepairDatabase();
+    
+    saveDatabaseToDisk(true);
+    const cloudSqlMigration = await migrateAllToCloudSql();
     await syncToFirestore(true, true);
+    
     res.json({
       success: true,
       message: "Pemeriksaan dan perbaikan integritas database berhasil dilakukan.",
       data: {
         ...result,
+        cloudSqlMigration,
         syncStats: getSyncStats(),
       },
     });
@@ -1620,7 +1646,7 @@ apiRouter.post("/regions/validate", authMiddleware, (req, res) => {
   });
 });
 
-apiRouter.post("/regions/import", authMiddleware, requireRoles("ADMIN", "OWNER"), (req: AuthenticatedRequest, res) => {
+apiRouter.post("/regions/import", authMiddleware, requireRoles("ADMIN", "OWNER"), async (req: AuthenticatedRequest, res) => {
   const { provinces, regencies, districts, villages } = req.body || {};
   const nowStr = new Date().toISOString();
   let importedCounts = { provinces: 0, regencies: 0, districts: 0, villages: 0 };
@@ -1732,6 +1758,9 @@ apiRouter.post("/regions/import", authMiddleware, requireRoles("ADMIN", "OWNER")
     "bulk",
     importedCounts
   );
+
+  saveDatabaseToDisk(true);
+  await migrateAllToCloudSql();
 
   res.json({
     message: "Master data wilayah administratif berhasil diimport / diperbarui.",
@@ -2387,8 +2416,8 @@ apiRouter.put("/settings", authMiddleware, requireRoles("ADMIN", "OWNER"), (req:
   );
 
   saveDatabaseToDisk(true);
-  syncToFirestore(true, false).catch((err) => console.warn("Firestore settings sync error:", err?.message));
-
+  syncSingleDoc("system_settings", "global", db.settings);
+  syncSingleDoc("company_profile", "main", db.company_profile);
   res.json({ settings: db.settings, ...db.settings });
 });
 
@@ -2453,7 +2482,8 @@ apiRouter.post("/settings/reset-defaults", authMiddleware, requireRoles("ADMIN",
   };
 
   saveDatabaseToDisk(true);
-  syncToFirestore(true, false).catch((err) => console.warn("Firestore settings reset sync error:", err?.message));
+  syncSingleDoc("system_settings", "global", db.settings);
+  syncSingleDoc("company_profile", "main", db.company_profile);
 
   recordAuditLog(
     req.user!._id,
@@ -2626,6 +2656,10 @@ apiRouter.put("/company-profile", authMiddleware, requireRoles("OWNER", "ADMIN")
     }
   );
 
+  saveDatabaseToDisk(true);
+  syncSingleDoc("company_profile", "main", db.company_profile);
+  syncSingleDoc("system_settings", "global", db.settings);
+
   res.json({
     message: "Profil perusahaan berhasil diperbarui.",
     company_profile: db.company_profile,
@@ -2675,6 +2709,9 @@ apiRouter.post("/company-profile/logo", authMiddleware, requireRoles("OWNER", "A
     }
   );
 
+  saveDatabaseToDisk(true);
+  syncSingleDoc("company_profile", "main", db.company_profile);
+
   res.json({
     message: "Logo perusahaan berhasil diperbarui.",
     company_profile: db.company_profile,
@@ -2706,6 +2743,9 @@ apiRouter.delete("/company-profile/logo", authMiddleware, requireRoles("OWNER", 
       role: req.user!.role,
     }
   );
+
+  saveDatabaseToDisk(true);
+  syncSingleDoc("company_profile", "main", db.company_profile);
 
   res.json({
     message: "Logo perusahaan berhasil dihapus. Aplikasi kembali menggunakan logo default DMS Mahameru.",
@@ -7382,172 +7422,18 @@ apiRouter.get("/monitoring/sales", authMiddleware, requireRoles("SUPERVISOR", "A
   });
 });
 
-apiRouter.get("/dashboard/owner", authMiddleware, requireRoles("OWNER", "ADMIN"), (req, res) => {
-  const from = (req.query.from as string) || new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
-  const to = (req.query.to as string) || new Date().toISOString().slice(0, 10);
-
-  const kpis = calculateSalesKPIs({ from, to });
-  const overallTarget = calculateVolumeTargetAndAchievement({ from, to });
-
-  // Planned calls in range
-  const callPlansInRange = db.call_plans.filter((p) => p.date >= from && p.date <= to);
-  const plannedIds = new Set(callPlansInRange.map((p) => p._id));
-  const plannedCount = db.call_plan_items.filter((i) => plannedIds.has(i.call_plan_id)).length;
-
-  const totalOutlets = db.outlets.length;
-  const newOutletsCount = db.outlets.filter((o) => o.created_at && o.created_at.slice(0, 10) >= from && o.created_at.slice(0, 10) <= to).length;
-  const activeSalesmen = db.users.filter((u) => u.role === "SALES" && u.status === "ACTIVE").length;
-  const missedCount = Math.max(0, plannedCount - kpis.outlet_calls);
-  const coveragePercent = totalOutlets > 0 ? Math.min(100, Math.round((kpis.distinct_outlets_visited / totalOutlets) * 100)) : 0;
-
-  // Daily Trend
-  const trendDays: Record<string, { date: string; sales_value: number; volume: number; planned: number; outlet_calls: number; effective_calls: number; ec_rate: number }> = {};
-  
-  // Initialize days
-  const cur = new Date(from);
-  const end = new Date(to);
-  while (cur <= end) {
-    const dStr = cur.toISOString().slice(0, 10);
-    trendDays[dStr] = {
-      date: dStr,
-      sales_value: 0,
-      volume: 0,
-      planned: 0,
-      outlet_calls: 0,
-      effective_calls: 0,
-      ec_rate: 0,
-    };
-    cur.setDate(cur.getDate() + 1);
+apiRouter.get("/dashboard/owner", authMiddleware, requireRoles("OWNER", "ADMIN"), async (req, res) => {
+  try {
+    const data = await getOwnerDashboardData(req);
+    res.json(data);
+  } catch (err: any) {
+    if (err.message === "Database Unavailable") {
+      res.status(503).json({ success: false, message: "Database Unavailable" });
+    } else {
+      console.error(err);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
   }
-
-  // Populate trend stats per day
-  Object.keys(trendDays).forEach((dStr) => {
-    const dayKpi = calculateSalesKPIs({ from: dStr, to: dStr });
-    const dayPlans = db.call_plans.filter((p) => p.date === dStr);
-    const dayPlanIds = new Set(dayPlans.map((p) => p._id));
-    const dayPlanned = db.call_plan_items.filter((i) => dayPlanIds.has(i.call_plan_id)).length;
-
-    trendDays[dStr] = {
-      date: dStr,
-      sales_value: dayKpi.total_revenue,
-      volume: dayKpi.total_volume,
-      planned: dayPlanned,
-      outlet_calls: dayKpi.outlet_calls,
-      effective_calls: dayKpi.effective_calls,
-      ec_rate: dayKpi.ec_rate,
-    };
-  });
-
-  const trend = Object.values(trendDays).sort((a, b) => a.date.localeCompare(b.date));
-
-  // Area Performance
-  const areaPerformance = db.areas.map((a) => {
-    const areaKpi = calculateSalesKPIs({ from, to, areaId: a._id });
-    const areaTgt = calculateVolumeTargetAndAchievement({ areaId: a._id, from, to });
-    const areaOutlets = db.outlets.filter((o) => o.area_id === a._id);
-    return {
-      area_id: a._id,
-      area: a.name,
-      area_name: a.name,
-      outlets: areaOutlets.length,
-      outlet_count: areaOutlets.length,
-      outlet_calls: areaKpi.outlet_calls,
-      visited: areaKpi.outlet_calls, // backward compatibility
-      effective_calls: areaKpi.effective_calls,
-      effective: areaKpi.effective_calls,
-      ec_rate: areaKpi.ec_rate,
-      volume: areaKpi.total_volume,
-      target_volume: areaTgt.target_volume,
-      achievement_percentage: areaTgt.achievement_percentage,
-      achievement_formatted: areaTgt.achievement_formatted,
-      sales_value: areaKpi.total_revenue,
-      total_sales: areaKpi.total_revenue,
-    };
-  });
-
-  // Product (SKU) Coverage
-  const productCoverage = db.skus.map((sku) => {
-    const skuKpi = calculateSalesKPIs({ from, to, skuId: sku._id });
-    const skuTgt = calculateVolumeTargetAndAchievement({ skuId: sku._id, from, to });
-    const coverage = totalOutlets > 0 ? Math.round((skuKpi.effective_calls / totalOutlets) * 100) : 0;
-    return {
-      sku_id: sku._id,
-      sku: sku.name,
-      code: sku.code,
-      qty: skuKpi.total_volume,
-      target_volume: skuTgt.target_volume,
-      achievement_percentage: skuTgt.achievement_percentage,
-      achievement_formatted: skuTgt.achievement_formatted,
-      outlet_calls: kpis.outlet_calls,
-      effective_calls: skuKpi.effective_calls,
-      coverage,
-      value: skuKpi.total_revenue,
-      sales_value: skuKpi.total_revenue,
-    };
-  });
-
-  // Salesman Performance
-  const salesmanPerformance = db.users
-    .filter((u) => u.role === "SALES")
-    .map((u) => {
-      const salesKpi = calculateSalesKPIs({ salesmanId: u._id, from, to });
-      const salesTgt = calculateVolumeTargetAndAchievement({ salesmanId: u._id, from, to });
-      const salesPlans = db.call_plans.filter((p) => p.salesman_id === u._id && p.date >= from && p.date <= to);
-      const salesPlanIds = new Set(salesPlans.map((p) => p._id));
-      const salesPlanned = db.call_plan_items.filter((i) => salesPlanIds.has(i.call_plan_id)).length;
-      const areaName = db.areas.find((a) => a._id === u.area_id)?.name || "-";
-
-      return {
-        salesman_id: u._id,
-        name: u.name,
-        code: (u as any).code || u._id,
-        area: areaName,
-        planned: salesPlanned,
-        outlet_calls: salesKpi.outlet_calls,
-        effective_calls: salesKpi.effective_calls,
-        ec_rate: salesKpi.ec_rate,
-        volume: salesKpi.total_volume,
-        target_volume: salesTgt.target_volume,
-        achievement_percentage: salesTgt.achievement_percentage,
-        achievement_formatted: salesTgt.achievement_formatted,
-        txns: salesKpi.transaction_count,
-        value: salesKpi.total_revenue,
-        sales_value: salesKpi.total_revenue,
-      };
-    });
-
-  res.json({
-    totals: {
-      sales_value: kpis.total_revenue,
-      total_sales: kpis.total_revenue,
-      total_volume: kpis.total_volume,
-      volume: kpis.total_volume,
-      target_volume: overallTarget.target_volume,
-      actual_volume: overallTarget.actual_volume,
-      achievement_percentage: overallTarget.achievement_percentage,
-      achievement_formatted: overallTarget.achievement_formatted,
-      achievement_status: overallTarget.status,
-      transactions: kpis.transaction_count,
-      transaction_count: kpis.transaction_count,
-      planned: plannedCount,
-      outlet_calls: kpis.outlet_calls,
-      actual: kpis.outlet_calls,
-      effective_calls: kpis.effective_calls,
-      effective: kpis.effective_calls,
-      ec_rate: kpis.ec_rate,
-      effective_ratio: kpis.ec_rate,
-      missed: missedCount,
-      coverage: coveragePercent,
-      new_outlets: newOutletsCount,
-      active_sales: activeSalesmen,
-      active_salesmen: activeSalesmen,
-      total_outlets: totalOutlets,
-    },
-    trend,
-    area_performance: areaPerformance,
-    product_coverage: productCoverage,
-    salesman_performance: salesmanPerformance,
-  });
 });
 
 // ================= REPORTS =================
@@ -9241,29 +9127,40 @@ function getSalesStock(salesmanId: string, skuId: string): number {
 export function syncSalesStockLedger(salesmanId: string, skuId: string, businessDate: string): SalesStockLedger {
   const ledgerId = `ssl-${salesmanId}-${businessDate}-${skuId}`;
 
-  // 1. Calculate transfers in (TRANSFER_IN) on this business date
-  const transfersIn = db.stock_movements
-    .filter((m) => m.business_date === businessDate && m.salesman_id === salesmanId && m.sku_id === skuId && m.movement_type === "TRANSFER_IN" && m.status === "COMPLETED")
-    .reduce((sum, m) => sum + m.quantity, 0);
+  // Find all completed movements for this sales and sku today
+  const mvts = db.stock_movements.filter(
+    (m) => m.business_date === businessDate && m.salesman_id === salesmanId && m.sku_id === skuId && m.status === "COMPLETED"
+  );
 
-  // 2. Calculate sales out (SALES_OUT) on this business date
-  const salesOut = db.stock_movements
-    .filter((m) => m.business_date === businessDate && m.salesman_id === salesmanId && m.sku_id === skuId && m.movement_type === "SALES_OUT" && m.status === "COMPLETED")
-    .reduce((sum, m) => sum + m.quantity, 0);
+  let transfersIn = 0;
+  let salesOut = 0;
+  let returnsOut = 0;
+  let adjustmentsIn = 0;
+  let adjustmentsOut = 0;
 
-  // 3. Calculate returns out (RETURN_IN) on this business date
-  const returnsOut = db.stock_movements
-    .filter((m) => m.business_date === businessDate && m.salesman_id === salesmanId && m.sku_id === skuId && m.movement_type === "RETURN_IN" && m.status === "COMPLETED")
-    .reduce((sum, m) => sum + m.quantity, 0);
-
-  // 4. Calculate adjustments (ADJUSTMENT_IN / ADJUSTMENT_OUT) on this business date
-  const adjustmentsIn = db.stock_movements
-    .filter((m) => m.business_date === businessDate && m.salesman_id === salesmanId && m.sku_id === skuId && m.movement_type === "ADJUSTMENT_IN" && m.status === "COMPLETED")
-    .reduce((sum, m) => sum + m.quantity, 0);
-
-  const adjustmentsOut = db.stock_movements
-    .filter((m) => m.business_date === businessDate && m.salesman_id === salesmanId && m.sku_id === skuId && m.movement_type === "ADJUSTMENT_OUT" && m.status === "COMPLETED")
-    .reduce((sum, m) => sum + m.quantity, 0);
+  for (const m of mvts) {
+    if (m.destination_location_type === "SALES" && m.destination_location_id === salesmanId) {
+      // Stock entering sales
+      if (m.movement_type === "ADJUSTMENT_IN") {
+        adjustmentsIn += m.quantity;
+      } else if (m.movement_type === "REVERSAL") {
+        salesOut -= m.quantity; // Void cancels out sale
+      } else {
+        // Includes TRANSFER_OUT from warehouse (which is handovers to sales)
+        transfersIn += m.quantity;
+      }
+    } else if (m.source_location_type === "SALES" && m.source_location_id === salesmanId) {
+      // Stock leaving sales
+      if (m.movement_type === "SALES_OUT") {
+        salesOut += m.quantity;
+      } else if (m.movement_type === "ADJUSTMENT_OUT") {
+        adjustmentsOut += m.quantity;
+      } else {
+        // Includes TRANSFER_IN to warehouse (which is returns from sales)
+        returnsOut += m.quantity;
+      }
+    }
+  }
 
   // 5. Current physical stock in sales inventory
   const salesInv = db.inventory.find(
@@ -9327,6 +9224,37 @@ export function syncSalesStockLedger(salesmanId: string, skuId: string, business
     ledger.status = status;
     ledger.last_movement_id = lastMvt?._id || ledger.last_movement_id;
     ledger.updated_at = nowStr;
+  }
+
+  // Update PostgreSQL
+  try {
+    const { sqlDb } = require('../src/db/index.js');
+    const { salesStockLedgers } = require('../src/db/schema.js');
+    const { eq } = require('drizzle-orm');
+    
+    // We do an upsert
+    sqlDb.insert(salesStockLedgers).values({
+      id: ledger._id,
+      salesmanId: ledger.salesman_id,
+      date: ledger.business_date,
+      skuId: ledger.sku_id,
+      initialStock: ledger.opening_balance,
+      loadedStock: ledger.transfers_in + adjustmentsIn,
+      soldStock: ledger.sales_out,
+      returnedStock: ledger.returns_out + adjustmentsOut,
+      finalStock: ledger.closing_balance
+    }).onConflictDoUpdate({
+      target: salesStockLedgers.id,
+      set: {
+        initialStock: ledger.opening_balance,
+        loadedStock: ledger.transfers_in + adjustmentsIn,
+        soldStock: ledger.sales_out,
+        returnedStock: ledger.returns_out + adjustmentsOut,
+        finalStock: ledger.closing_balance
+      }
+    }).catch((e: any) => console.error("Error syncing sales ledger to pg:", e.message));
+  } catch (err: any) {
+    console.error("Failed to sync ledger to postgres", err.message);
   }
 
   syncSingleDoc("sales_stock_ledgers", ledger._id, ledger);
@@ -9443,17 +9371,21 @@ apiRouter.post("/stock/handovers", authMiddleware, requireRoles("WAREHOUSE", "AD
     return res.status(400).json({ detail: "Salesman, tanggal, dan daftar item produk wajib diisi." });
   }
 
-  const sales = db.users.find((u) => u._id === salesman_id && u.role === "SALES");
+  const rawSalesmanId = salesman_id;
+  const salesMaster = db.salesmen.find((s) => s._id === rawSalesmanId || s.user_id === rawSalesmanId);
+  const cleanId = rawSalesmanId.replace(/^sm-/, "");
+  const sales = db.users.find((u) => u._id === rawSalesmanId || u._id === cleanId || u._id === salesMaster?.user_id) || salesMaster;
   if (!sales) {
     return res.status(404).json({ detail: "Salesman tidak ditemukan dalam sistem." });
   }
+  const resolvedSalesmanId = (sales as any).user_id || sales._id;
 
   const wh = db.offices.find((o) => o._id === targetWhId);
 
   // Validate duplicate handover for same sales & date if initial handover
   if (!isAdditional) {
     const existing = db.stock_handovers.find(
-      (h) => h.salesman_id === salesman_id && h.business_date === targetDate && h.status !== "CANCELLED" && !h.is_additional && (h as any).handover_type !== "ADDITIONAL_HANDOVER"
+      (h) => (h.salesman_id === resolvedSalesmanId || h.salesman_id === rawSalesmanId) && h.business_date === targetDate && h.status !== "CANCELLED" && !h.is_additional && (h as any).handover_type !== "ADDITIONAL_HANDOVER"
     );
     if (existing) {
       return res.status(400).json({
@@ -9492,7 +9424,7 @@ apiRouter.post("/stock/handovers", authMiddleware, requireRoles("WAREHOUSE", "AD
     handover_code: handoverCode,
     business_date: targetDate,
     warehouse_id: targetWhId,
-    salesman_id,
+    salesman_id: resolvedSalesmanId,
     status: auto_confirm ? "CONFIRMED" : "DRAFT",
     is_additional: isAdditional,
     items: processedItems,
@@ -9583,19 +9515,32 @@ apiRouter.post("/stock/handovers/:id/confirm", authMiddleware, requireRoles("WAR
 
   res.json({ message: "Stok telah disiapkan di area loading gudang.", handover: h });
 });
+
+apiRouter.get("/stock/returns", authMiddleware, (req: AuthenticatedRequest, res) => {
+  const { business_date } = req.query;
+  let returns = db.stock_returns;
+  if (business_date) {
+    returns = returns.filter((r) => r.business_date === business_date);
+  }
+  if (req.user?.role === "SALES") {
+    returns = returns.filter((r) => r.salesman_id === req.user?._id);
+  }
+  // Sort descending by date
+  returns.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  res.json({ items: returns });
+});
+
 apiRouter.post("/stock/returns", authMiddleware, async (req: AuthenticatedRequest, res) => {
   const { business_date, warehouse_id, salesman_id, items, notes, auto_confirm } = req.body || {};
 
   const targetDate = business_date || getTodayWIB();
   const targetWhId = warehouse_id || req.user?.office_id || "off-1";
-  const targetSalesId = req.user!.role === "SALES" ? req.user!._id : (salesman_id || req.user!._id);
-
-  if (!items || !Array.isArray(items) || !items.length) {
-    return res.status(400).json({ detail: "Daftar item produk yang diretur wajib diisi." });
-  }
-
-  const sales = db.users.find((u) => u._id === targetSalesId);
+  const rawSalesId = req.user!.role === "SALES" ? req.user!._id : (salesman_id || req.user!._id);
+  const salesMaster = db.salesmen.find((s) => s._id === rawSalesId || s.user_id === rawSalesId);
+  const cleanId = typeof rawSalesId === "string" ? rawSalesId.replace(/^sm-/, "") : rawSalesId;
+  const sales = db.users.find((u) => u._id === rawSalesId || u._id === cleanId || u._id === salesMaster?.user_id) || salesMaster;
   if (!sales) return res.status(404).json({ detail: "Data sales tidak ditemukan." });
+  const targetSalesId = (sales as any).user_id || sales._id;
 
   // Validate that return qty <= sales stock
   const processedItems: DailyStockReturnItem[] = [];
@@ -9646,44 +9591,12 @@ apiRouter.post("/stock/returns", authMiddleware, async (req: AuthenticatedReques
   };
 
   if (isDirectConfirm) {
-    // Atomic deduction from sales, addition to warehouse
-    processedItems.forEach((it, idx) => {
-      const salesInv = ensureSalesInventory(targetSalesId, it.sku_id);
-      salesInv.stock_on_hand = Math.max(0, salesInv.stock_on_hand - it.quantity);
-      salesInv.available_stock = Math.max(0, salesInv.available_stock - it.quantity);
-      salesInv.updated_at = nowStr;
-      syncSingleDoc("inventory", salesInv._id, salesInv);
-
-      const whInv = ensureWarehouseInventory(targetWhId, it.sku_id);
-      whInv.stock_on_hand += it.quantity;
-      whInv.available_stock += it.quantity;
-      whInv.updated_at = nowStr;
-      syncSingleDoc("inventory", whInv._id, whInv);
-
-      // Record RETURN_IN movement
-      const mvtCount = db.stock_movements.length + 1;
-      const mvt: StockMovement = {
-        _id: `mvt-${Date.now()}-ret-${idx}`,
-        movement_code: `MVT-${targetDate.replace(/-/g, "")}-${String(mvtCount).padStart(4, "0")}`,
-        movement_type: "RETURN_IN",
-        source_location_type: "SALES",
-        source_location_id: targetSalesId,
-        destination_location_type: "WAREHOUSE",
-        destination_location_id: targetWhId,
-        sku_id: it.sku_id,
-        quantity: it.quantity,
-        warehouse_id: targetWhId,
-        salesman_id: targetSalesId,
-        reference_id: returnId,
-        business_date: targetDate,
-        status: "COMPLETED",
-        notes: `Pengembalian Sisa Stok dari Sales ${sales.name} (${returnCode})`,
-        created_by: req.user!._id,
-        created_at: nowStr,
-      };
-      db.stock_movements.push(mvt);
-      syncSingleDoc("stock_movements", mvt._id, mvt);
-    });
+    try {
+      await InventoryService.processReturn(newReturn, newReturn.items, req.user!._id);
+      await refreshInventoryCache();
+    } catch (err: any) {
+      return res.status(400).json({ detail: err.message, code: "RETURN_EXCEEDS_SALES_STOCK" });
+    }
   }
 
   if (!db.stock_returns) db.stock_returns = [];
@@ -10379,15 +10292,15 @@ apiRouter.get("/warehouse/monitoring", authMiddleware, requireRoles("WAREHOUSE",
 
     // Sum stock movements for today
     const broughtTotal = db.stock_movements
-      .filter((m) => m.business_date === business_date && m.salesman_id === sales._id && m.movement_type === "TRANSFER_IN")
+      .filter((m) => m.business_date === business_date && (m.salesman_id === sales._id || m.destination_location_id === sales._id) && (m.movement_type === "TRANSFER_IN" || m.movement_type === "TRANSFER_OUT"))
       .reduce((sum, m) => sum + m.quantity, 0);
 
     const soldTotal = db.stock_movements
-      .filter((m) => m.business_date === business_date && m.salesman_id === sales._id && m.movement_type === "SALES_OUT")
+      .filter((m) => m.business_date === business_date && (m.salesman_id === sales._id || m.source_location_id === sales._id) && m.movement_type === "SALES_OUT")
       .reduce((sum, m) => sum + m.quantity, 0);
 
     const returnedTotal = db.stock_movements
-      .filter((m) => m.business_date === business_date && m.salesman_id === sales._id && m.movement_type === "RETURN_IN")
+      .filter((m) => m.business_date === business_date && (m.salesman_id === sales._id || m.source_location_id === sales._id) && (m.movement_type === "RETURN_IN" || (m.movement_type === "TRANSFER_IN" && m.destination_location_type === "WAREHOUSE")))
       .reduce((sum, m) => sum + m.quantity, 0);
 
     const currentInventory = db.inventory.filter((i) => i.location_type === "SALES" && i.location_id === sales._id);
@@ -10456,15 +10369,15 @@ apiRouter.get("/warehouse/reconciliation", authMiddleware, requireRoles("WAREHOU
   salesUsers.forEach((sales) => {
     db.skus.filter((s) => s.status === "ACTIVE").forEach((sku) => {
       const brought = db.stock_movements
-        .filter((m) => m.business_date === business_date && m.salesman_id === sales._id && m.sku_id === sku._id && m.movement_type === "TRANSFER_IN")
+        .filter((m) => m.business_date === business_date && (m.salesman_id === sales._id || m.destination_location_id === sales._id) && m.sku_id === sku._id && (m.movement_type === "TRANSFER_IN" || m.movement_type === "TRANSFER_OUT"))
         .reduce((sum, m) => sum + m.quantity, 0);
 
       const sold = db.stock_movements
-        .filter((m) => m.business_date === business_date && m.salesman_id === sales._id && m.sku_id === sku._id && m.movement_type === "SALES_OUT")
+        .filter((m) => m.business_date === business_date && (m.salesman_id === sales._id || m.source_location_id === sales._id) && m.sku_id === sku._id && m.movement_type === "SALES_OUT")
         .reduce((sum, m) => sum + m.quantity, 0);
 
       const returned = db.stock_movements
-        .filter((m) => m.business_date === business_date && m.salesman_id === sales._id && m.sku_id === sku._id && m.movement_type === "RETURN_IN")
+        .filter((m) => m.business_date === business_date && (m.salesman_id === sales._id || m.source_location_id === sales._id) && m.sku_id === sku._id && (m.movement_type === "RETURN_IN" || (m.movement_type === "TRANSFER_IN" && m.destination_location_type === "WAREHOUSE")))
         .reduce((sum, m) => sum + m.quantity, 0);
 
       const salesInv = db.inventory.find((i) => i.location_type === "SALES" && i.location_id === sales._id && i.sku_id === sku._id);
@@ -10807,8 +10720,8 @@ apiRouter.delete("/stock/receivings/:id", authMiddleware, requireRoles("ADMIN", 
   res.json({ message: "Draft penerimaan barang berhasil dihapus." });
 });
 
-// ================= STOCK ADJUSTMENT (OWNER & ADMIN ONLY) =================
-apiRouter.post("/inventory/adjustments", authMiddleware, requireRoles("ADMIN", "OWNER"), (req: AuthenticatedRequest, res) => {
+// ================= STOCK ADJUSTMENT (OWNER, ADMIN, WAREHOUSE) =================
+apiRouter.post("/inventory/adjustments", authMiddleware, requireRoles("ADMIN", "OWNER", "WAREHOUSE"), (req: AuthenticatedRequest, res) => {
   const { location_type, location_id, sku_id, adjustment_type, quantity, reason, notes } = req.body || {};
 
   if (!location_type || !location_id || !sku_id || !adjustment_type || !quantity || !reason) {
@@ -10886,6 +10799,44 @@ apiRouter.post("/inventory/adjustments", authMiddleware, requireRoles("ADMIN", "
   );
 
   syncSingleDoc("inventory", targetInv._id, targetInv);
+
+  try {
+    const { sqlDb } = require('../src/db/index.js');
+    const { stockMovements: pgStockMovements, inventory: pgInventory } = require('../src/db/schema.js');
+    const { eq } = require('drizzle-orm');
+
+    // Insert Movement
+    sqlDb.insert(pgStockMovements).values({
+      id: movement._id,
+      movementType: movement.movement_type,
+      sourceLocationType: movement.source_location_type,
+      sourceLocationId: movement.source_location_id,
+      destLocationType: movement.destination_location_type,
+      destLocationId: movement.destination_location_id,
+      skuId: movement.sku_id,
+      quantity: movement.quantity,
+      performedBy: movement.created_by,
+      notes: movement.notes,
+      createdAt: new Date(movement.created_at),
+      metadata: {
+        movementCode: movement.movement_code,
+        salesmanId: movement.salesman_id,
+        warehouseId: movement.warehouse_id,
+        businessDate: movement.business_date,
+        status: movement.status
+      }
+    }).catch((e: any) => console.error("Error inserting adjustment movement:", e.message));
+
+    // Update Inventory
+    sqlDb.update(pgInventory).set({
+      stockOnHand: targetInv.stock_on_hand,
+      availableStock: targetInv.available_stock,
+      updatedAt: new Date(targetInv.updated_at)
+    }).where(eq(pgInventory.id, targetInv._id))
+      .catch((e: any) => console.error("Error updating adjustment inventory:", e.message));
+  } catch (err: any) {
+    console.error("Failed to sync adjustment to postgres", err.message);
+  }
 
   res.status(201).json({
     message: `Penyesuaian stok ${sku.name} (${adjustment_type === "IN" ? "+" : "-"}${qty}) berhasil disimpan.`,
@@ -10967,21 +10918,23 @@ apiRouter.post("/inventory/opname", authMiddleware, requireRoles("ADMIN", "OWNER
         // Insert Movement
         sqlDb.insert(pgStockMovements).values({
           id: movement._id,
-          movementCode: movement.movement_code,
           movementType: movement.movement_type,
           sourceLocationType: movement.source_location_type,
           sourceLocationId: movement.source_location_id,
-          destinationLocationType: movement.destination_location_type,
-          destinationLocationId: movement.destination_location_id,
+          destLocationType: movement.destination_location_type,
+          destLocationId: movement.destination_location_id,
           skuId: movement.sku_id,
           quantity: movement.quantity,
-          salesmanId: movement.salesman_id,
-          officeId: movement.warehouse_id, // Ensure warehouse_id falls back to officeId
-          businessDate: movement.business_date,
-          status: movement.status,
+          performedBy: movement.created_by,
           notes: movement.notes,
-          createdBy: movement.created_by,
-          createdAt: new Date(movement.created_at)
+          createdAt: new Date(movement.created_at),
+          metadata: {
+            movementCode: movement.movement_code,
+            salesmanId: movement.salesman_id,
+            warehouseId: movement.warehouse_id,
+            businessDate: movement.business_date,
+            status: movement.status
+          }
         }).catch((e: any) => console.error("Error inserting opname movement:", e.message));
 
         // Update Inventory
@@ -11113,6 +11066,43 @@ apiRouter.post("/inventory/movements", authMiddleware, requireRoles("WAREHOUSE",
   };
 
   db.stock_movements.push(movement);
+
+  try {
+    const { sqlDb } = require('../src/db/index.js');
+    const { stockMovements: pgStockMovements, inventory: pgInventory } = require('../src/db/schema.js');
+    const { eq } = require('drizzle-orm');
+
+    sqlDb.insert(pgStockMovements).values({
+      id: movement._id,
+      movementType: movement.movement_type,
+      sourceLocationType: movement.source_location_type,
+      sourceLocationId: movement.source_location_id,
+      destLocationType: movement.destination_location_type,
+      destLocationId: movement.destination_location_id,
+      skuId: movement.sku_id,
+      quantity: movement.quantity,
+      performedBy: movement.created_by,
+      notes: movement.notes,
+      createdAt: new Date(movement.created_at),
+      metadata: {
+        movementCode: movement.movement_code,
+        warehouseId: movement.warehouse_id,
+        businessDate: movement.business_date,
+        status: movement.status
+      }
+    }).catch((e: any) => console.error("Error inserting movement to pg:", e.message));
+
+    sqlDb.update(pgInventory).set({
+      stockOnHand: inv.stock_on_hand,
+      availableStock: inv.available_stock,
+      updatedAt: new Date(inv.updated_at)
+    }).where(eq(pgInventory.id, inv._id))
+      .catch((e: any) => console.error("Error updating inv to pg:", e.message));
+
+  } catch (err: any) {
+    console.error("Failed to sync POST movement to postgres", err.message);
+  }
+
   res.status(201).json(movement);
 });
 
@@ -11887,13 +11877,14 @@ apiRouter.post("/transactions/:id/void", authMiddleware, requireRoles("SUPERVISO
       salesInv.updated_at = new Date().toISOString();
     }
 
-    db.stock_movements.push({
+    const movementCode = `MVT-REV-${today.replace(/-/g, "")}-${String(db.stock_movements.length + 1).padStart(4, "0")}`;
+    const mvt = {
       _id: `mvt-rev-${Date.now()}-${idx}`,
-      movement_code: `MVT-REV-${today.replace(/-/g, "")}-${String(db.stock_movements.length + 1).padStart(4, "0")}`,
-      movement_type: "REVERSAL",
-      source_location_type: "OUTLET",
+      movement_code: movementCode,
+      movement_type: "REVERSAL" as any,
+      source_location_type: "OUTLET" as any,
       source_location_id: txn.outlet_id,
-      destination_location_type: "SALES",
+      destination_location_type: "SALES" as any,
       destination_location_id: txn.salesman_id,
       sku_id: it.sku_id,
       quantity: qty,
@@ -11901,11 +11892,50 @@ apiRouter.post("/transactions/:id/void", authMiddleware, requireRoles("SUPERVISO
       outlet_id: txn.outlet_id,
       reference_id: txn._id,
       business_date: today,
-      status: "COMPLETED",
+      status: "COMPLETED" as any,
       notes: `Void/Reversal pembatalan ${txn.invoice_number || txn._id}: ${reason}`,
       created_by: req.user!._id,
       created_at: new Date().toISOString(),
-    });
+    };
+    db.stock_movements.push(mvt);
+
+    try {
+      const { sqlDb } = require('../src/db/index.js');
+      const { stockMovements: pgStockMovements, inventory: pgInventory } = require('../src/db/schema.js');
+      const { eq, and } = require('drizzle-orm');
+
+      sqlDb.insert(pgStockMovements).values({
+        id: mvt._id,
+        movementType: mvt.movement_type,
+        sourceLocationType: mvt.source_location_type,
+        sourceLocationId: mvt.source_location_id,
+        destLocationType: mvt.destination_location_type,
+        destLocationId: mvt.destination_location_id,
+        skuId: mvt.sku_id,
+        quantity: mvt.quantity,
+        referenceId: mvt.reference_id,
+        performedBy: mvt.created_by,
+        notes: mvt.notes,
+        createdAt: new Date(mvt.created_at),
+        metadata: {
+          movementCode: mvt.movement_code,
+          salesmanId: mvt.salesman_id,
+          businessDate: mvt.business_date,
+          status: mvt.status
+        }
+      }).catch((e: any) => console.error("Error inserting void movement:", e.message));
+
+      if (salesInv) {
+        sqlDb.update(pgInventory).set({
+          stockOnHand: salesInv.stock_on_hand,
+          availableStock: salesInv.available_stock,
+          updatedAt: new Date(salesInv.updated_at)
+        }).where(eq(pgInventory.id, salesInv._id))
+          .catch((e: any) => console.error("Error updating void inventory:", e.message));
+      }
+    } catch (err: any) {
+      console.error("Failed to sync void to postgres", err.message);
+    }
 
     syncSalesStockLedger(txn.salesman_id, it.sku_id, today);
   });
@@ -12380,3 +12410,16 @@ apiRouter.post("/reconciliations/daily/approve", authMiddleware, requireRoles("A
     reconciliation: newRec,
   });
 });
+
+// Global API Error Handling Middleware
+apiRouter.use((err: any, _req: any, res: Response, _next: any) => {
+  console.error("[API Error Handler]", err);
+  if (res.headersSent) return;
+  const status = err.status || err.statusCode || 500;
+  res.status(status).json({
+    success: false,
+    detail: err.message || "Terjadi kesalahan internal pada server.",
+    error: process.env.NODE_ENV !== "production" ? err.stack : undefined,
+  });
+});
+

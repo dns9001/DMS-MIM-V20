@@ -2,15 +2,18 @@ import { pool, sqlDb } from "../src/db/index.js";
 import { db } from "./data.js";
 import { ALL_SYNC_COLLECTIONS } from "./firestoreSync.js";
 
-let isCloudSqlConnected = false;
+export let isCloudSqlConnected = false;
 let lastCloudSqlSyncTimestamp: string | null = null;
 let lastCloudSqlSyncStatus: "SUCCESS" | "SYNCING" | "ERROR" | "IDLE" = "IDLE";
 let lastCloudSqlError: string | null = null;
 
 // Initialize PostgreSQL tables automatically with retry
 export async function initializeCloudSqlTables(retries = 3): Promise<boolean> {
-  if (!process.env.SQL_HOST || !process.env.SQL_USER) {
-    console.log("[Cloud SQL] Missing SQL_HOST/SQL_USER credentials.");
+  const hasUrl = !!process.env.DATABASE_URL;
+  const hasHostUser = !!process.env.SQL_HOST && !!process.env.SQL_USER;
+
+  if (!hasUrl && !hasHostUser) {
+    console.log("[Cloud SQL] Missing SQL_HOST/SQL_USER or DATABASE_URL credentials. Using local operational store.");
     return false;
   }
 
@@ -451,6 +454,12 @@ export async function initializeCloudSqlTables(retries = 3): Promise<boolean> {
         client.release();
       }
     } catch (err: any) {
+      const isRefused = err?.code === "ECONNREFUSED" || (typeof err?.message === "string" && err.message.includes("ECONNREFUSED"));
+      if (isRefused) {
+        console.warn(`[Cloud SQL] PostgreSQL host unreachable (ECONNREFUSED). Operating in local persistent store mode.`);
+        lastCloudSqlError = "ECONNREFUSED: Server database tidak aktif di alamat/port yang dikonfigurasi.";
+        break;
+      }
       console.warn(`[Cloud SQL] Table init attempt ${attempt}/${retries} failed:`, err?.message || err);
       lastCloudSqlError = err?.message || String(err);
       if (attempt < retries) {
@@ -465,8 +474,13 @@ export async function initializeCloudSqlTables(retries = 3): Promise<boolean> {
  * Load all collections directly from Cloud SQL PostgreSQL into memory cache on server startup
  */
 export async function loadAllFromPostgres(targetDb: any): Promise<boolean> {
-  if (!process.env.SQL_HOST || !process.env.SQL_USER) {
-    console.log("[Cloud SQL] Missing SQL credentials, skipping PostgreSQL load.");
+  const hasUrl = !!process.env.DATABASE_URL;
+  const hasHostUser = !!process.env.SQL_HOST && !!process.env.SQL_USER;
+
+  if (!hasUrl && !hasHostUser) {
+    return false;
+  }
+  if (!isCloudSqlConnected) {
     return false;
   }
 
@@ -529,7 +543,7 @@ export async function loadAllFromPostgres(targetDb: any): Promise<boolean> {
  * Persist single document to Cloud SQL PostgreSQL immediately (ACID Transaction)
  */
 export async function syncDocToPostgres(collectionName: string, docId: string, data: any): Promise<boolean> {
-  if (!process.env.SQL_HOST || !process.env.SQL_USER) return false;
+  if (!process.env.DATABASE_URL && (!process.env.SQL_HOST || !process.env.SQL_USER)) return false;
   try {
     const payload = JSON.stringify(data);
     await pool.query(
@@ -553,7 +567,7 @@ export async function syncDocToPostgres(collectionName: string, docId: string, d
  * Delete single document from Cloud SQL PostgreSQL immediately
  */
 export async function deleteDocFromPostgres(collectionName: string, docId: string): Promise<boolean> {
-  if (!process.env.SQL_HOST || !process.env.SQL_USER) return false;
+  if (!process.env.DATABASE_URL && (!process.env.SQL_HOST || !process.env.SQL_USER)) return false;
   try {
     await pool.query(
       `DELETE FROM dms_document_store WHERE collection_name = $1 AND doc_id = $2`,
@@ -577,8 +591,24 @@ export async function migrateAllToCloudSql(): Promise<{ success: boolean; totalR
   let totalMigrated = 0;
   const counts: Record<string, number> = {};
 
+  const hasUrl = !!process.env.DATABASE_URL;
+  const hasHostUser = !!process.env.SQL_HOST && !!process.env.SQL_USER;
+
+  if (!hasUrl && !hasHostUser) {
+    return {
+      success: false,
+      totalRecords: 0,
+      collectionCounts: {},
+      message: "Gagal migrasi: Kredensial Cloud SQL (DATABASE_URL atau SQL_HOST) tidak ditemukan.",
+    };
+  }
+
   try {
-    await initializeCloudSqlTables();
+    const initSuccess = await initializeCloudSqlTables();
+    if (!initSuccess && lastCloudSqlError?.includes("ECONNREFUSED")) {
+      throw new Error("Server database tidak aktif di alamat/port yang dikonfigurasi (ECONNREFUSED).");
+    }
+
     const client = await pool.connect();
 
     try {
@@ -642,9 +672,22 @@ export async function migrateAllToCloudSql(): Promise<{ success: boolean; totalR
       client.release();
     }
   } catch (err: any) {
+    const isRefused = err?.code === "ECONNREFUSED" || (typeof err?.message === "string" && err.message.includes("ECONNREFUSED"));
     lastCloudSqlSyncStatus = "ERROR";
+    
+    if (isRefused) {
+      lastCloudSqlError = "ECONNREFUSED: Server database tidak aktif.";
+      console.warn("[Cloud SQL] Migration aborted: PostgreSQL host unreachable (ECONNREFUSED).");
+      return {
+        success: false,
+        totalRecords: 0,
+        collectionCounts: {},
+        message: "Gagal migrasi: Server database tidak aktif (ECONNREFUSED).",
+      };
+    }
+
     lastCloudSqlError = err?.message || String(err);
-    console.error("[Cloud SQL] Migration failed:", err);
+    console.error("[Cloud SQL] Migration process failed:", err);
     return {
       success: false,
       totalRecords: 0,
@@ -663,7 +706,7 @@ export async function getCloudSqlStats() {
   let connected = false;
 
   try {
-    if (process.env.SQL_HOST && process.env.SQL_USER) {
+    if (process.env.DATABASE_URL || (process.env.SQL_HOST && process.env.SQL_USER)) {
       const res = await pool.query(
         "SELECT count(*) as count FROM information_schema.tables WHERE table_schema = 'public'"
       );

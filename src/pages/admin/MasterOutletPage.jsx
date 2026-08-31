@@ -708,7 +708,7 @@ export default function MasterOutletPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleRecalculateAll}
+            onClick={() => handleRecalculateAll()}
             disabled={recalculating}
             data-testid="btn-recalculate-all"
             className="rounded-xl border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold gap-1.5 h-9"
@@ -720,7 +720,7 @@ export default function MasterOutletPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportCSV}
+            onClick={() => handleExportCSV()}
             data-testid="btn-export-csv"
             className="rounded-xl border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold gap-1.5 h-9"
           >
@@ -729,7 +729,7 @@ export default function MasterOutletPage() {
           </Button>
 
           <Button
-            onClick={handleOpenCreate}
+            onClick={() => handleOpenCreate()}
             data-testid="btn-add-outlet"
             className="bg-navy hover:bg-navy-light text-white rounded-xl text-xs font-bold gap-1.5 h-9 shadow-xs"
           >

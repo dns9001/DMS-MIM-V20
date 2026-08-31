@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { Home, CalendarCheck, Store, Receipt, User, RefreshCw } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Logo from "../components/Logo";
+import PageTransition from "../components/layout/PageTransition";
 import { pendingCount, flushQueue } from "../lib/offline";
 
 const NAV = [
@@ -60,7 +61,9 @@ export default function MobileLayout({ children }) {
           </div>
         </div>
       </header>
-      <main className="p-3 sm:p-4 space-y-4">{children}</main>
+      <main className="p-3 sm:p-4 space-y-4">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <nav
         data-testid="bottom-nav"
         className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-slate-200/90 pb-safe z-50 flex justify-around items-center h-16 shadow-lg"

@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Logo from "../components/Logo";
+import PageTransition from "../components/layout/PageTransition";
 import { Sheet, SheetContent, SheetTrigger } from "../components/ui/sheet";
 import { Button } from "../components/ui/button";
 
@@ -140,7 +141,9 @@ export default function DesktopLayout({ children, title }) {
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-5 md:p-8 bg-slate-50/70">{children}</main>
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-5 md:p-8 bg-slate-50/70">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </div>
     </div>
   );

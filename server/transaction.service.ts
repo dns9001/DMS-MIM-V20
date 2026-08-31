@@ -1,3 +1,4 @@
+import { isCloudSqlConnected } from "./cloudsqlSync.js";
 import { sqlDb } from "../src/db/index.js";
 import { transactions, visits, outlets, skus, salesOutlets } from "../src/db/schema.js";
 import { transactionItems } from "./transaction-items.schema.js";
@@ -24,7 +25,7 @@ export async function postSaleAtomic(input: {
     return { ...item, quantity, unitPrice, discount };
   });
 
-  return sqlDb.transaction(async (tx) => {
+  const runner = isCloudSqlConnected ? (cb: any) => sqlDb.transaction(cb) : (cb: any) => cb(null); return runner(async (tx: any) => {
     const existing = await tx.select().from(transactions).where(eq(transactions.invoiceNumber, input.invoice_number)).limit(1);
     if (existing[0]) return { transaction: existing[0], replayed: true };
 
@@ -75,7 +76,7 @@ export async function postSaleAtomic(input: {
     `);
     const purchaseCount = Number((purchaseCountResult.rows[0] as any)?.count || 0);
     const nextStatus = purchaseCount === 1 ? "NOO" : purchaseCount === 2 ? "REPEAT" : "ACTIVE";
-    await tx.update(outlets).set({ status: nextStatus as any, updatedAt: now }).where(eq(outlets.id, input.outlet_id));
+    await tx.update(outlets).set({ status: nextStatus as any }).where(eq(outlets.id, input.outlet_id));
 
     // Effective Call requires a valid visit on the same local calendar date.
     if (validVisit) {

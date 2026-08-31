@@ -431,7 +431,7 @@ export default function SalesHome() {
       <div className="grid grid-cols-2 gap-2.5">
         <StatCard
           label="Volume Terjual Hari Ini"
-          value={`${s.total_volume ?? s.volume ?? 0} Qty`}
+          value={`${formatNumber(s.total_volume ?? s.volume ?? 0)} Qty`}
           sub={`${s.transaction_count ?? s.txn_count ?? 0} transaksi berhasil`}
           testid="kpi-total-volume"
         />
@@ -451,7 +451,7 @@ export default function SalesHome() {
               Target &amp; Volume per SKU ({data.period || "Bulan Ini"})
             </span>
             <span className="text-[10px] text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-              Hari ini: {s.total_volume ?? s.volume ?? 0} Qty
+              Hari ini: {formatNumber(s.total_volume ?? s.volume ?? 0)} Qty
             </span>
           </div>
           <div className="space-y-2">
@@ -516,22 +516,22 @@ export default function SalesHome() {
           <div className="grid grid-cols-4 gap-2 bg-slate-50/90 p-3 rounded-xl text-center border border-slate-100">
             <div>
               <div className="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Dibawa</div>
-              <div className="font-heading font-bold text-blue-700 text-base">{stockToday.totals?.total_dibawa || 0}</div>
+              <div className="font-heading font-bold text-blue-700 text-base">{formatNumber(stockToday.totals?.total_dibawa || 0)}</div>
               <div className="text-[9px] text-slate-400">Qty</div>
             </div>
             <div>
               <div className="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Terjual</div>
-              <div className="font-heading font-bold text-emerald-700 text-base">{stockToday.totals?.total_terjual || 0}</div>
+              <div className="font-heading font-bold text-emerald-700 text-base">{formatNumber(stockToday.totals?.total_terjual || 0)}</div>
               <div className="text-[9px] text-slate-400">Qty</div>
             </div>
             <div>
               <div className="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Retur</div>
-              <div className="font-heading font-bold text-purple-700 text-base">{stockToday.totals?.total_return || 0}</div>
+              <div className="font-heading font-bold text-purple-700 text-base">{formatNumber(stockToday.totals?.total_return || 0)}</div>
               <div className="text-[9px] text-slate-400">Qty</div>
             </div>
             <div>
               <div className="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Sisa Fisik</div>
-              <div className="font-heading font-bold text-navy text-base">{stockToday.totals?.total_sisa || 0}</div>
+              <div className="font-heading font-bold text-navy text-base">{formatNumber(stockToday.totals?.total_sisa || 0)}</div>
               <div className="text-[9px] text-slate-400">Qty</div>
             </div>
           </div>

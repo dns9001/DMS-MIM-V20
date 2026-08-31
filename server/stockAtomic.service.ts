@@ -1,3 +1,4 @@
+import { isCloudSqlConnected } from "./cloudsqlSync.js";
 import { sqlDb } from "../src/db/index.js";
 import { sql } from "drizzle-orm";
 import { assertAdjustmentRole, assertPositiveQuantity, assertSufficientStock } from "./inventoryPolicy.js";
@@ -18,7 +19,7 @@ export async function transferStock(args: {
 }) {
   assertPositiveQuantity(args.quantity);
 
-  return sqlDb.transaction(async (tx) => {
+  const runner = isCloudSqlConnected ? (cb: any) => sqlDb.transaction(cb) : (cb: any) => cb(null); return runner(async (tx: any) => {
     const source = await tx.execute(sql`
       SELECT id, stock_on_hand, available_stock
       FROM inventory
@@ -96,7 +97,7 @@ export async function adjustStock(args: {
     throw new Error("INVALID_STOCK_ADJUSTMENT");
   }
 
-  return sqlDb.transaction(async (tx) => {
+  const runner = isCloudSqlConnected ? (cb: any) => sqlDb.transaction(cb) : (cb: any) => cb(null); return runner(async (tx: any) => {
     const current = await tx.execute(sql`
       SELECT id, stock_on_hand, available_stock
       FROM inventory

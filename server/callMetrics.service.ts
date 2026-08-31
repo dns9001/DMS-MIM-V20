@@ -1,5 +1,7 @@
 import { sqlDb } from "../src/db/index.js";
 import { sql } from "drizzle-orm";
+import { db } from "./data.js";
+import { isCloudSqlConnected } from "./cloudsqlSync.js";
 
 /** Canonical DMS call metrics, derived from PostgreSQL facts. */
 export async function getCallMetrics(date: string, salesmanId?: string) {
@@ -9,6 +11,45 @@ export async function getCallMetrics(date: string, salesmanId?: string) {
 
 /** One database query for an inclusive date range, returning one row per day. */
 export async function getCallMetricsRange(from: string, to: string, salesmanId?: string) {
+  if (!isCloudSqlConnected) {
+    // In-memory fallback
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    const days: string[] = [];
+    for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
+      days.push(new Date(d).toISOString().slice(0, 10));
+    }
+    return days.map(date => {
+       const dayVisits = db.visits.filter(v => 
+          v.check_in_time && v.check_in_time.startsWith(date) &&
+          v.status !== 'CANCELLED' &&
+          (!salesmanId || v.salesman_id === salesmanId)
+       );
+       const dayTxns = db.transactions.filter(t => 
+          t.created_at && t.created_at.startsWith(date) &&
+          t.status !== 'CANCELLED' &&
+          (!salesmanId || t.salesman_id === salesmanId)
+       );
+       
+       const uniqueOutlets = new Set<string>();
+       dayVisits.forEach(v => uniqueOutlets.add(`${v.salesman_id}-${v.outlet_id}`));
+       
+       const effectiveOutlets = new Set<string>();
+       dayTxns.forEach(t => {
+          if (uniqueOutlets.has(`${t.salesman_id}-${t.outlet_id}`)) {
+             effectiveOutlets.add(`${t.salesman_id}-${t.outlet_id}`);
+          }
+       });
+
+       return {
+         date,
+         outlet_call: uniqueOutlets.size,
+         effective_call: effectiveOutlets.size,
+         ec_product_rows: 0,
+       };
+    });
+  }
+
   const salesmanVisitFilter = salesmanId ? sql`AND v.salesman_id = ${salesmanId}` : sql``;
   const salesmanTxnFilter = salesmanId ? sql`AND t.salesman_id = ${salesmanId}` : sql``;
 
@@ -77,6 +118,10 @@ export async function getCallMetricsRange(from: string, to: string, salesmanId?:
 }
 
 export async function getProductEcMetrics(date: string, salesmanId?: string) {
+  if (!isCloudSqlConnected) {
+    return []; // Return empty for now as in-memory SKU breakdown is complex
+  }
+
   const result = await sqlDb.execute(sql`
     WITH visits_day AS (
       SELECT DATE(v.check_in_time) AS date, v.salesman_id, v.outlet_id

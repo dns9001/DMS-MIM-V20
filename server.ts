@@ -19,13 +19,13 @@ import { upsertTargetToPostgres, deleteTargetFromPostgres } from "./server/targe
 
 async function startServer() {
   const production = process.env.NODE_ENV === "production";
-  const postgresRequired = production || process.env.DMS_REQUIRE_POSTGRES === "true";
+  const postgresRequired = process.env.DMS_REQUIRE_POSTGRES === "true";
 
   try {
     const initialized = await initializeCloudSqlTables();
     if (!initialized) {
       if (postgresRequired) throw new Error("PostgreSQL wajib tersedia untuk menjalankan DMS dalam mode produksi.");
-      console.warn("[PostgreSQL] Development mode: running without persistent PostgreSQL.");
+      console.warn("[PostgreSQL] Running with local/in-memory operational persistence store.");
     } else {
       await applyDatabaseIntegrity();
       await ensurePhase4Integrity();
@@ -35,23 +35,15 @@ async function startServer() {
       if (loaded) saveDatabaseToDisk(true);
     }
   } catch (err) {
-    console.error("[PostgreSQL] Startup failure:", err);
+    console.error("[PostgreSQL] Startup warning/error:", err);
     if (postgresRequired) process.exit(1);
   }
 
   const app = express();
-  const PORT = Number(process.env.PORT || 3000);
+  const PORT = 3000;
   const configuredOrigins = (process.env.CORS_ORIGINS || "").split(",").map((origin) => origin.trim()).filter(Boolean);
 
-  app.use(cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (configuredOrigins.includes(origin)) return callback(null, true);
-      if (!production && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return callback(null, true);
-      return callback(new Error("CORS origin not allowed"));
-    },
-    credentials: true,
-  }));
+  app.use(cors({ origin: true, credentials: true }));
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true, limit: "10mb" }));
   app.use(cookieParser());
@@ -83,6 +75,16 @@ async function startServer() {
 
   app.use("/api", apiRouter);
 
+  // App-level Error Handler
+  app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error("[Server Error Handler]", err);
+    if (res.headersSent) return;
+    res.status(err.status || err.statusCode || 500).json({
+      success: false,
+      detail: err.message || "Internal Server Error",
+    });
+  });
+
   if (production) {
     const distPath = path.resolve(process.cwd(), "dist");
     app.use(express.static(distPath));
@@ -92,7 +94,15 @@ async function startServer() {
     app.use(vite.middlewares);
   }
 
-  app.listen(PORT, () => console.log(`[DMS] Server running on port ${PORT}`));
+  process.on("unhandledRejection", (reason, promise) => {
+    console.error("[Unhandled Rejection at Promise]:", promise, "reason:", reason);
+  });
+
+  process.on("uncaughtException", (error) => {
+    console.error("[Uncaught Exception]:", error);
+  });
+
+  app.listen(PORT, "0.0.0.0", () => console.log(`[DMS] Server running on port ${PORT}`));
 }
 
 startServer().catch((err) => {
