@@ -884,7 +884,7 @@ export default function ReportsPage() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={resetFilters}
+                onClick={() => resetFilters()}
                 className="text-xs text-slate-500 hover:text-slate-800 h-9"
               >
                 <RotateCcw size={13} className="mr-1" />
@@ -899,7 +899,7 @@ export default function ReportsPage() {
               <span className="text-xs text-slate-400 font-semibold mr-1">Ekspor:</span>
               <Button
                 data-testid="report-export-csv"
-                onClick={handleExportCSV}
+                onClick={() => handleExportCSV()}
                 variant="outline"
                 size="sm"
                 className="h-8 text-xs border-slate-300 text-slate-700 hover:bg-slate-50"
@@ -909,7 +909,7 @@ export default function ReportsPage() {
               </Button>
               <Button
                 data-testid="report-export-xlsx"
-                onClick={handleExportXLSX}
+                onClick={() => handleExportXLSX()}
                 variant="outline"
                 size="sm"
                 className="h-8 text-xs border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
@@ -919,7 +919,7 @@ export default function ReportsPage() {
               </Button>
               <Button
                 data-testid="report-export-pdf"
-                onClick={handleExportPDF}
+                onClick={() => handleExportPDF()}
                 variant="outline"
                 size="sm"
                 className="h-8 text-xs border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
@@ -929,7 +929,7 @@ export default function ReportsPage() {
               </Button>
               <Button
                 data-testid="report-print"
-                onClick={handlePrint}
+                onClick={() => handlePrint()}
                 variant="outline"
                 size="sm"
                 className="h-8 text-xs border-slate-300 text-slate-700 hover:bg-slate-50"

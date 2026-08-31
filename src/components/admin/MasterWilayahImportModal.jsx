@@ -282,7 +282,7 @@ prov-31,DKI JAKARTA,reg-3171,KOTA JAKARTA SELATAN,Kota,dist-317101,TEBET,vil-317
               <Button
                 variant="outline"
                 size="sm"
-                onClick={fetchWilayahData}
+                onClick={() => fetchWilayahData()}
                 disabled={loading}
                 className="h-9 text-xs rounded-xl gap-1.5 shrink-0"
               >
@@ -362,7 +362,7 @@ prov-31,DKI JAKARTA,reg-3171,KOTA JAKARTA SELATAN,Kota,dist-317101,TEBET,vil-317
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={handleDownloadSampleCSV}
+                  onClick={() => handleDownloadSampleCSV()}
                   className="h-8 text-xs bg-white border-blue-300 text-blue-800 font-semibold gap-1.5"
                 >
                   <Download size={13} />
@@ -407,7 +407,7 @@ prov-31,DKI JAKARTA,reg-3171,KOTA JAKARTA SELATAN,Kota,dist-317101,TEBET,vil-317
 
             <Button
               disabled={importing || !csvText.trim()}
-              onClick={handleProcessImport}
+              onClick={() => handleProcessImport()}
               className="w-full h-11 bg-navy hover:bg-navy-light text-white font-bold rounded-xl gap-2"
             >
               {importing ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />}

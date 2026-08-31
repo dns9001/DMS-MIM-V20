@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import {
   Loader2, Plus, Package, ArrowRightLeft, RotateCcw,
-  CheckCircle2, AlertTriangle, Building2, User, Search, Eye,
+  CheckCircle2, AlertTriangle, Building2, User, Users, Search, Eye,
   Truck, ArrowDownLeft, ShieldAlert, Download, RefreshCw,
   FileSpreadsheet, Layers, Filter, Check, X, PlusCircle
 } from "lucide-react";
@@ -48,7 +48,7 @@ export default function InventoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOfficeId, setSelectedOfficeId] = useState("ALL");
   const [stockFilterCategory, setStockFilterCategory] = useState("ALL");
-  const [stockFilterStatus, setStockFilterStatus] = useState("ALL"); // ALL, REORDER, SAFE
+  const [stockFilterStatus, setStockFilterStatus] = useState("ALL"); // ALL, REORDER, SAFE, IN_SALES, EMPTY
   const [movementTypeFilter, setMovementTypeFilter] = useState("ALL");
   const [receivingStatusFilter, setReceivingStatusFilter] = useState("ALL");
   const [salesmanFilter, setSalesmanFilter] = useState("ALL");
@@ -61,6 +61,8 @@ export default function InventoryPage() {
   const [opnameDialogOpen, setOpnameDialogOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
+  const [skuBreakdownModal, setSkuBreakdownModal] = useState(null); // Selected SKU for sales breakdown modal
+  const [refreshing, setRefreshing] = useState(false);
 
   // Forms
   const [receivingForm, setReceivingForm] = useState({
@@ -110,11 +112,31 @@ export default function InventoryPage() {
   });
 
   const [opnameSearch, setOpnameSearch] = useState("");
+  const [receivingSearch, setReceivingSearch] = useState("");
+  const [handoverSearch, setHandoverSearch] = useState("");
 
-  const loadAll = useCallback(async () => {
-    setLoading(true);
+  // Load static masters once
+  const loadMasters = useCallback(async () => {
     try {
-      const [invRes, rcvRes, hndRes, retRes, mvtRes, monRes, recRes, salesRes, skuRes, offRes] = await Promise.all([
+      const [salesRes, skuRes, offRes] = await Promise.all([
+        api.get("/masters/salesmen"),
+        api.get("/masters/skus"),
+        api.get("/masters/offices"),
+      ]);
+      setSalesmen(salesRes.data.items || []);
+      setSkus(skuRes.data.items || []);
+      setOffices(offRes.data.items || []);
+    } catch (e) {
+      console.error("Error loading masters:", e);
+    }
+  }, []);
+
+  const loadAll = useCallback(async (isManualRefresh = false) => {
+    if (isManualRefresh) setRefreshing(true);
+    else setLoading(true);
+
+    try {
+      const [invRes, rcvRes, hndRes, retRes, mvtRes, monRes, recRes] = await Promise.all([
         api.get("/inventory"),
         api.get("/stock/receivings"),
         api.get("/stock/handovers", { params: { business_date: filterDate } }),
@@ -122,9 +144,6 @@ export default function InventoryPage() {
         api.get("/inventory/movements", { params: { from_date: filterDate, to_date: filterDate } }),
         api.get("/warehouse/monitoring", { params: { business_date: filterDate } }),
         api.get("/warehouse/reconciliation", { params: { business_date: filterDate } }),
-        api.get("/masters/salesmen"),
-        api.get("/masters/skus"),
-        api.get("/masters/offices"),
       ]);
 
       setInventoryItems(invRes.data.items || []);
@@ -134,14 +153,21 @@ export default function InventoryPage() {
       setMovements(mvtRes.data.items || []);
       setMonitoringData(monRes.data || null);
       setReconciliationData(recRes.data || null);
-      setSalesmen(salesRes.data.items || []);
-      setSkus(skuRes.data.items || []);
-      setOffices(offRes.data.items || []);
+
+      if (isManualRefresh) {
+        toast.success("Data inventori & mutasi berhasil diperbarui.");
+      }
     } catch (e) {
       toast.error(errMsg(e));
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-    setLoading(false);
   }, [filterDate]);
+
+  useEffect(() => {
+    loadMasters();
+  }, [loadMasters]);
 
   useEffect(() => {
     loadAll();
@@ -571,9 +597,15 @@ export default function InventoryPage() {
       }
       if (stockFilterStatus !== "ALL") {
         const whInv = inventoryItems.find((i) => (i.location_type === "WAREHOUSE" || !i.location_type) && i.sku_id === s._id);
-        const isLow = (whInv ? whInv.available_stock : 0) <= (whInv?.reorder_level || 20);
+        const slsInvs = inventoryItems.filter((i) => i.location_type === "SALES" && i.sku_id === s._id);
+        const whStock = whInv ? whInv.available_stock : 0;
+        const slsStock = slsInvs.reduce((sum, it) => sum + (it.available_stock || 0), 0);
+        const isLow = whStock <= (whInv?.reorder_level || 20);
+
         if (stockFilterStatus === "REORDER" && !isLow) return false;
         if (stockFilterStatus === "SAFE" && isLow) return false;
+        if (stockFilterStatus === "IN_SALES" && slsStock <= 0) return false;
+        if (stockFilterStatus === "EMPTY" && whStock > 0) return false;
       }
       return true;
     });
@@ -669,6 +701,17 @@ export default function InventoryPage() {
             onChange={(e) => setFilterDate(e.target.value)}
             className="w-36 bg-white text-xs font-semibold"
           />
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => loadAll(true)}
+            disabled={refreshing}
+            title="Muat Ulang Data Inventori"
+            className="bg-white border-slate-300 text-slate-700 hover:bg-slate-50 h-9 w-9"
+          >
+            <RefreshCw className={refreshing ? "animate-spin text-navy" : "text-slate-600"} size={15} />
+          </Button>
 
           <Button
             onClick={() => handleOpenNewReceiving()}
@@ -809,6 +852,50 @@ export default function InventoryPage() {
       {/* TAB 1: POSISI STOK REAL-TIME */}
       {activeTab === "overview" && (
         <div className="space-y-4">
+          {/* Quick Filter Status Pills */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setStockFilterStatus("ALL")}
+              className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors ${
+                stockFilterStatus === "ALL"
+                  ? "bg-navy text-white shadow-sm"
+                  : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              Semua SKU ({skus.length})
+            </button>
+            <button
+              onClick={() => setStockFilterStatus("REORDER")}
+              className={`text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-colors ${
+                stockFilterStatus === "REORDER"
+                  ? "bg-red-600 text-white shadow-sm"
+                  : "bg-red-50 border border-red-200 text-red-700 hover:bg-red-100"
+              }`}
+            >
+              <AlertTriangle size={13} /> Reorder Alert ({reorderCount})
+            </button>
+            <button
+              onClick={() => setStockFilterStatus("IN_SALES")}
+              className={`text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-colors ${
+                stockFilterStatus === "IN_SALES"
+                  ? "bg-amber-600 text-white shadow-sm"
+                  : "bg-amber-50 border border-amber-200 text-amber-800 hover:bg-amber-100"
+              }`}
+            >
+              <Users size={13} /> Ada di Sales ({skus.filter(s => inventoryItems.some(i => i.location_type === "SALES" && i.sku_id === s._id && i.available_stock > 0)).length})
+            </button>
+            <button
+              onClick={() => setStockFilterStatus("SAFE")}
+              className={`text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-colors ${
+                stockFilterStatus === "SAFE"
+                  ? "bg-emerald-700 text-white shadow-sm"
+                  : "bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100"
+              }`}
+            >
+              <CheckCircle2 size={13} /> Stok Aman ({skus.length - reorderCount})
+            </button>
+          </div>
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2 flex-1">
               <div className="relative flex-1 min-w-[200px] max-w-sm">
@@ -830,17 +917,6 @@ export default function InventoryPage() {
                   {categories.map((c) => (
                     <SelectItem key={c} value={c}>{c}</SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={stockFilterStatus} onValueChange={setStockFilterStatus}>
-                <SelectTrigger className="w-36 text-xs bg-white h-9">
-                  <SelectValue placeholder="Semua Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">Semua Status</SelectItem>
-                  <SelectItem value="REORDER">Reorder Alert (Low)</SelectItem>
-                  <SelectItem value="SAFE">Stok Aman</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -897,8 +973,19 @@ export default function InventoryPage() {
                       <TableCell className={`text-right font-heading font-bold text-sm ${isLow ? "text-red-600" : "text-navy"}`}>
                         {whStock.toLocaleString("id-ID")} {s.unit}
                       </TableCell>
-                      <TableCell className="text-right font-heading font-bold text-sm text-amber-700">
-                        {slsStock.toLocaleString("id-ID")} {s.unit}
+                      <TableCell className="text-right">
+                        {slsStock > 0 ? (
+                          <button
+                            onClick={() => setSkuBreakdownModal(s)}
+                            className="inline-flex items-center gap-1 font-heading font-bold text-sm text-amber-700 hover:text-amber-900 hover:underline bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded transition-colors"
+                            title="Klik untuk melihat rincian sales yang membawa produk ini"
+                          >
+                            <Users size={12} />
+                            {slsStock.toLocaleString("id-ID")} {s.unit}
+                          </button>
+                        ) : (
+                          <span className="font-heading text-sm text-slate-400">0 {s.unit}</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right font-heading font-bold text-sm text-emerald-800">
                         {totalQty.toLocaleString("id-ID")} {s.unit}
@@ -1983,7 +2070,7 @@ export default function InventoryPage() {
 
             {/* List SKU Opname Table */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="relative flex-1 max-w-xs">
                   <Search className="absolute left-2.5 top-2.5 text-slate-400" size={13} />
                   <Input
@@ -1993,7 +2080,44 @@ export default function InventoryPage() {
                     className="pl-8 h-8 text-xs bg-white"
                   />
                 </div>
-                <div className="text-xs text-slate-500 font-medium">
+
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setOpnameForm((prev) => ({
+                        ...prev,
+                        items: prev.items.map((it) => ({ ...it, physical_qty: it.system_qty })),
+                      }));
+                      toast.info("Semua kuantitas fisik disamakan dengan sistem.");
+                    }}
+                    className="h-8 text-[11px] font-bold text-emerald-800 bg-emerald-50 border-emerald-200 hover:bg-emerald-100"
+                  >
+                    <CheckCircle2 size={12} className="mr-1" /> Samakan dg Sistem
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setOpnameForm((prev) => ({
+                        ...prev,
+                        items: prev.items.map((it) => ({ ...it, physical_qty: 0 })),
+                      }));
+                      toast.info("Semua kuantitas fisik direset ke 0.");
+                    }}
+                    className="h-8 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border-slate-300"
+                  >
+                    <RotateCcw size={12} className="mr-1" /> Reset ke 0
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span>Daftar {opnameForm.items.length} SKU untuk diverifikasi:</span>
+                <div>
                   {(() => {
                     const diffCount = opnameForm.items.filter((it) => {
                       const p = Number(it.physical_qty);
@@ -2378,6 +2502,96 @@ export default function InventoryPage() {
               </div>
 
               <Button onClick={() => setDetailDialogOpen(false)} className="w-full bg-navy text-white text-xs">
+                Tutup
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* DIALOG: RINCIAN STOK SALES PER SKU */}
+      <Dialog open={!!skuBreakdownModal} onOpenChange={(open) => !open && setSkuBreakdownModal(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-base font-bold text-navy flex items-center gap-2">
+              <Users size={18} className="text-amber-600" /> Rincian Stok di Tangan Salesman
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Daftar salesman yang saat ini membawa produk <b>{skuBreakdownModal?.name}</b> ({skuBreakdownModal?.code}).
+            </DialogDescription>
+          </DialogHeader>
+
+          {skuBreakdownModal && (
+            <div className="space-y-3 py-1">
+              <div className="bg-amber-50/60 border border-amber-200 rounded-lg p-2.5 flex items-center justify-between text-xs">
+                <div>
+                  <div className="font-bold text-slate-800">{skuBreakdownModal.name}</div>
+                  <div className="text-[11px] text-slate-500 font-mono">{skuBreakdownModal.code}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[11px] text-slate-500">Total di Sales</div>
+                  <div className="font-heading font-bold text-base text-amber-700">
+                    {inventoryItems
+                      .filter((i) => i.location_type === "SALES" && i.sku_id === skuBreakdownModal._id)
+                      .reduce((sum, it) => sum + (it.available_stock || 0), 0)}{" "}
+                    {skuBreakdownModal.unit || "Unit"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="border border-slate-200 rounded-lg overflow-hidden max-h-60 overflow-y-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-50">
+                      <TableHead className="text-xs font-bold">SALESMAN</TableHead>
+                      <TableHead className="text-xs font-bold text-right">STOK FISIK</TableHead>
+                      <TableHead className="text-xs font-bold text-right">EST. NILAI</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(() => {
+                      const salesHolding = inventoryItems.filter(
+                        (i) => i.location_type === "SALES" && i.sku_id === skuBreakdownModal._id && (i.available_stock || 0) > 0
+                      );
+
+                      if (salesHolding.length === 0) {
+                        return (
+                          <TableRow>
+                            <TableCell colSpan={3} className="text-center py-6 text-slate-400 text-xs">
+                              Tidak ada salesman yang sedang membawa stok produk ini.
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
+
+                      return salesHolding.map((inv) => {
+                        const salesman = salesmen.find((s) => s._id === inv.location_id);
+                        const val = (inv.available_stock || 0) * (skuBreakdownModal.base_price || 0);
+                        return (
+                          <TableRow key={inv._id || inv.location_id}>
+                            <TableCell>
+                              <div className="font-bold text-slate-800 text-xs">
+                                {salesman?.name || inv.salesman_name || inv.location_id}
+                              </div>
+                              <div className="text-[10px] text-slate-400 font-mono">
+                                {salesman?.code || "SALES"} · {salesman?.phone || "-"}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right font-heading font-bold text-xs text-amber-700">
+                              {inv.available_stock} {skuBreakdownModal.unit || "Unit"}
+                            </TableCell>
+                            <TableCell className="text-right font-medium text-[11px] text-slate-600">
+                              {rupiah(val)}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      });
+                    })()}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <Button onClick={() => setSkuBreakdownModal(null)} className="w-full bg-navy text-white text-xs">
                 Tutup
               </Button>
             </div>

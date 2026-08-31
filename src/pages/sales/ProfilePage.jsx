@@ -114,7 +114,7 @@ export default function ProfilePage() {
             </div>
           </div>
           <button
-            onClick={handleRefresh}
+            onClick={() => handleRefresh()}
             disabled={refreshing}
             title="Segarkan data akun"
             className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors shrink-0"
@@ -207,7 +207,7 @@ export default function ProfilePage() {
 
       {/* Logout Button */}
       <Button
-        onClick={handleLogout}
+        onClick={() => handleLogout()}
         variant="destructive"
         className="w-full text-xs font-bold gap-2 py-3"
       >

@@ -1,5 +1,5 @@
 import { pool, sqlDb } from "../src/db/index.js";
-import { db } from "./data.js";
+import { db, ensureDefaultUsers, ensureDefaultMasterData } from "./data.js";
 import { ALL_SYNC_COLLECTIONS } from "./firestoreSync.js";
 
 export let isCloudSqlConnected = false;
@@ -521,6 +521,9 @@ export async function loadAllFromPostgres(targetDb: any): Promise<boolean> {
           loadedCounts[colName] = (loadedCounts[colName] || 0) + 1;
         }
       }
+
+      ensureDefaultUsers();
+      ensureDefaultMasterData();
 
       isCloudSqlConnected = true;
       lastCloudSqlSyncTimestamp = new Date().toISOString();

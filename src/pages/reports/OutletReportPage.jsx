@@ -530,7 +530,7 @@ export default function OutletReportPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={fetchReport}
+            onClick={() => fetchReport()}
             disabled={loading}
             className="h-9 text-xs border-slate-200 text-slate-700 hover:bg-slate-50"
           >
@@ -540,7 +540,7 @@ export default function OutletReportPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportCSV}
+            onClick={() => handleExportCSV()}
             disabled={!outletsList.length}
             className="h-9 text-xs border-slate-300 text-slate-700 hover:bg-slate-100"
           >
@@ -550,7 +550,7 @@ export default function OutletReportPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportXLSX}
+            onClick={() => handleExportXLSX()}
             disabled={!outletsList.length}
             className="h-9 text-xs border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-semibold"
           >
@@ -560,7 +560,7 @@ export default function OutletReportPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportPDF}
+            onClick={() => handleExportPDF()}
             disabled={!outletsList.length}
             className="h-9 text-xs border-red-300 text-red-700 bg-red-50 hover:bg-red-100 font-semibold"
           >
@@ -570,7 +570,7 @@ export default function OutletReportPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
             className="h-9 text-xs border-slate-300 text-slate-700 hover:bg-slate-100 hidden sm:inline-flex"
           >
             <Printer size={13} className="mr-1.5" />
@@ -872,7 +872,7 @@ export default function OutletReportPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleResetFilters}
+                onClick={() => handleResetFilters()}
                 className="text-xs text-slate-500 hover:text-slate-800 h-9"
               >
                 <RotateCcw size={12} className="mr-1.5" />
@@ -880,7 +880,7 @@ export default function OutletReportPage() {
               </Button>
             )}
             <Button
-              onClick={fetchReport}
+              onClick={() => fetchReport()}
               disabled={loading}
               className="bg-navy hover:bg-navy-light text-white font-bold h-9 text-xs px-4 shadow-xs"
               data-testid="apply-filter-button"
@@ -1442,7 +1442,7 @@ export default function OutletReportPage() {
               </div>
 
               <button
-                onClick={closeOutletDetail}
+                onClick={() => closeOutletDetail()}
                 className="p-1.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
               >
                 <X size={20} />
@@ -1791,7 +1791,7 @@ export default function OutletReportPage() {
 
             {/* Modal Footer */}
             <div className="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-2 shrink-0">
-              <Button variant="outline" size="sm" onClick={closeOutletDetail} className="text-xs font-bold">
+              <Button variant="outline" size="sm" onClick={() => closeOutletDetail()} className="text-xs font-bold">
                 Tutup
               </Button>
             </div>

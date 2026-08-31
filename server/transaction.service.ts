@@ -13,7 +13,7 @@ const SALEABLE_OUTLET_STATUSES = new Set(["PROSPECT", "NOO", "REPEAT", "ACTIVE",
 export async function postSaleAtomic(input: {
   invoice_number: string; salesman_id: string; outlet_id: string; visit_id?: string; office_id?: string;
   transaction_type?: string; items: SaleItemInput[]; notes?: string; idempotency_key?: string;
-}) {
+}): Promise<{ transaction: any; replayed: boolean }> {
   if (!input.invoice_number?.trim()) throw new Error("Nomor invoice wajib diisi.");
   if (!input.salesman_id || !input.outlet_id) throw new Error("Salesman dan outlet wajib diisi.");
   if (!Array.isArray(input.items) || input.items.length === 0) throw new Error("Minimal satu item transaksi wajib diisi.");
@@ -25,7 +25,7 @@ export async function postSaleAtomic(input: {
     return { ...item, quantity, unitPrice, discount };
   });
 
-  const runner = isCloudSqlConnected ? (cb: any) => sqlDb.transaction(cb) : (cb: any) => cb(null); return runner(async (tx: any) => {
+  return await sqlDb.transaction(async (tx) => {
     const existing = await tx.select().from(transactions).where(eq(transactions.invoiceNumber, input.invoice_number)).limit(1);
     if (existing[0]) return { transaction: existing[0], replayed: true };
 

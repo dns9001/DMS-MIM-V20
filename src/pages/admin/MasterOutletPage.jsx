@@ -2133,7 +2133,7 @@ export default function MasterOutletPage() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={handleDetectGps}
+                    onClick={() => handleDetectGps()}
                     disabled={gpsLoading}
                     className="h-7 text-[11px] rounded-lg border-slate-300 font-semibold gap-1"
                   >
@@ -2369,7 +2369,7 @@ export default function MasterOutletPage() {
             </Button>
             <Button
               type="button"
-              onClick={confirmDeleteOutlet}
+              onClick={() => confirmDeleteOutlet()}
               disabled={deletingOutlet}
               className="rounded-xl text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold"
             >

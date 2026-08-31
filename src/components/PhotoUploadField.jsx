@@ -153,7 +153,7 @@ export default function PhotoUploadField({
             </button>
             <button
               type="button"
-              onClick={handleClear}
+              onClick={() => handleClear()}
               disabled={disabled || compressing}
               className="p-1.5 bg-red-600/80 hover:bg-red-600 text-white rounded-lg backdrop-blur-sm transition-all"
               title="Hapus foto"

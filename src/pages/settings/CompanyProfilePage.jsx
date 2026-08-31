@@ -404,7 +404,7 @@ export default function CompanyProfilePage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={refreshProfile}
+            onClick={() => refreshProfile()}
             disabled={saving}
             className="text-slate-600 border-slate-200 hover:bg-slate-50"
             title="Refresh data dari server"
@@ -417,7 +417,7 @@ export default function CompanyProfilePage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleResetForm}
+                onClick={() => handleResetForm()}
                 disabled={saving}
                 className="text-slate-600 border-slate-200 hover:bg-slate-50"
                 title="Batal perubahan"
@@ -428,7 +428,7 @@ export default function CompanyProfilePage() {
               <Button
                 data-testid="save-company-profile-top"
                 disabled={saving || uploadingLogo || deletingLogo}
-                onClick={handleSaveProfile}
+                onClick={() => handleSaveProfile()}
                 className="bg-gold hover:bg-gold-light text-navy font-bold shadow-xs transition-all flex items-center min-w-[140px] justify-center"
               >
                 {saving ? (
@@ -567,7 +567,7 @@ export default function CompanyProfilePage() {
                       size="sm"
                       data-testid="delete-logo-button"
                       disabled={deletingLogo || compressingLogo || uploadingLogo}
-                      onClick={handleDeleteLogo}
+                      onClick={() => handleDeleteLogo()}
                       className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 text-xs font-bold"
                     >
                       {deletingLogo ? <Loader2 size={14} className="animate-spin mr-1" /> : <Trash2 size={14} className="mr-1.5" />}
@@ -588,7 +588,7 @@ export default function CompanyProfilePage() {
                     </div>
                     <Button
                       size="sm"
-                      onClick={handleUploadLogoConfirm}
+                      onClick={() => handleUploadLogoConfirm()}
                       disabled={uploadingLogo}
                       className="bg-navy text-white text-xs h-7 px-3 font-bold"
                     >

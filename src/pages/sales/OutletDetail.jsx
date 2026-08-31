@@ -393,7 +393,7 @@ export default function OutletDetail() {
       <Button
         data-testid="start-visit-button"
         disabled={busy || outlet.status !== "ACTIVE"}
-        onClick={startVisit}
+        onClick={() => startVisit()}
         className="w-full h-12 bg-gradient-to-r from-gold to-gold-light hover:brightness-105 text-navy-dark font-bold text-base rounded-xl disabled:opacity-50 shadow-xs transition-all active:scale-[0.98]"
       >
         {busy ? <Loader2 className="animate-spin mr-2" size={18} /> : <LogIn size={18} className="mr-2" />}

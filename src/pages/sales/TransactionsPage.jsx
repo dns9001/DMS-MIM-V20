@@ -16,6 +16,7 @@ import {
   Building2,
   User,
   ArrowUpDown,
+  Printer,
 } from "lucide-react";
 import api, { errMsg } from "../../lib/api";
 import { rupiah, fmtDateTime, todayLocal } from "../../lib/format";
@@ -139,6 +140,98 @@ export default function TransactionsPage() {
       volumeBySkuMap[name] += vol;
     });
   });
+
+  const handlePrintInvoice = () => {
+    if (!detail) return;
+    
+    // Create an iframe to hold the print content
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
+    
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    
+    // Simple basic POS receipt layout
+    doc.write(`
+      <html>
+        <head>
+          <title>Struk - ${detail.invoice_number || detail.transaction_code}</title>
+          <style>
+            body { font-family: monospace; width: 300px; margin: 0 auto; color: #000; font-size: 12px; }
+            .center { text-align: center; }
+            .right { text-align: right; }
+            .bold { font-weight: bold; }
+            .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
+            .flex-between { display: flex; justify-content: space-between; }
+            table { width: 100%; border-collapse: collapse; }
+            td { vertical-align: top; padding: 2px 0; }
+            .col-qty { width: 30px; }
+            .col-name { width: auto; }
+            .col-total { width: 80px; text-align: right; }
+          </style>
+        </head>
+        <body>
+          <div class="center bold" style="font-size: 14px; margin-bottom: 5px;">MAHAMERU DMS</div>
+          <div class="center">Struk Pembelian</div>
+          
+          <div class="divider"></div>
+          
+          <div><span class="bold">No:</span> ${detail.invoice_number || detail.transaction_code}</div>
+          <div><span class="bold">Waktu:</span> ${fmtDateTime(detail.created_at)}</div>
+          <div><span class="bold">Sales:</span> ${detail.salesman_name || detail.salesman_id}</div>
+          <div><span class="bold">Outlet:</span> ${detail.outlet_name || detail.outlet_id}</div>
+          
+          <div class="divider"></div>
+          
+          <table>
+            ${(detail.items || []).map((it) => {
+              const qty = Number(it.quantity ?? it.volume ?? 0);
+              const price = Number(it.unit_price ?? it.unitPrice ?? 0);
+              const sub = Number(it.subtotal ?? qty * price);
+              return `
+                <tr>
+                  <td class="col-name">${it.sku_name || it.skuName}</td>
+                  <td class="col-qty right">${qty}x</td>
+                  <td class="col-total">${rupiah(sub)}</td>
+                </tr>
+              `;
+            }).join("")}
+          </table>
+          
+          <div class="divider"></div>
+          
+          <div class="flex-between">
+            <span>Subtotal</span>
+            <span>${rupiah(detail.subtotal || detail.total)}</span>
+          </div>
+          ${Number(detail.discount) > 0 ? `
+          <div class="flex-between">
+            <span>Diskon</span>
+            <span>- ${rupiah(detail.discount)}</span>
+          </div>
+          ` : ""}
+          <div class="flex-between bold" style="font-size: 14px; margin-top: 5px;">
+            <span>TOTAL</span>
+            <span>${rupiah(detail.total)}</span>
+          </div>
+          
+          <div class="divider"></div>
+          
+          <div class="center">Status: ${detail.payment_method} - ${detail.status}</div>
+          <div class="center" style="margin-top: 10px;">Terima Kasih!</div>
+        </body>
+      </html>
+    `);
+    
+    doc.close();
+    
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    }, 500);
+  };
 
   return (
     <div className="space-y-4 max-w-6xl mx-auto pb-10" data-testid="transactions-page">
@@ -585,7 +678,17 @@ export default function TransactionsPage() {
 
               {/* Footer Actions */}
               <div className="border-t border-slate-200 p-4 bg-slate-50 flex items-center justify-between gap-2">
-                <div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePrintInvoice()}
+                    className="text-navy border-slate-300 hover:bg-slate-100 text-xs rounded-xl h-9 font-medium"
+                  >
+                    <Printer size={14} className="mr-1.5" />
+                    Cetak Struk
+                  </Button>
+                  
                   {detail.status !== "CANCELLED" && (
                     <Button
                       variant="outline"
@@ -650,7 +753,7 @@ export default function TransactionsPage() {
               <Button
                 size="sm"
                 disabled={cancelling || !cancelReason.trim()}
-                onClick={handleCancelTransaction}
+                onClick={() => handleCancelTransaction()}
                 className="bg-red-600 hover:bg-red-700 text-white text-xs rounded-xl h-9"
               >
                 {cancelling ? <Loader2 className="animate-spin mr-1.5" size={14} /> : null}

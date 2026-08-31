@@ -91,7 +91,9 @@ export async function getCallMetricsRange(from: string, to: string, salesmanId?:
     daily AS (
       SELECT
         d.date,
-        COUNT(DISTINCT (v.salesman_id, v.outlet_id))::int AS outlet_call,
+        COUNT(DISTINCT (v.salesman_id, v.outlet_id)) FILTER (
+          WHERE v.outlet_id IS NOT NULL
+        )::int AS outlet_call,
         COUNT(DISTINCT (v.salesman_id, v.outlet_id)) FILTER (
           WHERE p.outlet_id IS NOT NULL
         )::int AS effective_call,

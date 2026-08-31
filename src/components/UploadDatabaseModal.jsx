@@ -304,7 +304,7 @@ export default function UploadDatabaseModal({ open, onOpenChange, onSuccess }) {
             type="button"
             variant="outline"
             size="sm"
-            onClick={handleClose}
+            onClick={() => handleClose()}
             disabled={loading}
             className="text-xs"
           >
@@ -313,7 +313,7 @@ export default function UploadDatabaseModal({ open, onOpenChange, onSuccess }) {
           <Button
             type="button"
             size="sm"
-            onClick={handleUpload}
+            onClick={() => handleUpload()}
             disabled={!parsedData || loading}
             className="bg-navy hover:bg-navy/90 text-white font-semibold text-xs shadow-xs"
           >

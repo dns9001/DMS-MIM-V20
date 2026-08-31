@@ -538,7 +538,7 @@ export default function MonitoringPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={exportToCSV}
+            onClick={() => exportToCSV()}
             className="text-xs font-semibold text-slate-700 hover:bg-slate-50 h-8"
           >
             <Download size={13} className="mr-1.5" /> Export CSV

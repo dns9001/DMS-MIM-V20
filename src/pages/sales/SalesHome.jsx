@@ -18,7 +18,7 @@ import { Button } from "../../components/ui/button";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "../../components/ui/dialog";
-import { fmtTime, fmtDate, fmtDayDateWIB, formatDuration, rupiah, todayLocal } from "../../lib/format";
+import { fmtTime, fmtDate, fmtDayDateWIB, formatDuration, rupiah, todayLocal, formatNumber } from "../../lib/format";
 
 export function LiveWIBClock() {
   const [now, setNow] = useState(new Date());

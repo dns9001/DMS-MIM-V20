@@ -232,7 +232,7 @@ export default function Login() {
               value={forgotEmail}
               onChange={(e) => setForgotEmail(e.target.value)}
             />
-            <Button data-testid="forgot-submit-button" onClick={doForgot} className="w-full bg-navy text-white">
+            <Button data-testid="forgot-submit-button" onClick={() => doForgot()} className="w-full bg-navy text-white">
               Kirim Tautan Reset
             </Button>
           </div>

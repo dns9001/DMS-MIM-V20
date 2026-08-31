@@ -370,7 +370,7 @@ export default function MasterDataPage() {
               </Button>
 
               <Button
-                onClick={handleDownloadDatabase}
+                onClick={() => handleDownloadDatabase()}
                 disabled={downloading}
                 variant="outline"
                 size="sm"
@@ -617,7 +617,7 @@ function MasterTab({ entityKey, config, active }) {
           <Button
             size="icon"
             variant="outline"
-            onClick={load}
+            onClick={() => load()}
             disabled={loading}
             title="Muat ulang data"
             className="h-10 w-10 shrink-0 border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -831,7 +831,7 @@ function MasterTab({ entityKey, config, active }) {
             </Button>
             <Button
               type="button"
-              onClick={confirmDelete}
+              onClick={() => confirmDelete()}
               disabled={deleting}
               className="rounded-xl text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold"
             >
@@ -964,7 +964,7 @@ function EntityFormDialog({ open, onClose, config, entityKey, item, options, onS
           <Button
             type="button"
             variant="outline"
-            onClick={onClose}
+            onClick={() => onClose()}
             disabled={busy}
             className="text-xs rounded-xl"
           >
@@ -973,7 +973,7 @@ function EntityFormDialog({ open, onClose, config, entityKey, item, options, onS
           <Button
             data-testid={`${entityKey}-form-submit`}
             disabled={busy}
-            onClick={submit}
+            onClick={() => submit()}
             className="bg-navy hover:bg-navy/90 text-white font-bold text-xs rounded-xl px-5"
           >
             {busy ? <Loader2 className="animate-spin mr-1.5" size={15} /> : null}

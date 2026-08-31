@@ -233,7 +233,7 @@ export default function AuditPage() {
           <Button
             size="sm"
             variant="outline"
-            onClick={handleExport}
+            onClick={() => handleExport()}
             data-testid="audit-export-btn"
             className="text-xs h-9 font-semibold text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100 flex items-center gap-1.5"
           >
@@ -408,7 +408,7 @@ export default function AuditPage() {
             <Button
               size="sm"
               variant="ghost"
-              onClick={resetFilters}
+              onClick={() => resetFilters()}
               className="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 h-8"
             >
               <RotateCcw size={13} className="mr-1" /> Reset Filter

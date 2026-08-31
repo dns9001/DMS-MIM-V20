@@ -332,7 +332,7 @@ function MarkerPopupCard({ marker, userCoords }) {
             </span>
           </div>
           <button
-            onClick={handleCopyCoord}
+            onClick={() => handleCopyCoord()}
             title="Salin Koordinat"
             className="flex items-center gap-1 text-[10px] font-semibold text-slate-600 hover:text-navy px-1.5 py-0.5 rounded bg-white border border-slate-200 shadow-2xs transition-colors"
           >
@@ -611,7 +611,7 @@ export default function MapView({
           {/* Real-time GPS Tracker Center Button */}
           {showUserLocation && (
             <button
-              onClick={handleCenterUser}
+              onClick={() => handleCenterUser()}
               title={liveUserCoords ? "Arahkan ke Lokasi Saya (Real-time GPS)" : "GPS sedang mendeteksi..."}
               className={`p-1.5 rounded-lg transition-colors text-[11px] font-semibold flex items-center gap-1 ${
                 followUser
@@ -638,7 +638,7 @@ export default function MapView({
 
           {/* Fullscreen Toggle */}
           <button
-            onClick={toggleFullscreen}
+            onClick={() => toggleFullscreen()}
             title={isFullscreen ? "Keluar Layar Penuh" : "Buka Layar Penuh"}
             className="p-1.5 text-slate-700 hover:bg-slate-100 hover:text-navy rounded-lg transition-colors"
           >
@@ -833,7 +833,7 @@ export default function MapView({
 
         {/* Click Handler */}
         <ClickHandler
-          onClick={onClick}
+          onClick={() => onClick()}
           isPicker={isPicker}
           onPickerMove={onPickerChange}
         />

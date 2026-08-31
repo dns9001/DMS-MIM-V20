@@ -2,6 +2,7 @@
 process.env.TZ = "Asia/Jakarta";
 
 import express from "express";
+import "express-async-errors";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";

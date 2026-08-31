@@ -659,7 +659,7 @@ export function seedDatabase() {
 
   const hash = (pw: string) => bcrypt.hashSync(pw, 10);
 
-  // System Accounts Only (Owner & Admin) - No dummy salesmen or staff
+  // Standard Role Accounts for Operation & Testing
   db.users = [
     {
       _id: "usr-owner",
@@ -678,6 +678,36 @@ export function seedDatabase() {
       password_hash: hash("admin123"),
       role: "ADMIN",
       phone: "081234567890",
+      status: "ACTIVE",
+      created_at: now,
+    },
+    {
+      _id: "usr-spv",
+      name: "Budi Santoso (Supervisor)",
+      email: "spv@mahameru.id",
+      password_hash: hash("spv123"),
+      role: "SUPERVISOR",
+      phone: "081298765432",
+      status: "ACTIVE",
+      created_at: now,
+    },
+    {
+      _id: "usr-sales1",
+      name: "Rian Hidayat (Salesman)",
+      email: "sales1@mahameru.id",
+      password_hash: hash("sales123"),
+      role: "SALES",
+      phone: "081311223344",
+      status: "ACTIVE",
+      created_at: now,
+    },
+    {
+      _id: "usr-warehouse",
+      name: "Dedi Supriyadi (Gudang)",
+      email: "gudang@mahameru.id",
+      password_hash: hash("gudang123"),
+      role: "WAREHOUSE",
+      phone: "081399887766",
       status: "ACTIVE",
       created_at: now,
     },
@@ -1018,6 +1048,36 @@ export function ensureDefaultUsers() {
       status: "ACTIVE",
       created_at: now,
     },
+    {
+      _id: "usr-spv",
+      name: "Budi Santoso (Supervisor)",
+      email: "spv@mahameru.id",
+      password_hash: hash("spv123"),
+      role: "SUPERVISOR",
+      phone: "081298765432",
+      status: "ACTIVE",
+      created_at: now,
+    },
+    {
+      _id: "usr-sales1",
+      name: "Rian Hidayat (Salesman)",
+      email: "sales1@mahameru.id",
+      password_hash: hash("sales123"),
+      role: "SALES",
+      phone: "081311223344",
+      status: "ACTIVE",
+      created_at: now,
+    },
+    {
+      _id: "usr-warehouse",
+      name: "Dedi Supriyadi (Gudang)",
+      email: "gudang@mahameru.id",
+      password_hash: hash("gudang123"),
+      role: "WAREHOUSE",
+      phone: "081399887766",
+      status: "ACTIVE",
+      created_at: now,
+    },
   ];
 
   if (!Array.isArray(db.users)) {
@@ -1041,16 +1101,13 @@ export function ensureDefaultUsers() {
 
   db.users = uniqueUsers;
 
-  // Only seed standard users if users table is completely empty
-  if (db.users.length === 0) {
-    db.users = standardUsers;
-  } else {
-    // If users already exist, just ensure existing accounts have password_hash
-    for (const su of standardUsers) {
-      const existing = db.users.find((u) => u.email.toLowerCase() === su.email.toLowerCase());
-      if (existing && !existing.password_hash) {
-        existing.password_hash = su.password_hash;
-      }
+  // Ensure all standard users exist in db.users
+  for (const su of standardUsers) {
+    const existing = db.users.find((u) => u.email.toLowerCase() === su.email.toLowerCase());
+    if (!existing) {
+      db.users.push(su);
+    } else if (!existing.password_hash) {
+      existing.password_hash = su.password_hash;
     }
   }
 }

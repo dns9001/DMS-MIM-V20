@@ -83,7 +83,7 @@ function OutletRow({ o, right, testid, onClick, userCoords }) {
   return (
     <button
       data-testid={testid}
-      onClick={onClick}
+      onClick={() => onClick()}
       className="w-full bg-white border border-slate-200/90 hover:border-navy/40 rounded-2xl p-4 flex items-center gap-3.5 text-left shadow-2xs hover:shadow-xs active:scale-[0.98] transition-all"
     >
       <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-navy shrink-0 font-bold">
@@ -339,7 +339,7 @@ function NearbyTab() {
       <div className="flex items-center gap-2">
         <Button
           data-testid="nearby-locate-button"
-          onClick={locate}
+          onClick={() => locate()}
           disabled={loading}
           className="flex-1 h-12 bg-navy hover:bg-navy-light text-white font-bold rounded-xl shadow-xs transition-all active:scale-[0.98]"
         >
@@ -616,7 +616,7 @@ function NewOutletTab() {
           type="button"
           variant="outline"
           data-testid="new-outlet-gps"
-          onClick={grabGps}
+          onClick={() => grabGps()}
           className={`h-11 rounded-xl font-bold border transition-all ${
             geo ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-navy text-navy"
           }`}

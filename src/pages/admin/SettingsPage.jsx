@@ -458,7 +458,7 @@ export default function SettingsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleDownloadDatabase}
+                onClick={() => handleDownloadDatabase()}
                 disabled={downloading}
                 className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 font-semibold"
                 title="Download seluruh data & koleksi database dalam format JSON"
@@ -487,7 +487,7 @@ export default function SettingsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={handleReset}
+              onClick={() => handleReset()}
               disabled={saving}
               className="text-slate-600 hover:text-rose-600 hover:bg-rose-50 border-slate-200"
             >
@@ -498,7 +498,7 @@ export default function SettingsPage() {
           {canEdit && (
             <Button
               size="sm"
-              onClick={handleSave}
+              onClick={() => handleSave()}
               disabled={saving}
               className="bg-navy hover:bg-navy/90 text-white font-semibold shadow-xs"
             >
@@ -662,7 +662,7 @@ export default function SettingsPage() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={handleGetCurrentLocation}
+                    onClick={() => handleGetCurrentLocation()}
                     disabled={gettingLocation}
                     className="border-navy/20 text-navy hover:bg-navy/5 text-xs font-medium"
                   >
@@ -1511,7 +1511,7 @@ export default function SettingsPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={handleTestDbConnection}
+                  onClick={() => handleTestDbConnection()}
                   disabled={testingDb}
                   className="border-emerald-600 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 font-semibold text-xs shadow-xs"
                   title="Uji koneksi langsung ke server PostgreSQL Cloud SQL"
@@ -1527,7 +1527,7 @@ export default function SettingsPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={handleRunMigrations}
+                  onClick={() => handleRunMigrations()}
                   disabled={runningMigrations}
                   className="border-blue-600 bg-blue-50 text-blue-800 hover:bg-blue-100 font-semibold text-xs shadow-xs"
                   title="Jalankan dan verifikasi migrasi 34 tabel PostgreSQL"
@@ -1543,7 +1543,7 @@ export default function SettingsPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={handleDownloadDatabase}
+                  onClick={() => handleDownloadDatabase()}
                   disabled={downloading}
                   className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs"
                   title="Download snapshot backup seluruh data dalam format JSON"
@@ -1570,7 +1570,7 @@ export default function SettingsPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={fetchSettings}
+                  onClick={() => fetchSettings()}
                   disabled={loading}
                   className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs"
                   title="Segarkan status database"
@@ -1815,7 +1815,7 @@ export default function SettingsPage() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={handleFetchCloudServices}
+                onClick={() => handleFetchCloudServices()}
                 disabled={loadingCloudServices}
                 className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs"
               >
@@ -2042,7 +2042,7 @@ export default function SettingsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={handleReset}
+              onClick={() => handleReset()}
               disabled={saving}
               className="text-slate-600 hover:text-rose-600 hover:bg-rose-50 border-slate-200"
             >
@@ -2051,7 +2051,7 @@ export default function SettingsPage() {
             </Button>
             <Button
               size="sm"
-              onClick={handleSave}
+              onClick={() => handleSave()}
               disabled={saving}
               className="bg-navy hover:bg-navy/90 text-white font-semibold shadow-xs"
             >

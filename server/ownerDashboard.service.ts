@@ -113,6 +113,43 @@ function getOwnerDashboardDataInMemory(req: any) {
   const transaction_count = txnIdSet.size;
   const ec_rate = outlet_calls > 0 ? Math.round((effective_calls / outlet_calls) * 100) : 0;
 
+  // Lifecycle status counts
+  const noo_count = (db.outlets || []).filter((o: any) => {
+    if (areaId && o.area_id !== areaId) return false;
+    return o.lifecycle_status === "NOO" || o.lifecycle_status === "NEW";
+  }).length;
+
+  const repeat_count = (db.outlets || []).filter((o: any) => {
+    if (areaId && o.area_id !== areaId) return false;
+    return o.lifecycle_status === "REPEAT";
+  }).length;
+
+  const active_count = (db.outlets || []).filter((o: any) => {
+    if (areaId && o.area_id !== areaId) return false;
+    return o.lifecycle_status === "ACTIVE";
+  }).length;
+
+  const dormant_count = (db.outlets || []).filter((o: any) => {
+    if (areaId && o.area_id !== areaId) return false;
+    return o.lifecycle_status === "DORMANT" || o.lifecycle_status === "INACTIVE";
+  }).length;
+
+  const totalFilteredOutlets = (db.outlets || []).filter((o: any) => !areaId || o.area_id === areaId).length;
+  const coverage = totalFilteredOutlets > 0 ? Math.round((distinctTxnOutlets.size / totalFilteredOutlets) * 100) : 0;
+
+  // Planned calls across call plans in range
+  const relevantCallPlans = (db.call_plans || []).filter((cp: any) => {
+    const cpDate = (cp.date || "").slice(0, 10);
+    if (cpDate < safeFrom || cpDate > safeTo) return false;
+    if (salesmanId && cp.salesman_id !== salesmanId) return false;
+    return true;
+  });
+  const planned_calls = relevantCallPlans.reduce((sum: number, cp: any) => {
+    const items = (db.call_plan_items || []).filter((i: any) => i.call_plan_id === cp._id);
+    return sum + (items.length || Number(cp.total_outlets || 0));
+  }, 0);
+  const missed_calls = Math.max(0, planned_calls - outlet_calls);
+
   // New Outlets
   const new_outlets = (db.outlets || []).filter((o: any) => {
     const createdDate = (o.created_at || "").slice(0, 10);
@@ -167,17 +204,33 @@ function getOwnerDashboardDataInMemory(req: any) {
     const aId = area._id || area.id;
     let aVol = 0;
     let aVal = 0;
+    const aVisits = new Set<string>();
+    const aEc = new Set<string>();
+
     validTxns.forEach((t: any) => {
       const o = outletsMap.get(t.outlet_id);
       if (o?.area_id === aId) {
+        let hasMatched = false;
         (t.items || []).forEach((item: any) => {
           if (!skuId || item.sku_id === skuId) {
+            hasMatched = true;
             const q = Number(item.quantity || 0);
             const p = Number(item.price || item.unit_price || 0);
             aVol += q;
             aVal += q * p;
           }
         });
+        const txnDate = (t.created_at || t.date || "").slice(0, 10);
+        if (hasMatched && visitKeySet.has(`${t.salesman_id}|${txnDate}|${t.outlet_id}`)) {
+          aEc.add(t.outlet_id);
+        }
+      }
+    });
+
+    validVisits.forEach((v: any) => {
+      const o = outletsMap.get(v.outlet_id);
+      if (o?.area_id === aId) {
+        aVisits.add(v.outlet_id);
       }
     });
 
@@ -186,6 +239,9 @@ function getOwnerDashboardDataInMemory(req: any) {
       return tg.period_month === currentMonth && u?.area_id === aId;
     }).reduce((s: number, tg: any) => s + Number(tg.target_volume || 0), 0);
 
+    const aOc = aVisits.size;
+    const aEffective = aEc.size;
+
     return {
       area_id: aId,
       area: area.area_name || area.name,
@@ -193,12 +249,12 @@ function getOwnerDashboardDataInMemory(req: any) {
       volume: aVol,
       sales_value: aVal,
       total_sales: aVal,
-      outlet_calls: 0,
-      effective_calls: 0,
+      outlet_calls: aOc,
+      effective_calls: aEffective,
       target_volume: aTgt || null,
       achievement_percentage: aTgt > 0 ? Math.round((aVol / aTgt) * 100) : 0,
       achievement_formatted: aTgt > 0 ? `${Math.round((aVol / aTgt) * 100)}%` : "-",
-      ec_rate: 0,
+      ec_rate: aOc > 0 ? Math.round((aEffective / aOc) * 100) : 0,
     };
   });
 
@@ -208,6 +264,8 @@ function getOwnerDashboardDataInMemory(req: any) {
     let sVol = 0;
     let sVal = 0;
     let sTxns = 0;
+    const sVisits = new Set<string>();
+    const sEc = new Set<string>();
 
     validTxns.forEach((t: any) => {
       if (t.salesman_id === sId) {
@@ -221,7 +279,19 @@ function getOwnerDashboardDataInMemory(req: any) {
             sVal += q * p;
           }
         });
-        if (hasItem) sTxns++;
+        if (hasItem) {
+          sTxns++;
+          const txnDate = (t.created_at || t.date || "").slice(0, 10);
+          if (visitKeySet.has(`${sId}|${txnDate}|${t.outlet_id}`)) {
+            sEc.add(t.outlet_id);
+          }
+        }
+      }
+    });
+
+    validVisits.forEach((v: any) => {
+      if (v.salesman_id === sId) {
+        sVisits.add(v.outlet_id);
       }
     });
 
@@ -229,6 +299,8 @@ function getOwnerDashboardDataInMemory(req: any) {
       .reduce((s: number, tg: any) => s + Number(tg.target_volume || 0), 0);
 
     const uArea = areasMap.get(user.area_id);
+    const sOc = sVisits.size;
+    const sEffective = sEc.size;
 
     return {
       salesman_id: sId,
@@ -239,12 +311,12 @@ function getOwnerDashboardDataInMemory(req: any) {
       sales_value: sVal,
       value: sVal,
       txns: sTxns,
-      outlet_calls: 0,
-      effective_calls: 0,
+      outlet_calls: sOc,
+      effective_calls: sEffective,
       target_volume: sTgt || null,
       achievement_percentage: sTgt > 0 ? Math.round((sVol / sTgt) * 100) : 0,
       achievement_formatted: sTgt > 0 ? `${Math.round((sVol / sTgt) * 100)}%` : "-",
-      ec_rate: 0,
+      ec_rate: sOc > 0 ? Math.round((sEffective / sOc) * 100) : 0,
       planned: 0,
     };
   });
@@ -321,17 +393,20 @@ function getOwnerDashboardDataInMemory(req: any) {
       achievement_status: "Target Berdasarkan Volume",
       transactions: transaction_count,
       transaction_count: transaction_count,
+      planned: planned_calls,
       outlet_calls: outlet_calls,
       actual: outlet_calls,
       effective_calls: effective_calls,
       effective: effective_calls,
       ec_rate: ec_rate,
       effective_ratio: ec_rate,
+      missed: missed_calls,
+      coverage: coverage,
       new_outlets: new_outlets,
-      noo_count: 0,
-      repeat_count: 0,
-      active_count: 0,
-      dormant_count: 0,
+      noo_count: noo_count,
+      repeat_count: repeat_count,
+      active_count: active_count,
+      dormant_count: dormant_count,
       active_sales: active_salesmen,
       active_salesmen: active_salesmen,
       warehouse_stock: warehouseStock,
@@ -415,7 +490,8 @@ export async function getOwnerDashboardData(req: any) {
         (SELECT count(DISTINCT outlet_id) FROM effective_calls) as effective_calls,
         (SELECT COALESCE(sum(qty), 0) FROM filtered_items) as total_volume,
         (SELECT COALESCE(sum(qty * price), 0) FROM filtered_items) as total_revenue,
-        (SELECT count(DISTINCT id) FROM filtered_items) as transaction_count
+        (SELECT count(DISTINCT id) FROM filtered_items) as transaction_count,
+        (SELECT count(DISTINCT outlet_id) FROM filtered_items) as distinct_txn_outlets
     `;
 
     const kpiRes = await sqlDb.execute(sql.raw(mainQuery));
@@ -426,7 +502,38 @@ export async function getOwnerDashboardData(req: any) {
     const outlet_calls = Number(kpiData?.outlet_calls) || 0;
     const effective_calls = Number(kpiData?.effective_calls) || 0;
     const transaction_count = Number(kpiData?.transaction_count) || 0;
+    const distinct_txn_outlets = Number(kpiData?.distinct_txn_outlets) || 0;
     const ec_rate = outlet_calls > 0 ? Math.round((effective_calls / outlet_calls) * 100) : 0;
+
+    // Planned calls in range
+    let planned_calls = 0;
+    try {
+      const plannedQ = `
+        SELECT COALESCE(sum(COALESCE(cpi.count, cp.total_outlets, 0)), 0) as planned_calls
+        FROM call_plans cp
+        LEFT JOIN (
+          SELECT call_plan_id, count(*) as count FROM call_plan_items GROUP BY call_plan_id
+        ) cpi ON cp.id = cpi.call_plan_id
+        WHERE to_char(cp.date, 'YYYY-MM-DD') >= '${safeFrom}' AND to_char(cp.date, 'YYYY-MM-DD') <= '${safeTo}'
+        ${safeSalesmanId ? ` AND cp.salesman_id = '${safeSalesmanId}'` : ""}
+      `;
+      const plannedRes = await sqlDb.execute(sql.raw(plannedQ));
+      planned_calls = Number(plannedRes.rows[0]?.planned_calls) || 0;
+    } catch {
+      planned_calls = 0;
+    }
+    const missed_calls = Math.max(0, planned_calls - outlet_calls);
+
+    // Total outlets for coverage
+    let coverage = 0;
+    try {
+      const totalOutletsQ = `SELECT count(*) as count FROM outlets o WHERE 1=1 ${conditionsArea}`;
+      const totalOutletsRes = await sqlDb.execute(sql.raw(totalOutletsQ));
+      const totalOutletsCount = Number(totalOutletsRes.rows[0]?.count) || 0;
+      coverage = totalOutletsCount > 0 ? Math.round((distinct_txn_outlets / totalOutletsCount) * 100) : 0;
+    } catch {
+      coverage = 0;
+    }
 
     // New Outlets count
     const newOutletsQ = `
@@ -841,41 +948,46 @@ export async function getOwnerDashboardData(req: any) {
       coverage: outlet_calls > 0 ? Math.round((Number(row.effective_calls)/outlet_calls)*100) : 0
     }));
 
+    const inMemFallback = getOwnerDashboardDataInMemory(req);
+
     return {
       totals: {
-        sales_value: total_revenue,
-        total_sales: total_revenue,
-        total_volume: total_volume,
-        volume: total_volume,
-        target_volume: target_volume,
-        actual_volume: total_volume,
-        achievement_percentage: achievement_percentage,
-        achievement_formatted: `${achievement_percentage}%`,
+        sales_value: total_revenue || inMemFallback.totals.sales_value,
+        total_sales: total_revenue || inMemFallback.totals.total_sales,
+        total_volume: total_volume || inMemFallback.totals.total_volume,
+        volume: total_volume || inMemFallback.totals.volume,
+        target_volume: target_volume || inMemFallback.totals.target_volume,
+        actual_volume: total_volume || inMemFallback.totals.actual_volume,
+        achievement_percentage: achievement_percentage || inMemFallback.totals.achievement_percentage,
+        achievement_formatted: `${achievement_percentage || inMemFallback.totals.achievement_percentage}%`,
         achievement_status: "Target Berdasarkan Volume",
-        transactions: transaction_count,
-        transaction_count: transaction_count,
-        outlet_calls: outlet_calls,
-        actual: outlet_calls,
-        effective_calls: effective_calls,
-        effective: effective_calls,
-        ec_rate: ec_rate,
-        effective_ratio: ec_rate,
-        new_outlets: new_outlets,
-        noo_count: Number(lcData.noo_count) || 0,
-        repeat_count: Number(lcData.repeat_count) || 0,
-        active_count: Number(lcData.active_count) || 0,
-        dormant_count: Number(lcData.dormant_count) || 0,
-        active_sales: active_salesmen,
-        active_salesmen: active_salesmen,
-        warehouse_stock: warehouseStock,
-        salesman_stock: salesmanStock,
-        stock_on_hand: stock_on_hand
+        transactions: transaction_count || inMemFallback.totals.transactions,
+        transaction_count: transaction_count || inMemFallback.totals.transaction_count,
+        planned: planned_calls || inMemFallback.totals.planned,
+        outlet_calls: outlet_calls || inMemFallback.totals.outlet_calls,
+        actual: outlet_calls || inMemFallback.totals.actual,
+        effective_calls: effective_calls || inMemFallback.totals.effective_calls,
+        effective: effective_calls || inMemFallback.totals.effective,
+        ec_rate: ec_rate || inMemFallback.totals.ec_rate,
+        effective_ratio: ec_rate || inMemFallback.totals.effective_ratio,
+        missed: missed_calls || inMemFallback.totals.missed,
+        coverage: coverage || inMemFallback.totals.coverage,
+        new_outlets: new_outlets || inMemFallback.totals.new_outlets,
+        noo_count: Number(lcData.noo_count) || inMemFallback.totals.noo_count,
+        repeat_count: Number(lcData.repeat_count) || inMemFallback.totals.repeat_count,
+        active_count: Number(lcData.active_count) || inMemFallback.totals.active_count,
+        dormant_count: Number(lcData.dormant_count) || inMemFallback.totals.dormant_count,
+        active_sales: active_salesmen || inMemFallback.totals.active_sales,
+        active_salesmen: active_salesmen || inMemFallback.totals.active_salesmen,
+        warehouse_stock: warehouseStock || inMemFallback.totals.warehouse_stock,
+        salesman_stock: salesmanStock || inMemFallback.totals.salesman_stock,
+        stock_on_hand: stock_on_hand || inMemFallback.totals.stock_on_hand
       },
-      trend,
-      area_performance, 
-      product_coverage,
-      salesman_performance,
-      top_outlets
+      trend: (trend && trend.length > 0) ? trend : inMemFallback.trend,
+      area_performance: (area_performance && area_performance.length > 0) ? area_performance : inMemFallback.area_performance, 
+      product_coverage: (product_coverage && product_coverage.length > 0) ? product_coverage : inMemFallback.product_coverage,
+      salesman_performance: (salesman_performance && salesman_performance.length > 0) ? salesman_performance : inMemFallback.salesman_performance,
+      top_outlets: (top_outlets && top_outlets.length > 0) ? top_outlets : inMemFallback.top_outlets
     };
   } catch (error) {
     console.warn("[getOwnerDashboardData] PostgreSQL query failed, falling back to in-memory store:", error);

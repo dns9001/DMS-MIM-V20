@@ -250,7 +250,7 @@ export default function CallPlanPage() {
             size="icon"
             variant="outline"
             title="Refresh data"
-            onClick={handleRefresh}
+            onClick={() => handleRefresh()}
             disabled={refreshing}
             className="h-8 w-8 rounded-xl border-slate-200"
           >
@@ -313,7 +313,7 @@ export default function CallPlanPage() {
             <div className="flex items-center justify-between text-xs text-slate-300 pt-1">
               <span>Effective Call (EC): <strong className="text-emerald-400">{effectiveCount} Toko</strong></span>
               <button
-                onClick={handleOptimizeRoute}
+                onClick={() => handleOptimizeRoute()}
                 disabled={optimizing || items.length <= 1}
                 className="text-gold-light hover:text-white font-bold inline-flex items-center gap-1 text-[11px] underline underline-offset-2"
               >

@@ -1,27 +1,6 @@
 {
   "users": [
     {
-      "_id": "usr-owner",
-      "name": "Andis Moch Solihin",
-      "role": "OWNER",
-      "email": "andismochsolihin@gmail.com",
-      "phone": "081122334455",
-      "status": "ACTIVE",
-      "office_id": "off-1",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "last_location": {
-        "lat": -6.8727257,
-        "lng": 107.6048038,
-        "speed": 2.1249372959136963,
-        "heading": 322.0337829589844,
-        "accuracy": 100,
-        "latitude": -6.8727257,
-        "longitude": 107.6048038,
-        "timestamp": "2026-08-30T09:50:31.878Z"
-      },
-      "password_hash": "$2b$10$aquvw47roCv17eG2L/MqXeZOSOp.02UhiFVQy54rzw27Z9vekROC."
-    },
-    {
       "_id": "usr-1788086187277",
       "name": "Salesman Tester 7273",
       "role": "SALES",
@@ -32,18 +11,6 @@
       "office_id": "off-1",
       "created_at": "2026-08-30T10:36:27.373Z",
       "password_hash": "$2b$10$rvd6BDhymCY5jf4A/IXUneWYlo1raq7nJAG4Rg3KMTYEt7fB27OUy"
-    },
-    {
-      "_id": "usr-1788086058443",
-      "name": "Salesman Tester 8440",
-      "role": "SALES",
-      "email": "sales.cycle.8440@mahameru.id",
-      "phone": "08123458440",
-      "status": "ACTIVE",
-      "area_id": "area-1",
-      "office_id": "off-1",
-      "created_at": "2026-08-30T10:34:18.539Z",
-      "password_hash": "$2b$10$jGZ2ke1s//N/M7.mdkO0Ie5VuBTf.syY9YPRjNO7EvjBRQ51KAJaG"
     },
     {
       "_id": "usr-1788085594775",
@@ -58,6 +25,45 @@
       "password_hash": "$2b$10$k7srpdPQo0anX8yu7W5rCONdiPzuPmMnytLZ6FRTM1lsJ2mq5qVHG"
     },
     {
+      "_id": "usr-sales1",
+      "name": "Rian Hidayat (Salesman)",
+      "role": "SALES",
+      "email": "sales1@mahameru.id",
+      "phone": "081311223344",
+      "status": "ACTIVE",
+      "created_at": "2026-08-31T02:23:34.573Z",
+      "last_location": {
+        "lat": -6.8027056,
+        "lng": 107.1722696,
+        "speed": 0,
+        "accuracy": 100,
+        "latitude": -6.8027056,
+        "longitude": 107.1722696,
+        "timestamp": "2026-08-31T02:43:50.985Z"
+      },
+      "password_hash": "$2b$10$zw5vJ3k11WMlGMvqgYwm5el6QI48IsiIew9s/2TjEQlyaMhNWG9Y6"
+    },
+    {
+      "_id": "usr-warehouse",
+      "name": "Dedi Supriyadi (Gudang)",
+      "role": "WAREHOUSE",
+      "email": "gudang@mahameru.id",
+      "phone": "081399887766",
+      "status": "ACTIVE",
+      "created_at": "2026-08-31T02:23:34.573Z",
+      "password_hash": "$2b$10$anZO/Z.euo3iGkHO0fNLROJP0Ev4A2T4v8fcloD.cAKwbb5z6QTCm"
+    },
+    {
+      "_id": "usr-spv",
+      "name": "Budi Santoso (Supervisor)",
+      "role": "SUPERVISOR",
+      "email": "spv@mahameru.id",
+      "phone": "081298765432",
+      "status": "ACTIVE",
+      "created_at": "2026-08-31T02:23:34.573Z",
+      "password_hash": "$2b$10$wYtTGLtuE65jfKqADOZVj.MYSbPM4gCi5S9d7/yEnIiep0SW3t4Ve"
+    },
+    {
       "_id": "usr-admin",
       "name": "Super Administrator",
       "role": "ADMIN",
@@ -66,7 +72,48 @@
       "status": "ACTIVE",
       "office_id": "off-1",
       "created_at": "2026-08-27T16:53:21.547Z",
+      "last_location": {
+        "lat": -6.8026759,
+        "lng": 107.1722338,
+        "speed": 4.882121562957764,
+        "heading": 129.33078002929688,
+        "accuracy": 100,
+        "latitude": -6.8026759,
+        "longitude": 107.1722338,
+        "timestamp": "2026-08-31T02:32:37.695Z"
+      },
       "password_hash": "$2b$10$NwBYi/JFPSqj/s/bdMhPuu8.bcY4ESEk2IKYXIDEujo4XqjuS38na"
+    },
+    {
+      "_id": "usr-1788086058443",
+      "name": "Salesman Tester 8440",
+      "role": "SALES",
+      "email": "sales.cycle.8440@mahameru.id",
+      "phone": "08123458440",
+      "status": "ACTIVE",
+      "area_id": "area-1",
+      "office_id": "off-1",
+      "created_at": "2026-08-30T10:34:18.539Z",
+      "password_hash": "$2b$10$jGZ2ke1s//N/M7.mdkO0Ie5VuBTf.syY9YPRjNO7EvjBRQ51KAJaG"
+    },
+    {
+      "_id": "usr-owner",
+      "name": "Andis Moch Solihin",
+      "role": "OWNER",
+      "email": "andismochsolihin@gmail.com",
+      "phone": "081122334455",
+      "status": "ACTIVE",
+      "office_id": "off-1",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "last_location": {
+        "lat": -6.882882882882883,
+        "lng": 107.07799724684943,
+        "latitude": -6.882882882882883,
+        "longitude": 107.07799724684943,
+        "accuracy": 2000,
+        "timestamp": "2026-08-31T13:53:03.213Z"
+      },
+      "password_hash": "$2b$10$aquvw47roCv17eG2L/MqXeZOSOp.02UhiFVQy54rzw27Z9vekROC."
     }
   ],
   "company_profile": {
@@ -121,20 +168,6 @@
   ],
   "provinces": [
     {
-      "_id": "prov-35",
-      "code": "35",
-      "name": "Jawa Timur",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z"
-    },
-    {
-      "_id": "prov-36",
-      "code": "36",
-      "name": "Banten",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z"
-    },
-    {
       "_id": "prov-32",
       "code": "32",
       "name": "Jawa Barat",
@@ -149,6 +182,13 @@
       "created_at": "2026-08-27T16:53:21.547Z"
     },
     {
+      "_id": "prov-33",
+      "code": "33",
+      "name": "Jawa Tengah",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z"
+    },
+    {
       "_id": "prov-31",
       "code": "31",
       "name": "DKI Jakarta",
@@ -156,99 +196,43 @@
       "created_at": "2026-08-27T16:53:21.547Z"
     },
     {
-      "_id": "prov-33",
-      "code": "33",
-      "name": "Jawa Tengah",
+      "_id": "prov-35",
+      "code": "35",
+      "name": "Jawa Timur",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z"
+    },
+    {
+      "_id": "prov-36",
+      "code": "36",
+      "name": "Banten",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z"
     }
   ],
   "regencies": [
     {
-      "_id": "reg-3372",
-      "code": "33.72",
-      "name": "Kota Surakarta (Solo)",
+      "_id": "reg-3273",
+      "code": "32.73",
+      "name": "Kota Bandung",
+      "type": "KOTA",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-32"
+    },
+    {
+      "_id": "reg-3374",
+      "code": "33.74",
+      "name": "Kota Semarang",
       "type": "KOTA",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
       "province_id": "prov-33"
     },
     {
-      "_id": "reg-3671",
-      "code": "36.71",
-      "name": "Kota Tangerang",
-      "type": "KOTA",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-36"
-    },
-    {
-      "_id": "reg-3172",
-      "code": "31.72",
-      "name": "Kota Adm. Jakarta Utara",
-      "type": "KOTA",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "reg-3173",
-      "code": "31.73",
-      "name": "Kota Adm. Jakarta Barat",
-      "type": "KOTA",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "reg-3171",
-      "code": "31.71",
-      "name": "Kota Adm. Jakarta Pusat",
-      "type": "KOTA",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "reg-3174",
-      "code": "31.74",
-      "name": "Kota Adm. Jakarta Selatan",
-      "type": "KOTA",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "reg-3271",
-      "code": "32.71",
-      "name": "Kota Bogor",
-      "type": "KOTA",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-32"
-    },
-    {
-      "_id": "reg-3216",
-      "code": "32.16",
-      "name": "Kabupaten Bekasi",
-      "type": "KABUPATEN",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-32"
-    },
-    {
-      "_id": "reg-3275",
-      "code": "32.75",
-      "name": "Kota Bekasi",
-      "type": "KOTA",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-32"
-    },
-    {
-      "_id": "reg-3203",
-      "code": "32.03",
-      "name": "Kabupaten Cianjur",
+      "_id": "reg-3201",
+      "code": "32.01",
+      "name": "Kabupaten Bogor",
       "type": "KABUPATEN",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
@@ -264,13 +248,13 @@
       "province_id": "prov-35"
     },
     {
-      "_id": "reg-3674",
-      "code": "36.74",
-      "name": "Kota Tangerang Selatan",
+      "_id": "reg-3276",
+      "code": "32.76",
+      "name": "Kota Depok",
       "type": "KOTA",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-36"
+      "province_id": "prov-32"
     },
     {
       "_id": "reg-3175",
@@ -282,40 +266,31 @@
       "province_id": "prov-31"
     },
     {
-      "_id": "reg-3374",
-      "code": "33.74",
-      "name": "Kota Semarang",
-      "type": "KOTA",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-33"
-    },
-    {
-      "_id": "reg-3276",
-      "code": "32.76",
-      "name": "Kota Depok",
-      "type": "KOTA",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-32"
-    },
-    {
-      "_id": "reg-3273",
-      "code": "32.73",
-      "name": "Kota Bandung",
-      "type": "KOTA",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "province_id": "prov-32"
-    },
-    {
-      "_id": "reg-3201",
-      "code": "32.01",
-      "name": "Kabupaten Bogor",
+      "_id": "reg-3203",
+      "code": "32.03",
+      "name": "Kabupaten Cianjur",
       "type": "KABUPATEN",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
       "province_id": "prov-32"
+    },
+    {
+      "_id": "reg-3216",
+      "code": "32.16",
+      "name": "Kabupaten Bekasi",
+      "type": "KABUPATEN",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-32"
+    },
+    {
+      "_id": "reg-3174",
+      "code": "31.74",
+      "name": "Kota Adm. Jakarta Selatan",
+      "type": "KOTA",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-31"
     },
     {
       "_id": "reg-3573",
@@ -325,25 +300,115 @@
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
       "province_id": "prov-35"
+    },
+    {
+      "_id": "reg-3372",
+      "code": "33.72",
+      "name": "Kota Surakarta (Solo)",
+      "type": "KOTA",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-33"
+    },
+    {
+      "_id": "reg-3172",
+      "code": "31.72",
+      "name": "Kota Adm. Jakarta Utara",
+      "type": "KOTA",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-31"
+    },
+    {
+      "_id": "reg-3671",
+      "code": "36.71",
+      "name": "Kota Tangerang",
+      "type": "KOTA",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-36"
+    },
+    {
+      "_id": "reg-3171",
+      "code": "31.71",
+      "name": "Kota Adm. Jakarta Pusat",
+      "type": "KOTA",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-31"
+    },
+    {
+      "_id": "reg-3674",
+      "code": "36.74",
+      "name": "Kota Tangerang Selatan",
+      "type": "KOTA",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-36"
+    },
+    {
+      "_id": "reg-3271",
+      "code": "32.71",
+      "name": "Kota Bogor",
+      "type": "KOTA",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-32"
+    },
+    {
+      "_id": "reg-3173",
+      "code": "31.73",
+      "name": "Kota Adm. Jakarta Barat",
+      "type": "KOTA",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-31"
+    },
+    {
+      "_id": "reg-3275",
+      "code": "32.75",
+      "name": "Kota Bekasi",
+      "type": "KOTA",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "province_id": "prov-32"
     }
   ],
   "districts": [
     {
-      "_id": "dist-317503",
-      "code": "31.75.03",
-      "name": "Kecamatan Duren Sawit",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3175",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "dist-317401",
-      "code": "31.74.01",
-      "name": "Kecamatan Tebet",
+      "_id": "dist-317405",
+      "code": "31.74.05",
+      "name": "Kecamatan Pancoran",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
       "regency_id": "reg-3174",
+      "province_id": "prov-31"
+    },
+    {
+      "_id": "dist-357801",
+      "code": "35.78.01",
+      "name": "Kecamatan Gubeng",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3578",
+      "province_id": "prov-35"
+    },
+    {
+      "_id": "dist-367401",
+      "code": "36.74.01",
+      "name": "Kecamatan Serpong",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3674",
+      "province_id": "prov-36"
+    },
+    {
+      "_id": "dist-317501",
+      "code": "31.75.01",
+      "name": "Kecamatan Pulo Gadung",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3175",
       "province_id": "prov-31"
     },
     {
@@ -356,13 +421,13 @@
       "province_id": "prov-32"
     },
     {
-      "_id": "dist-320301",
-      "code": "32.03.01",
-      "name": "Kecamatan Cianjur",
+      "_id": "dist-317401",
+      "code": "31.74.01",
+      "name": "Kecamatan Tebet",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3203",
-      "province_id": "prov-32"
+      "regency_id": "reg-3174",
+      "province_id": "prov-31"
     },
     {
       "_id": "dist-327503",
@@ -383,13 +448,22 @@
       "province_id": "prov-31"
     },
     {
-      "_id": "dist-357802",
-      "code": "35.78.02",
-      "name": "Kecamatan Tegalsari",
+      "_id": "dist-320301",
+      "code": "32.03.01",
+      "name": "Kecamatan Cianjur",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3578",
-      "province_id": "prov-35"
+      "regency_id": "reg-3203",
+      "province_id": "prov-32"
+    },
+    {
+      "_id": "dist-327502",
+      "code": "32.75.02",
+      "name": "Kecamatan Bekasi Timur",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3275",
+      "province_id": "prov-32"
     },
     {
       "_id": "dist-327302",
@@ -410,40 +484,22 @@
       "province_id": "prov-31"
     },
     {
-      "_id": "dist-357801",
-      "code": "35.78.01",
-      "name": "Kecamatan Gubeng",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3578",
-      "province_id": "prov-35"
-    },
-    {
-      "_id": "dist-317501",
-      "code": "31.75.01",
-      "name": "Kecamatan Pulo Gadung",
+      "_id": "dist-317503",
+      "code": "31.75.03",
+      "name": "Kecamatan Duren Sawit",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
       "regency_id": "reg-3175",
       "province_id": "prov-31"
     },
     {
-      "_id": "dist-317405",
-      "code": "31.74.05",
-      "name": "Kecamatan Pancoran",
+      "_id": "dist-357802",
+      "code": "35.78.02",
+      "name": "Kecamatan Tegalsari",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3174",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "dist-367401",
-      "code": "36.74.01",
-      "name": "Kecamatan Serpong",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3674",
-      "province_id": "prov-36"
+      "regency_id": "reg-3578",
+      "province_id": "prov-35"
     },
     {
       "_id": "dist-317404",
@@ -455,22 +511,13 @@
       "province_id": "prov-31"
     },
     {
-      "_id": "dist-320302",
-      "code": "32.03.02",
-      "name": "Kecamatan Cipanas",
+      "_id": "dist-317403",
+      "code": "31.74.03",
+      "name": "Kecamatan Pasar Minggu",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3203",
-      "province_id": "prov-32"
-    },
-    {
-      "_id": "dist-327502",
-      "code": "32.75.02",
-      "name": "Kecamatan Bekasi Timur",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3275",
-      "province_id": "prov-32"
+      "regency_id": "reg-3174",
+      "province_id": "prov-31"
     },
     {
       "_id": "dist-327501",
@@ -482,37 +529,37 @@
       "province_id": "prov-32"
     },
     {
-      "_id": "dist-317403",
-      "code": "31.74.03",
-      "name": "Kecamatan Pasar Minggu",
+      "_id": "dist-320302",
+      "code": "32.03.02",
+      "name": "Kecamatan Cipanas",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3174",
-      "province_id": "prov-31"
+      "regency_id": "reg-3203",
+      "province_id": "prov-32"
     }
   ],
   "villages": [
     {
-      "_id": "vil-32750103",
-      "code": "32.75.01.1003",
-      "name": "Kota Baru",
+      "_id": "vil-31750102",
+      "code": "31.75.01.1002",
+      "name": "Kayu Putih",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3275",
-      "district_id": "dist-327501",
-      "postal_code": "17133",
-      "province_id": "prov-32"
+      "regency_id": "reg-3175",
+      "district_id": "dist-317501",
+      "postal_code": "13210",
+      "province_id": "prov-31"
     },
     {
-      "_id": "vil-32750102",
-      "code": "32.75.01.1002",
-      "name": "Bintara",
+      "_id": "vil-35780102",
+      "code": "35.78.01.1002",
+      "name": "Airlangga",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3275",
-      "district_id": "dist-327501",
-      "postal_code": "17134",
-      "province_id": "prov-32"
+      "regency_id": "reg-3578",
+      "district_id": "dist-357801",
+      "postal_code": "60286",
+      "province_id": "prov-35"
     },
     {
       "_id": "vil-31740106",
@@ -523,50 +570,6 @@
       "regency_id": "reg-3174",
       "district_id": "dist-317401",
       "postal_code": "12870",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "vil-31740102",
-      "code": "31.74.01.1002",
-      "name": "Tebet Timur",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3174",
-      "district_id": "dist-317401",
-      "postal_code": "12820",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "vil-31740201",
-      "code": "31.74.02.1001",
-      "name": "Karet",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3174",
-      "district_id": "dist-317402",
-      "postal_code": "12920",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "vil-31740105",
-      "code": "31.74.01.1005",
-      "name": "Manggarai",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3174",
-      "district_id": "dist-317401",
-      "postal_code": "12850",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "vil-31740101",
-      "code": "31.74.01.1001",
-      "name": "Tebet Barat",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3174",
-      "district_id": "dist-317401",
-      "postal_code": "12810",
       "province_id": "prov-31"
     },
     {
@@ -581,15 +584,15 @@
       "province_id": "prov-31"
     },
     {
-      "_id": "vil-35780101",
-      "code": "35.78.01.1001",
-      "name": "Gubeng",
+      "_id": "vil-32730103",
+      "code": "32.73.01.1003",
+      "name": "Sekeloa",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3578",
-      "district_id": "dist-357801",
-      "postal_code": "60281",
-      "province_id": "prov-35"
+      "regency_id": "reg-3273",
+      "district_id": "dist-327301",
+      "postal_code": "40134",
+      "province_id": "prov-32"
     },
     {
       "_id": "vil-31740104",
@@ -603,26 +606,37 @@
       "province_id": "prov-31"
     },
     {
-      "_id": "vil-32750104",
-      "code": "32.75.01.1004",
-      "name": "Jakasampurna",
+      "_id": "vil-31740101",
+      "code": "31.74.01.1001",
+      "name": "Tebet Barat",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3275",
-      "district_id": "dist-327501",
-      "postal_code": "17145",
-      "province_id": "prov-32"
+      "regency_id": "reg-3174",
+      "district_id": "dist-317401",
+      "postal_code": "12810",
+      "province_id": "prov-31"
     },
     {
-      "_id": "vil-32030101",
-      "code": "32.03.01.1001",
-      "name": "Pamoyanan",
+      "_id": "vil-31740105",
+      "code": "31.74.01.1005",
+      "name": "Manggarai",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3203",
-      "district_id": "dist-320301",
-      "postal_code": "43211",
-      "province_id": "prov-32"
+      "regency_id": "reg-3174",
+      "district_id": "dist-317401",
+      "postal_code": "12850",
+      "province_id": "prov-31"
+    },
+    {
+      "_id": "vil-31740102",
+      "code": "31.74.01.1002",
+      "name": "Tebet Timur",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3174",
+      "district_id": "dist-317401",
+      "postal_code": "12820",
+      "province_id": "prov-31"
     },
     {
       "_id": "vil-32730102",
@@ -636,47 +650,14 @@
       "province_id": "prov-32"
     },
     {
-      "_id": "vil-32730103",
-      "code": "32.73.01.1003",
-      "name": "Sekeloa",
+      "_id": "vil-32750102",
+      "code": "32.75.01.1002",
+      "name": "Bintara",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3273",
-      "district_id": "dist-327301",
-      "postal_code": "40134",
-      "province_id": "prov-32"
-    },
-    {
-      "_id": "vil-36740101",
-      "code": "36.74.01.1001",
-      "name": "Lengkong Gudang",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3674",
-      "district_id": "dist-367401",
-      "postal_code": "15321",
-      "province_id": "prov-36"
-    },
-    {
-      "_id": "vil-32030102",
-      "code": "32.03.01.1002",
-      "name": "Sawah Gede",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3203",
-      "district_id": "dist-320301",
-      "postal_code": "43212",
-      "province_id": "prov-32"
-    },
-    {
-      "_id": "vil-32030103",
-      "code": "32.03.01.1003",
-      "name": "Sayang",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3203",
-      "district_id": "dist-320301",
-      "postal_code": "43213",
+      "regency_id": "reg-3275",
+      "district_id": "dist-327501",
+      "postal_code": "17134",
       "province_id": "prov-32"
     },
     {
@@ -691,26 +672,59 @@
       "province_id": "prov-36"
     },
     {
-      "_id": "vil-35780102",
-      "code": "35.78.01.1002",
-      "name": "Airlangga",
+      "_id": "vil-32750103",
+      "code": "32.75.01.1003",
+      "name": "Kota Baru",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3578",
-      "district_id": "dist-357801",
-      "postal_code": "60286",
-      "province_id": "prov-35"
+      "regency_id": "reg-3275",
+      "district_id": "dist-327501",
+      "postal_code": "17133",
+      "province_id": "prov-32"
     },
     {
-      "_id": "vil-32730101",
-      "code": "32.73.01.1001",
-      "name": "Dago",
+      "_id": "vil-31740103",
+      "code": "31.74.01.1003",
+      "name": "Kebon Baru",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3273",
-      "district_id": "dist-327301",
-      "postal_code": "40135",
+      "regency_id": "reg-3174",
+      "district_id": "dist-317401",
+      "postal_code": "12830",
+      "province_id": "prov-31"
+    },
+    {
+      "_id": "vil-31750103",
+      "code": "31.75.01.1003",
+      "name": "Jati",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3175",
+      "district_id": "dist-317501",
+      "postal_code": "13220",
+      "province_id": "prov-31"
+    },
+    {
+      "_id": "vil-32030103",
+      "code": "32.03.01.1003",
+      "name": "Sayang",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3203",
+      "district_id": "dist-320301",
+      "postal_code": "43213",
       "province_id": "prov-32"
+    },
+    {
+      "_id": "vil-31740202",
+      "code": "31.74.02.1002",
+      "name": "Karet Kuningan",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3174",
+      "district_id": "dist-317402",
+      "postal_code": "12940",
+      "province_id": "prov-31"
     },
     {
       "_id": "vil-31740203",
@@ -735,26 +749,70 @@
       "province_id": "prov-32"
     },
     {
-      "_id": "vil-31740202",
-      "code": "31.74.02.1002",
-      "name": "Karet Kuningan",
+      "_id": "vil-32030101",
+      "code": "32.03.01.1001",
+      "name": "Pamoyanan",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3203",
+      "district_id": "dist-320301",
+      "postal_code": "43211",
+      "province_id": "prov-32"
+    },
+    {
+      "_id": "vil-36740101",
+      "code": "36.74.01.1001",
+      "name": "Lengkong Gudang",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3674",
+      "district_id": "dist-367401",
+      "postal_code": "15321",
+      "province_id": "prov-36"
+    },
+    {
+      "_id": "vil-31740201",
+      "code": "31.74.02.1001",
+      "name": "Karet",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
       "regency_id": "reg-3174",
       "district_id": "dist-317402",
-      "postal_code": "12940",
+      "postal_code": "12920",
       "province_id": "prov-31"
     },
     {
-      "_id": "vil-31750102",
-      "code": "31.75.01.1002",
-      "name": "Kayu Putih",
+      "_id": "vil-32030102",
+      "code": "32.03.01.1002",
+      "name": "Sawah Gede",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3175",
-      "district_id": "dist-317501",
-      "postal_code": "13210",
-      "province_id": "prov-31"
+      "regency_id": "reg-3203",
+      "district_id": "dist-320301",
+      "postal_code": "43212",
+      "province_id": "prov-32"
+    },
+    {
+      "_id": "vil-35780101",
+      "code": "35.78.01.1001",
+      "name": "Gubeng",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3578",
+      "district_id": "dist-357801",
+      "postal_code": "60281",
+      "province_id": "prov-35"
+    },
+    {
+      "_id": "vil-32730101",
+      "code": "32.73.01.1001",
+      "name": "Dago",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "regency_id": "reg-3273",
+      "district_id": "dist-327301",
+      "postal_code": "40135",
+      "province_id": "prov-32"
     },
     {
       "_id": "vil-32750101",
@@ -768,26 +826,15 @@
       "province_id": "prov-32"
     },
     {
-      "_id": "vil-31750103",
-      "code": "31.75.01.1003",
-      "name": "Jati",
+      "_id": "vil-32750104",
+      "code": "32.75.01.1004",
+      "name": "Jakasampurna",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3175",
-      "district_id": "dist-317501",
-      "postal_code": "13220",
-      "province_id": "prov-31"
-    },
-    {
-      "_id": "vil-31740103",
-      "code": "31.74.01.1003",
-      "name": "Kebon Baru",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "regency_id": "reg-3174",
-      "district_id": "dist-317401",
-      "postal_code": "12830",
-      "province_id": "prov-31"
+      "regency_id": "reg-3275",
+      "district_id": "dist-327501",
+      "postal_code": "17145",
+      "province_id": "prov-32"
     }
   ],
   "areas": [
@@ -802,13 +849,6 @@
   ],
   "channels": [
     {
-      "_id": "ch-3",
-      "code": "HORECA",
-      "name": "Hotel, Resto & Kafe",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z"
-    },
-    {
       "_id": "ch-4",
       "code": "WS",
       "name": "Wholesaler (Grosir)",
@@ -819,6 +859,20 @@
       "_id": "ch-2",
       "code": "MT",
       "name": "Modern Trade (Minimarket/Supermarket)",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z"
+    },
+    {
+      "_id": "ch-1",
+      "code": "GT",
+      "name": "General Trade (Toko Kelontong/Warung)",
+      "status": "ACTIVE",
+      "created_at": "2026-08-31T02:23:35.038Z"
+    },
+    {
+      "_id": "ch-3",
+      "code": "HORECA",
+      "name": "Hotel, Resto & Kafe",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z"
     }
@@ -852,18 +906,28 @@
   "promos": [],
   "salesmen": [
     {
-      "_id": "usr-1788085594775",
-      "code": "SLS-1",
-      "name": "Budi Salesman Test",
-      "email": "sales.test.1788085594771@mahameru.id",
-      "phone": "081234567890",
+      "_id": "usr-1788086187277",
+      "code": "SLS-4",
+      "name": "Salesman Tester 7273",
+      "email": "sales.cycle.7273@mahameru.id",
+      "phone": "08123457273",
       "status": "ACTIVE",
       "area_id": "area-1",
-      "user_id": "usr-1788085594775",
+      "user_id": "usr-1788086187277",
       "office_id": "off-1",
-      "created_at": "2026-08-30T10:26:34.874Z",
+      "created_at": "2026-08-30T10:36:27.373Z",
       "target_daily_calls": 15,
       "target_monthly_sales": 50000000
+    },
+    {
+      "_id": "sal-1788085594883",
+      "code": "SLS-001",
+      "name": "Budi Salesman Test",
+      "phone": "081234567890",
+      "status": "ACTIVE",
+      "user_id": "usr-1788085594775",
+      "office_id": "off-1",
+      "created_at": "2026-08-30T10:26:34.883Z"
     },
     {
       "_id": "usr-1788086058443",
@@ -880,46 +944,28 @@
       "target_monthly_sales": 50000000
     },
     {
-      "_id": "sal-1788085594883",
-      "code": "SLS-001",
+      "_id": "usr-1788085594775",
+      "code": "SLS-1",
       "name": "Budi Salesman Test",
+      "email": "sales.test.1788085594771@mahameru.id",
       "phone": "081234567890",
       "status": "ACTIVE",
+      "area_id": "area-1",
       "user_id": "usr-1788085594775",
       "office_id": "off-1",
-      "created_at": "2026-08-30T10:26:34.883Z"
-    },
-    {
-      "_id": "usr-1788086187277",
-      "code": "SLS-4",
-      "name": "Salesman Tester 7273",
-      "email": "sales.cycle.7273@mahameru.id",
-      "phone": "08123457273",
-      "status": "ACTIVE",
-      "area_id": "area-1",
-      "user_id": "usr-1788086187277",
-      "office_id": "off-1",
-      "created_at": "2026-08-30T10:36:27.373Z",
+      "created_at": "2026-08-30T10:26:34.874Z",
       "target_daily_calls": 15,
       "target_monthly_sales": 50000000
     }
   ],
   "open_call_reasons": [
     {
-      "_id": "ocr-4",
-      "code": "BUDGET",
-      "name": "Kendala Keuangan / Budget",
+      "_id": "ocr-3",
+      "code": "OVERSTOCK",
+      "name": "Stok Masih Banyak",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
-      "description": "Belum ada dana belanja"
-    },
-    {
-      "_id": "ocr-6",
-      "code": "OTHER",
-      "name": "Alasan Lainnya",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "description": "Alasan spesifik dijelaskan pada catatan"
+      "description": "Stok produk masih mencukupi hingga kunjungan berikutnya"
     },
     {
       "_id": "ocr-2",
@@ -930,14 +976,6 @@
       "description": "Tidak bisa mengambil keputusan PO"
     },
     {
-      "_id": "ocr-3",
-      "code": "OVERSTOCK",
-      "name": "Stok Masih Banyak",
-      "status": "ACTIVE",
-      "created_at": "2026-08-27T16:53:21.547Z",
-      "description": "Stok produk masih mencukupi hingga kunjungan berikutnya"
-    },
-    {
       "_id": "ocr-5",
       "code": "RELOCATED",
       "name": "Toko Sudah Pindah Alamat",
@@ -946,16 +984,109 @@
       "description": "Perlu pembaruan master data outlet"
     },
     {
+      "_id": "ocr-6",
+      "code": "OTHER",
+      "name": "Alasan Lainnya",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "description": "Alasan spesifik dijelaskan pada catatan"
+    },
+    {
       "_id": "ocr-1",
       "code": "CLOSED",
       "name": "Toko Tutup / Libur",
       "status": "ACTIVE",
       "created_at": "2026-08-27T16:53:21.547Z",
       "description": "Outlet sedang tutup saat dikunjungi"
+    },
+    {
+      "_id": "ocr-4",
+      "code": "BUDGET",
+      "name": "Kendala Keuangan / Budget",
+      "status": "ACTIVE",
+      "created_at": "2026-08-27T16:53:21.547Z",
+      "description": "Belum ada dana belanja"
     }
   ],
-  "outlets": [],
-  "sales_outlets": [],
+  "outlets": [
+    {
+      "_id": "out-1788143065887",
+      "notes": "",
+      "phone": "081288991122",
+      "status": "ACTIVE",
+      "address": "Jl. Tebet Raya No. 45, Jakarta Selatan",
+      "area_id": "area-1",
+      "latitude": -6.2255,
+      "route_id": "rt-1",
+      "longitude": 106.8085,
+      "channel_id": "ch-1",
+      "created_at": "2026-08-31T02:24:25.887Z",
+      "created_by": "usr-sales1",
+      "owner_name": "Haji Ahmad",
+      "outlet_code": "OUT-001",
+      "outlet_name": "Toko Kelontong Berkah Mandiri",
+      "address_line": "Jl. Tebet Raya No. 45, Jakarta Selatan",
+      "credit_limit": 0,
+      "total_volume": 0,
+      "total_revenue": 0,
+      "lifecycle_status": "PROSPECT",
+      "payment_term_days": 0,
+      "completed_transaction_count": 0,
+      "last_completed_transaction_at": null,
+      "first_completed_transaction_at": null
+    },
+    {
+      "_id": "out-1788143330535",
+      "notes": "Toko prospek ramai dekat persimpangan jalan utama",
+      "phone": "081399887766",
+      "status": "ACTIVE",
+      "address": "Jl. Tebet Timur Dalam No. 88, Jakarta Selatan",
+      "area_id": "area-1",
+      "latitude": -6.226,
+      "route_id": "rt-1",
+      "longitude": 106.809,
+      "channel_id": "ch-1",
+      "created_at": "2026-08-31T02:28:50.535Z",
+      "created_by": "usr-sales1",
+      "owner_name": "Ibu Sri Wahyuni",
+      "updated_at": "2026-08-31T02:28:51.313Z",
+      "approved_at": "2026-08-31T02:28:51.313Z",
+      "approved_by": "usr-spv",
+      "outlet_code": "OUT-002",
+      "outlet_name": "Toko Sembako Maju Jaya 0529",
+      "address_line": "Jl. Tebet Timur Dalam No. 88, Jakarta Selatan",
+      "credit_limit": 2000000,
+      "total_volume": 0,
+      "total_revenue": 0,
+      "lifecycle_status": "PROSPECT",
+      "payment_term_days": 0,
+      "completed_transaction_count": 0,
+      "last_completed_transaction_at": null,
+      "first_completed_transaction_at": null
+    }
+  ],
+  "sales_outlets": [
+    {
+      "_id": "so-1788143065941-509",
+      "notes": "Penugasan otomatis saat pendaftaran outlet baru (NOO/Prospect)",
+      "status": "ACTIVE",
+      "area_id": "area-1",
+      "sales_id": "usr-sales1",
+      "outlet_id": "out-1788143065887",
+      "assigned_at": "2026-08-31T02:24:25.941Z",
+      "assigned_by": "usr-sales1"
+    },
+    {
+      "_id": "so-1788143330758-811",
+      "notes": "Penugasan otomatis saat pendaftaran outlet baru (NOO/Prospect)",
+      "status": "ACTIVE",
+      "area_id": "area-1",
+      "sales_id": "usr-sales1",
+      "outlet_id": "out-1788143330535",
+      "assigned_at": "2026-08-31T02:28:50.758Z",
+      "assigned_by": "usr-sales1"
+    }
+  ],
   "call_plans": [],
   "call_plan_items": [],
   "attendance": [],
@@ -963,76 +1094,144 @@
   "transactions": [],
   "inventory": [
     {
-      "_id": "inv-1788086188642-432833",
-      "sku_id": "sku-1788085594766",
-      "status": "ACTIVE",
-      "office_id": "",
-      "created_at": "2026-08-30T10:36:30.411Z",
-      "updated_at": "2026-08-30T10:36:30.411Z",
-      "location_id": "usr-1788086187277",
+      "_id": "inv-1788143065411-899469",
       "location_type": "SALES",
-      "stock_on_hand": 55,
+      "location_id": "usr-sales1",
+      "office_id": "",
+      "sku_id": "sku-1788085594766",
+      "stock_on_hand": 75,
+      "available_stock": 75,
       "allocated_stock": 0,
-      "available_stock": 55
+      "status": "ACTIVE",
+      "updated_at": "2026-08-31T02:29:06.020Z",
+      "created_at": "2026-08-31T02:24:25.231Z"
     },
     {
-      "_id": "inv-1788085596545-202798",
-      "sku_id": "sku-1788085594766",
-      "status": "ACTIVE",
-      "office_id": "",
-      "created_at": "2026-08-30T10:34:07.467Z",
-      "updated_at": "2026-08-30T10:34:07.467Z",
-      "location_id": "usr-1788085594775",
+      "_id": "inv-1788086188642-432833",
       "location_type": "SALES",
-      "stock_on_hand": 20,
+      "location_id": "usr-1788086187277",
+      "office_id": "",
+      "sku_id": "sku-1788085594766",
+      "stock_on_hand": 17,
+      "available_stock": 17,
       "allocated_stock": 0,
-      "available_stock": 20
+      "status": "ACTIVE",
+      "updated_at": "2026-08-31T13:53:40.888Z",
+      "created_at": "2026-08-30T10:36:28.463Z"
     },
     {
       "_id": "inv-1788085595547-678677",
-      "sku_id": "sku-1788085594766",
-      "status": "ACTIVE",
-      "office_id": "off-1",
-      "created_at": "2026-08-30T10:36:30.411Z",
-      "updated_at": "2026-08-30T10:36:31.364Z",
-      "location_id": "off-1",
       "location_type": "WAREHOUSE",
-      "stock_on_hand": 676,
+      "location_id": "off-1",
+      "office_id": "off-1",
+      "sku_id": "sku-1788085594766",
+      "stock_on_hand": 1208,
+      "available_stock": 1208,
       "allocated_stock": 0,
-      "available_stock": 676
+      "status": "ACTIVE",
+      "updated_at": "2026-08-31T13:53:40.888Z",
+      "created_at": "2026-08-30T10:26:35.463Z"
+    },
+    {
+      "_id": "test-inv-1",
+      "location_type": "WAREHOUSE",
+      "location_id": "off-1",
+      "office_id": "off-1",
+      "sku_id": "sku-1787719800354",
+      "stock_on_hand": 1,
+      "available_stock": 1,
+      "allocated_stock": 0,
+      "status": "ACTIVE",
+      "updated_at": "2026-08-30T17:24:30.973Z",
+      "created_at": "2026-08-30T17:24:30.973Z"
+    },
+    {
+      "_id": "inv-1788110882488-529035",
+      "location_type": "WAREHOUSE",
+      "location_id": "off-1",
+      "office_id": "off-1",
+      "sku_id": "sku-test-error-check",
+      "stock_on_hand": 1,
+      "available_stock": 1,
+      "allocated_stock": 0,
+      "status": "ACTIVE",
+      "updated_at": "2026-08-30T17:28:02.416Z",
+      "created_at": "2026-08-30T17:28:02.416Z"
+    },
+    {
+      "_id": "inv-test-1788110957019",
+      "location_type": "WAREHOUSE",
+      "location_id": "off-1",
+      "office_id": "off-1",
+      "sku_id": "sku-1787719800354",
+      "stock_on_hand": 1,
+      "available_stock": 1,
+      "allocated_stock": 0,
+      "status": "ACTIVE",
+      "updated_at": "2026-08-30T17:29:17.224Z",
+      "created_at": "2026-08-30T17:29:17.224Z"
     },
     {
       "_id": "inv-1788086061663-541924",
-      "sku_id": "sku-1788085594766",
-      "status": "ACTIVE",
-      "office_id": "",
-      "created_at": "2026-08-30T10:34:23.345Z",
-      "updated_at": "2026-08-30T10:34:23.345Z",
-      "location_id": "usr-1788086058443",
       "location_type": "SALES",
-      "stock_on_hand": 55,
+      "location_id": "usr-1788086058443",
+      "office_id": "",
+      "sku_id": "sku-1788085594766",
+      "stock_on_hand": 0,
+      "available_stock": 0,
       "allocated_stock": 0,
-      "available_stock": 55
+      "status": "ACTIVE",
+      "updated_at": "2026-08-31T01:47:44.001Z",
+      "created_at": "2026-08-30T10:34:21.475Z"
+    },
+    {
+      "_id": "inv-1788085596545-202798",
+      "location_type": "SALES",
+      "location_id": "usr-1788085594775",
+      "office_id": "",
+      "sku_id": "sku-1788085594766",
+      "stock_on_hand": 0,
+      "available_stock": 0,
+      "allocated_stock": 0,
+      "status": "ACTIVE",
+      "updated_at": "2026-08-31T02:00:06.844Z",
+      "created_at": "2026-08-30T10:26:36.364Z"
     }
   ],
   "stock_movements": [
     {
-      "_id": "mvt-1788085596698-178",
-      "notes": "Handover ke Sales usr-1788085594775",
+      "_id": "mvt-1788085782010-138",
+      "notes": "Penerimaan Barang Supplier PT Pabrik Mahameru Sentosa",
       "sku_id": "sku-1788085594766",
       "status": "COMPLETED",
-      "quantity": 30,
-      "created_at": "2026-08-30T10:26:36.798Z",
+      "quantity": 100,
+      "created_at": "2026-08-30T10:29:42.112Z",
       "created_by": "usr-owner",
-      "salesman_id": "usr-1788085594775",
       "warehouse_id": "off-1",
       "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0002",
-      "movement_type": "TRANSFER_OUT",
-      "source_location_id": "off-1",
-      "source_location_type": "WAREHOUSE",
-      "destination_location_id": "usr-1788085594775",
-      "destination_location_type": "SALES"
+      "movement_code": "MVT-20260830-0004",
+      "movement_type": "PURCHASE_IN",
+      "source_location_id": "PT Pabrik Mahameru Sentosa",
+      "source_location_type": "SUPPLIER",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
+      "_id": "mvt-1788086058685-890",
+      "notes": "Penerimaan Barang Supplier PT Pabrik Mahameru Sentosa",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 200,
+      "created_at": "2026-08-30T10:34:18.777Z",
+      "created_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "movement_code": "MVT-20260830-0015",
+      "movement_type": "PURCHASE_IN",
+      "source_location_id": "PT Pabrik Mahameru Sentosa",
+      "source_location_type": "SUPPLIER",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
     },
     {
       "_id": "mvt-1788086063642-52",
@@ -1070,56 +1269,23 @@
       "destination_location_type": "WAREHOUSE"
     },
     {
-      "_id": "mvt-1788086064203-adj",
-      "notes": "[Penyesuaian Kemasan Rusak] Penyesuaian keluar 4",
+      "_id": "mvt-1788085597291-ret-0",
+      "notes": "Pengembalian Sisa Stok dari Sales Budi Salesman Test (RET-20260830-001)",
       "sku_id": "sku-1788085594766",
       "status": "COMPLETED",
-      "quantity": 4,
-      "created_at": "2026-08-30T10:34:24.203Z",
+      "quantity": 10,
+      "created_at": "2026-08-30T10:26:37.291Z",
       "created_by": "usr-owner",
+      "salesman_id": "usr-1788085594775",
+      "reference_id": "ret-1788085597291",
       "warehouse_id": "off-1",
       "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0020",
-      "movement_type": "ADJUSTMENT_OUT",
-      "source_location_id": "off-1",
-      "source_location_type": "WAREHOUSE",
-      "destination_location_id": "ADJUSTMENT",
-      "destination_location_type": "NONE"
-    },
-    {
-      "_id": "mvt-1788086187862-423",
-      "notes": "Penerimaan Barang Supplier PT Pabrik Mahameru Sentosa",
-      "sku_id": "sku-1788085594766",
-      "status": "COMPLETED",
-      "quantity": 200,
-      "created_at": "2026-08-30T10:36:27.961Z",
-      "created_by": "usr-owner",
-      "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0021",
-      "movement_type": "PURCHASE_IN",
-      "source_location_id": "PT Pabrik Mahameru Sentosa",
-      "source_location_type": "SUPPLIER",
+      "movement_code": "MVT-20260830-0003",
+      "movement_type": "RETURN_IN",
+      "source_location_id": "usr-1788085594775",
+      "source_location_type": "SALES",
       "destination_location_id": "off-1",
       "destination_location_type": "WAREHOUSE"
-    },
-    {
-      "_id": "mvt-1788086188793-925",
-      "notes": "Handover ke Sales usr-1788086187277",
-      "sku_id": "sku-1788085594766",
-      "status": "COMPLETED",
-      "quantity": 50,
-      "created_at": "2026-08-30T10:36:28.894Z",
-      "created_by": "usr-owner",
-      "salesman_id": "usr-1788086187277",
-      "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0022",
-      "movement_type": "TRANSFER_OUT",
-      "source_location_id": "off-1",
-      "source_location_type": "WAREHOUSE",
-      "destination_location_id": "usr-1788086187277",
-      "destination_location_type": "SALES"
     },
     {
       "_id": "mvt-1788086189764-430",
@@ -1140,72 +1306,159 @@
       "destination_location_type": "SALES"
     },
     {
-      "_id": "mvt-1788086191364-adj",
-      "notes": "[Penyesuaian Kemasan Rusak] Penyesuaian keluar 4",
-      "sku_id": "sku-1788085594766",
-      "status": "COMPLETED",
-      "quantity": 4,
-      "created_at": "2026-08-30T10:36:31.364Z",
-      "created_by": "usr-owner",
-      "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0026",
-      "movement_type": "ADJUSTMENT_OUT",
-      "source_location_id": "off-1",
-      "source_location_type": "WAREHOUSE",
-      "destination_location_id": "ADJUSTMENT",
-      "destination_location_type": "NONE"
-    },
-    {
-      "_id": "mvt-1788086047767-13",
-      "notes": "Return dari Sales usr-1788085594775",
+      "_id": "mvt-1788086191358-adj",
+      "notes": "[Penyesuaian Koreksi Bonus Pabrik] Penyesuaian masuk 10",
       "sku_id": "sku-1788085594766",
       "status": "COMPLETED",
       "quantity": 10,
-      "created_at": "2026-08-30T10:34:07.858Z",
+      "created_at": "2026-08-30T10:36:31.358Z",
       "created_by": "usr-owner",
-      "salesman_id": "usr-1788085594775",
       "warehouse_id": "off-1",
       "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0011",
-      "movement_type": "RETURN_IN",
-      "source_location_id": "usr-1788085594775",
-      "source_location_type": "SALES",
+      "movement_code": "MVT-20260830-0025",
+      "movement_type": "ADJUSTMENT_IN",
+      "source_location_id": "ADJUSTMENT",
+      "source_location_type": "NONE",
       "destination_location_id": "off-1",
       "destination_location_type": "WAREHOUSE"
     },
     {
-      "_id": "mvt-1788085782010-138",
-      "notes": "Penerimaan Barang Supplier PT Pabrik Mahameru Sentosa",
+      "_id": "mvt-1788143065562-528897",
+      "notes": "Handover ke Sales usr-sales1",
       "sku_id": "sku-1788085594766",
       "status": "COMPLETED",
-      "quantity": 100,
-      "created_at": "2026-08-30T10:29:42.112Z",
+      "quantity": 25,
+      "created_at": "2026-08-31T02:24:25.562Z",
+      "created_by": "usr-warehouse",
+      "salesman_id": "usr-sales1",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0036",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "usr-sales1",
+      "destination_location_type": "SALES"
+    },
+    {
+      "_id": "mvt-1788085817584-adj",
+      "notes": "[Penyesuaian Koreksi sampel bonus] Penambahan stok 5 pack",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 5,
+      "created_at": "2026-08-30T10:30:17.584Z",
       "created_by": "usr-owner",
       "warehouse_id": "off-1",
       "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0004",
+      "movement_code": "MVT-20260830-0007",
+      "movement_type": "ADJUSTMENT_IN",
+      "source_location_id": "ADJUSTMENT",
+      "source_location_type": "NONE",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
+      "_id": "mvt-1788086048219-opn-4766",
+      "notes": "[Stock Opname: Opname Fisik Rutin Akhir Bulan] Sistem: 383 -> Fisik: 85 (Selisih: -298). Hasil hitung fisik 85",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 298,
+      "created_at": "2026-08-30T10:34:08.219Z",
+      "created_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "movement_code": "MVT-20260830-0014",
+      "movement_type": "ADJUSTMENT_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "OPNAME",
+      "destination_location_type": "NONE"
+    },
+    {
+      "_id": "mvt-1788086062773-894",
+      "notes": "Handover ke Sales usr-1788086058443",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 20,
+      "created_at": "2026-08-30T10:34:22.864Z",
+      "created_by": "usr-owner",
+      "salesman_id": "usr-1788086058443",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "movement_code": "MVT-20260830-0017",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "usr-1788086058443",
+      "destination_location_type": "SALES"
+    },
+    {
+      "_id": "mvt-1788141585987-293026",
+      "notes": "Handover ke Sales usr-1788085594775",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 800,
+      "created_at": "2026-08-31T01:59:45.987Z",
+      "created_by": "usr-owner",
+      "salesman_id": "usr-1788085594775",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0031",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "usr-1788085594775",
+      "destination_location_type": "SALES"
+    },
+    {
+      "_id": "mvt-1788085596698-178",
+      "notes": "Handover ke Sales usr-1788085594775",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 30,
+      "created_at": "2026-08-30T10:26:36.798Z",
+      "created_by": "usr-owner",
+      "salesman_id": "usr-1788085594775",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "movement_code": "MVT-20260830-0002",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "usr-1788085594775",
+      "destination_location_type": "SALES"
+    },
+    {
+      "_id": "mvt-1788143064573-840572",
+      "notes": "Penerimaan Barang Supplier PT Sumber Pangan Nusantara",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 100,
+      "created_at": "2026-08-31T02:24:24.573Z",
+      "created_by": "usr-warehouse",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0035",
       "movement_type": "PURCHASE_IN",
-      "source_location_id": "PT Pabrik Mahameru Sentosa",
+      "source_location_id": "PT Sumber Pangan Nusantara",
       "source_location_type": "SUPPLIER",
       "destination_location_id": "off-1",
       "destination_location_type": "WAREHOUSE"
     },
     {
-      "_id": "mvt-1788085597291-ret-0",
-      "notes": "Pengembalian Sisa Stok dari Sales Budi Salesman Test (RET-20260830-001)",
+      "_id": "mvt-1788140864329-30501",
+      "notes": "Return dari Sales usr-1788086058443",
       "sku_id": "sku-1788085594766",
       "status": "COMPLETED",
-      "quantity": 10,
-      "created_at": "2026-08-30T10:26:37.291Z",
+      "quantity": 780,
+      "created_at": "2026-08-31T01:47:44.329Z",
       "created_by": "usr-owner",
-      "salesman_id": "usr-1788085594775",
-      "reference_id": "ret-1788085597291",
+      "salesman_id": "usr-1788086058443",
       "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0003",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0029",
       "movement_type": "RETURN_IN",
-      "source_location_id": "usr-1788085594775",
+      "source_location_id": "usr-1788086058443",
       "source_location_type": "SALES",
       "destination_location_id": "off-1",
       "destination_location_type": "WAREHOUSE"
@@ -1247,40 +1500,6 @@
       "destination_location_type": "WAREHOUSE"
     },
     {
-      "_id": "mvt-1788085817584-adj",
-      "notes": "[Penyesuaian Koreksi sampel bonus] Penambahan stok 5 pack",
-      "sku_id": "sku-1788085594766",
-      "status": "COMPLETED",
-      "quantity": 5,
-      "created_at": "2026-08-30T10:30:17.584Z",
-      "created_by": "usr-owner",
-      "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0007",
-      "movement_type": "ADJUSTMENT_IN",
-      "source_location_id": "ADJUSTMENT",
-      "source_location_type": "NONE",
-      "destination_location_id": "off-1",
-      "destination_location_type": "WAREHOUSE"
-    },
-    {
-      "_id": "mvt-1788085817593-opn-4766",
-      "notes": "[Stock Opname: Opname Fisik Rutin Akhir Bulan] Sistem: 273 -> Fisik: 85 (Selisih: -188). Hasil hitung fisik 85",
-      "sku_id": "sku-1788085594766",
-      "status": "COMPLETED",
-      "quantity": 188,
-      "created_at": "2026-08-30T10:30:17.593Z",
-      "created_by": "usr-owner",
-      "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0009",
-      "movement_type": "ADJUSTMENT_OUT",
-      "source_location_id": "off-1",
-      "source_location_type": "WAREHOUSE",
-      "destination_location_id": "OPNAME",
-      "destination_location_type": "NONE"
-    },
-    {
       "_id": "mvt-1788085817588-adj",
       "notes": "[Penyesuaian Kemasan rusak saat display] Pengurangan 2 pack rusak",
       "sku_id": "sku-1788085594766",
@@ -1315,6 +1534,216 @@
       "destination_location_type": "WAREHOUSE"
     },
     {
+      "_id": "mvt-1788086191364-adj",
+      "notes": "[Penyesuaian Kemasan Rusak] Penyesuaian keluar 4",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 4,
+      "created_at": "2026-08-30T10:36:31.364Z",
+      "created_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "movement_code": "MVT-20260830-0026",
+      "movement_type": "ADJUSTMENT_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "ADJUSTMENT",
+      "destination_location_type": "NONE"
+    },
+    {
+      "_id": "mvt-1788142651316-176140",
+      "notes": "Return dari Sales usr-1788086187277",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 100,
+      "created_at": "2026-08-31T02:17:31.317Z",
+      "created_by": "usr-admin",
+      "salesman_id": "usr-1788086187277",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0034",
+      "movement_type": "RETURN_IN",
+      "source_location_id": "usr-1788086187277",
+      "source_location_type": "SALES",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
+      "_id": "mvt-1788142620961-536133",
+      "notes": "Handover ke Sales usr-1788086187277",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 100,
+      "created_at": "2026-08-31T02:17:00.962Z",
+      "created_by": "usr-admin",
+      "salesman_id": "usr-1788086187277",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0033",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "usr-1788086187277",
+      "destination_location_type": "SALES"
+    },
+    {
+      "_id": "mvt-1788086187862-423",
+      "notes": "Penerimaan Barang Supplier PT Pabrik Mahameru Sentosa",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 200,
+      "created_at": "2026-08-30T10:36:27.961Z",
+      "created_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "movement_code": "MVT-20260830-0021",
+      "movement_type": "PURCHASE_IN",
+      "source_location_id": "PT Pabrik Mahameru Sentosa",
+      "source_location_type": "SUPPLIER",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
+      "_id": "mvt-1788143331827-42335",
+      "notes": "Handover ke Sales usr-sales1",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 20,
+      "created_at": "2026-08-31T02:28:51.828Z",
+      "created_by": "usr-warehouse",
+      "salesman_id": "usr-sales1",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0042",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "usr-sales1",
+      "destination_location_type": "SALES"
+    },
+    {
+      "_id": "mvt-1788143346382-802855",
+      "notes": "Handover ke Sales usr-sales1",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 20,
+      "created_at": "2026-08-31T02:29:06.382Z",
+      "created_by": "usr-warehouse",
+      "salesman_id": "usr-sales1",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0043",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "usr-sales1",
+      "destination_location_type": "SALES"
+    },
+    {
+      "_id": "mvt-1788143346745-adj",
+      "notes": "[Penyesuaian Hasil audit stok fisik opname harian gudang] Audit periodik gudang tengah hari",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 5,
+      "created_at": "2026-08-31T02:29:06.745Z",
+      "created_by": "usr-warehouse",
+      "warehouse_id": "wh-main",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0044",
+      "movement_type": "ADJUSTMENT_IN",
+      "source_location_id": "ADJUSTMENT",
+      "source_location_type": "NONE",
+      "destination_location_id": "wh-main",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
+      "_id": "mvt-1788143100583-319180",
+      "notes": "Penerimaan Barang Supplier PT Sumber Pangan Nusantara",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 100,
+      "created_at": "2026-08-31T02:25:00.583Z",
+      "created_by": "usr-warehouse",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0037",
+      "movement_type": "PURCHASE_IN",
+      "source_location_id": "PT Sumber Pangan Nusantara",
+      "source_location_type": "SUPPLIER",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
+      "_id": "mvt-1788143109317-453030",
+      "notes": "Penerimaan Barang Supplier PT Sumber Pangan Nusantara",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 100,
+      "created_at": "2026-08-31T02:25:09.317Z",
+      "created_by": "usr-warehouse",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0038",
+      "movement_type": "PURCHASE_IN",
+      "source_location_id": "PT Sumber Pangan Nusantara",
+      "source_location_type": "SUPPLIER",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
+      "_id": "mvt-1788143135086-509063",
+      "notes": "Handover ke Sales usr-sales1",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 25,
+      "created_at": "2026-08-31T02:25:35.086Z",
+      "created_by": "usr-warehouse",
+      "salesman_id": "usr-sales1",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0040",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "usr-sales1",
+      "destination_location_type": "SALES"
+    },
+    {
+      "_id": "mvt-1788143131603-697303",
+      "notes": "Penerimaan Barang Supplier PT Sumber Pangan Nusantara",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 100,
+      "created_at": "2026-08-31T02:25:31.603Z",
+      "created_by": "usr-warehouse",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0039",
+      "movement_type": "PURCHASE_IN",
+      "source_location_id": "PT Sumber Pangan Nusantara",
+      "source_location_type": "SUPPLIER",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
+      "_id": "mvt-1788143135930-170819",
+      "notes": "Return dari Sales usr-sales1",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 15,
+      "created_at": "2026-08-31T02:25:35.930Z",
+      "created_by": "usr-warehouse",
+      "salesman_id": "usr-sales1",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0041",
+      "movement_type": "RETURN_IN",
+      "source_location_id": "usr-sales1",
+      "source_location_type": "SALES",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
       "_id": "mvt-1788086048213-adj",
       "notes": "[Penyesuaian Kemasan rusak saat display] Pengurangan 2 pack rusak",
       "sku_id": "sku-1788085594766",
@@ -1332,53 +1761,74 @@
       "destination_location_type": "NONE"
     },
     {
-      "_id": "mvt-1788086048219-opn-4766",
-      "notes": "[Stock Opname: Opname Fisik Rutin Akhir Bulan] Sistem: 383 -> Fisik: 85 (Selisih: -298). Hasil hitung fisik 85",
-      "sku_id": "sku-1788085594766",
-      "status": "COMPLETED",
-      "quantity": 298,
-      "created_at": "2026-08-30T10:34:08.219Z",
-      "created_by": "usr-owner",
-      "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0014",
-      "movement_type": "ADJUSTMENT_OUT",
-      "source_location_id": "off-1",
-      "source_location_type": "WAREHOUSE",
-      "destination_location_id": "OPNAME",
-      "destination_location_type": "NONE"
-    },
-    {
-      "_id": "mvt-1788086191358-adj",
-      "notes": "[Penyesuaian Koreksi Bonus Pabrik] Penyesuaian masuk 10",
+      "_id": "mvt-1788086047767-13",
+      "notes": "Return dari Sales usr-1788085594775",
       "sku_id": "sku-1788085594766",
       "status": "COMPLETED",
       "quantity": 10,
-      "created_at": "2026-08-30T10:36:31.358Z",
+      "created_at": "2026-08-30T10:34:07.858Z",
       "created_by": "usr-owner",
+      "salesman_id": "usr-1788085594775",
       "warehouse_id": "off-1",
       "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0025",
-      "movement_type": "ADJUSTMENT_IN",
-      "source_location_id": "ADJUSTMENT",
-      "source_location_type": "NONE",
+      "movement_code": "MVT-20260830-0011",
+      "movement_type": "RETURN_IN",
+      "source_location_id": "usr-1788085594775",
+      "source_location_type": "SALES",
       "destination_location_id": "off-1",
       "destination_location_type": "WAREHOUSE"
     },
     {
-      "_id": "mvt-1788086048208-adj",
-      "notes": "[Penyesuaian Koreksi sampel bonus] Penambahan stok 5 pack",
+      "_id": "mvt-1788086061820-956",
+      "notes": "Handover ke Sales usr-1788086058443",
       "sku_id": "sku-1788085594766",
       "status": "COMPLETED",
-      "quantity": 5,
-      "created_at": "2026-08-30T10:34:08.207Z",
+      "quantity": 50,
+      "created_at": "2026-08-30T10:34:21.928Z",
       "created_by": "usr-owner",
+      "salesman_id": "usr-1788086058443",
       "warehouse_id": "off-1",
       "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0012",
-      "movement_type": "ADJUSTMENT_IN",
-      "source_location_id": "ADJUSTMENT",
-      "source_location_type": "NONE",
+      "movement_code": "MVT-20260830-0016",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "usr-1788086058443",
+      "destination_location_type": "SALES"
+    },
+    {
+      "_id": "mvt-1788141607174-26532",
+      "notes": "Return dari Sales usr-1788085594775",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 800,
+      "created_at": "2026-08-31T02:00:07.174Z",
+      "created_by": "usr-owner",
+      "salesman_id": "usr-1788085594775",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0032",
+      "movement_type": "RETURN_IN",
+      "source_location_id": "usr-1788085594775",
+      "source_location_type": "SALES",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
+      "_id": "mvt-1788141246873-909263",
+      "notes": "Return dari Sales usr-1788085594775",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 20,
+      "created_at": "2026-08-31T01:54:06.873Z",
+      "created_by": "usr-owner",
+      "salesman_id": "usr-1788085594775",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0030",
+      "movement_type": "RETURN_IN",
+      "source_location_id": "usr-1788085594775",
+      "source_location_type": "SALES",
       "destination_location_id": "off-1",
       "destination_location_type": "WAREHOUSE"
     },
@@ -1401,6 +1851,41 @@
       "destination_location_type": "WAREHOUSE"
     },
     {
+      "_id": "mvt-1788140830559-707369",
+      "notes": "Handover ke Sales usr-1788086058443",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 725,
+      "created_at": "2026-08-31T01:47:10.560Z",
+      "created_by": "usr-owner",
+      "salesman_id": "usr-1788086058443",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0028",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "usr-1788086058443",
+      "destination_location_type": "SALES"
+    },
+    {
+      "_id": "mvt-1788086048208-adj",
+      "notes": "[Penyesuaian Koreksi sampel bonus] Penambahan stok 5 pack",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 5,
+      "created_at": "2026-08-30T10:34:08.207Z",
+      "created_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "movement_code": "MVT-20260830-0012",
+      "movement_type": "ADJUSTMENT_IN",
+      "source_location_id": "ADJUSTMENT",
+      "source_location_type": "NONE",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
       "_id": "mvt-1788085595601-521",
       "notes": "Penerimaan Barang Supplier PT Pabrik Mahameru Sentosa",
       "sku_id": "sku-1788085594766",
@@ -1418,112 +1903,200 @@
       "destination_location_type": "WAREHOUSE"
     },
     {
-      "_id": "mvt-1788086062773-894",
-      "notes": "Handover ke Sales usr-1788086058443",
+      "_id": "mvt-1788086064203-adj",
+      "notes": "[Penyesuaian Kemasan Rusak] Penyesuaian keluar 4",
       "sku_id": "sku-1788085594766",
       "status": "COMPLETED",
-      "quantity": 20,
-      "created_at": "2026-08-30T10:34:22.864Z",
+      "quantity": 4,
+      "created_at": "2026-08-30T10:34:24.203Z",
       "created_by": "usr-owner",
-      "salesman_id": "usr-1788086058443",
       "warehouse_id": "off-1",
       "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0017",
+      "movement_code": "MVT-20260830-0020",
+      "movement_type": "ADJUSTMENT_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "ADJUSTMENT",
+      "destination_location_type": "NONE"
+    },
+    {
+      "_id": "mvt-1788085817593-opn-4766",
+      "notes": "[Stock Opname: Opname Fisik Rutin Akhir Bulan] Sistem: 273 -> Fisik: 85 (Selisih: -188). Hasil hitung fisik 85",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 188,
+      "created_at": "2026-08-30T10:30:17.593Z",
+      "created_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "movement_code": "MVT-20260830-0009",
+      "movement_type": "ADJUSTMENT_OUT",
+      "source_location_id": "off-1",
+      "source_location_type": "WAREHOUSE",
+      "destination_location_id": "OPNAME",
+      "destination_location_type": "NONE"
+    },
+    {
+      "_id": "mvt-1788086188793-925",
+      "notes": "Handover ke Sales usr-1788086187277",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 50,
+      "created_at": "2026-08-30T10:36:28.894Z",
+      "created_by": "usr-owner",
+      "salesman_id": "usr-1788086187277",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "movement_code": "MVT-20260830-0022",
       "movement_type": "TRANSFER_OUT",
       "source_location_id": "off-1",
       "source_location_type": "WAREHOUSE",
-      "destination_location_id": "usr-1788086058443",
+      "destination_location_id": "usr-1788086187277",
       "destination_location_type": "SALES"
     },
     {
-      "_id": "mvt-1788086058685-890",
-      "notes": "Penerimaan Barang Supplier PT Pabrik Mahameru Sentosa",
+      "_id": "mvt-1788140762602-779025",
+      "notes": "Return dari Sales usr-1788086187277",
       "sku_id": "sku-1788085594766",
       "status": "COMPLETED",
-      "quantity": 200,
-      "created_at": "2026-08-30T10:34:18.777Z",
+      "quantity": 55,
+      "created_at": "2026-08-31T01:46:02.602Z",
+      "created_by": "usr-owner",
+      "salesman_id": "usr-1788086187277",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0027",
+      "movement_type": "RETURN_IN",
+      "source_location_id": "usr-1788086187277",
+      "source_location_type": "SALES",
+      "destination_location_id": "off-1",
+      "destination_location_type": "WAREHOUSE"
+    },
+    {
+      "_id": "mvt-1788183075020-55301",
+      "notes": "Penerimaan Barang Supplier Test Supplier",
+      "sku_id": "sku-1788085594766",
+      "status": "COMPLETED",
+      "quantity": 10,
+      "created_at": "2026-08-31T13:31:15.021Z",
       "created_by": "usr-owner",
       "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0015",
+      "business_date": "2026-08-31",
+      "movement_code": "MVT-20260831-0045",
       "movement_type": "PURCHASE_IN",
-      "source_location_id": "PT Pabrik Mahameru Sentosa",
+      "source_location_id": "Test Supplier",
       "source_location_type": "SUPPLIER",
       "destination_location_id": "off-1",
       "destination_location_type": "WAREHOUSE"
     },
     {
-      "_id": "mvt-1788086061820-956",
-      "notes": "Handover ke Sales usr-1788086058443",
+      "_id": "mvt-1788184194461-643192",
+      "movement_code": "MVT-20260831-0046",
+      "movement_type": "PURCHASE_IN",
+      "source_location_type": "SUPPLIER",
+      "source_location_id": "PT Mitra Pemasok Mandiri",
+      "destination_location_type": "WAREHOUSE",
+      "destination_location_id": "off-1",
       "sku_id": "sku-1788085594766",
-      "status": "COMPLETED",
       "quantity": 50,
-      "created_at": "2026-08-30T10:34:21.928Z",
-      "created_by": "usr-owner",
-      "salesman_id": "usr-1788086058443",
       "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "movement_code": "MVT-20260830-0016",
+      "business_date": "2026-08-31",
+      "status": "COMPLETED",
+      "notes": "Penerimaan Barang Supplier PT Mitra Pemasok Mandiri",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:49:54.462Z"
+    },
+    {
+      "_id": "mvt-1788184195244-233819",
+      "movement_code": "MVT-20260831-0047",
       "movement_type": "TRANSFER_OUT",
-      "source_location_id": "off-1",
       "source_location_type": "WAREHOUSE",
-      "destination_location_id": "usr-1788086058443",
-      "destination_location_type": "SALES"
+      "source_location_id": "off-1",
+      "destination_location_type": "SALES",
+      "destination_location_id": "usr-1788086187277",
+      "sku_id": "sku-1788085594766",
+      "quantity": 15,
+      "salesman_id": "usr-1788086187277",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "status": "COMPLETED",
+      "notes": "Handover ke Sales usr-1788086187277",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:49:55.244Z"
+    },
+    {
+      "_id": "mvt-1788184195906-870171",
+      "movement_code": "MVT-20260831-0048",
+      "movement_type": "RETURN_IN",
+      "source_location_type": "SALES",
+      "source_location_id": "usr-1788086187277",
+      "destination_location_type": "WAREHOUSE",
+      "destination_location_id": "off-1",
+      "sku_id": "sku-1788085594766",
+      "quantity": 5,
+      "salesman_id": "usr-1788086187277",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "status": "COMPLETED",
+      "notes": "Return dari Sales usr-1788086187277",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:49:55.906Z"
+    },
+    {
+      "_id": "mvt-1788184419853-846017",
+      "movement_code": "MVT-20260831-0049",
+      "movement_type": "PURCHASE_IN",
+      "source_location_type": "SUPPLIER",
+      "source_location_id": "PT Mitra Pemasok Mandiri",
+      "destination_location_type": "WAREHOUSE",
+      "destination_location_id": "off-1",
+      "sku_id": "sku-1788085594766",
+      "quantity": 40,
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "status": "COMPLETED",
+      "notes": "Penerimaan Barang Supplier PT Mitra Pemasok Mandiri",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:53:39.853Z"
+    },
+    {
+      "_id": "mvt-1788184420612-181485",
+      "movement_code": "MVT-20260831-0050",
+      "movement_type": "TRANSFER_OUT",
+      "source_location_type": "WAREHOUSE",
+      "source_location_id": "off-1",
+      "destination_location_type": "SALES",
+      "destination_location_id": "usr-1788086187277",
+      "sku_id": "sku-1788085594766",
+      "quantity": 10,
+      "salesman_id": "usr-1788086187277",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "status": "COMPLETED",
+      "notes": "Handover ke Sales usr-1788086187277",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:53:40.612Z"
+    },
+    {
+      "_id": "mvt-1788184421222-614939",
+      "movement_code": "MVT-20260831-0051",
+      "movement_type": "RETURN_IN",
+      "source_location_type": "SALES",
+      "source_location_id": "usr-1788086187277",
+      "destination_location_type": "WAREHOUSE",
+      "destination_location_id": "off-1",
+      "sku_id": "sku-1788085594766",
+      "quantity": 3,
+      "salesman_id": "usr-1788086187277",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "status": "COMPLETED",
+      "notes": "Return dari Sales usr-1788086187277",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:53:41.222Z"
     }
   ],
   "stock_handovers": [
-    {
-      "_id": "hnd-1788086062449",
-      "items": [
-        {
-          "notes": "20 pack tambahan",
-          "sku_id": "sku-1788085594766",
-          "quantity": 20
-        }
-      ],
-      "notes": "Restock siang tambahan",
-      "status": "CONFIRMED",
-      "created_at": "2026-08-30T10:34:22.449Z",
-      "created_by": "usr-owner",
-      "updated_at": "2026-08-30T10:34:22.449Z",
-      "prepared_at": "2026-08-30T10:34:22.449Z",
-      "prepared_by": "usr-owner",
-      "salesman_id": "usr-1788086058443",
-      "confirmed_at": "2026-08-30T10:34:22.449Z",
-      "confirmed_by": "usr-owner",
-      "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "handover_code": "HND-ADD-20260830-003",
-      "handover_time": "17.34",
-      "handover_type": "ADDITIONAL_HANDOVER",
-      "is_additional": true
-    },
-    {
-      "_id": "hnd-1788086188440",
-      "items": [
-        {
-          "notes": "50 pack awal",
-          "sku_id": "sku-1788085594766",
-          "quantity": 50
-        }
-      ],
-      "notes": "Serah terima stok pagi awal",
-      "status": "CONFIRMED",
-      "created_at": "2026-08-30T10:36:28.440Z",
-      "created_by": "usr-owner",
-      "updated_at": "2026-08-30T10:36:28.440Z",
-      "prepared_at": "2026-08-30T10:36:28.440Z",
-      "prepared_by": "usr-owner",
-      "salesman_id": "usr-1788086187277",
-      "confirmed_at": "2026-08-30T10:36:28.440Z",
-      "confirmed_by": "usr-owner",
-      "warehouse_id": "off-1",
-      "business_date": "2026-08-30",
-      "handover_code": "HND-20260830-004",
-      "handover_time": "17.36",
-      "handover_type": "INITIAL_HANDOVER",
-      "is_additional": false
-    },
     {
       "_id": "hnd-1788086061452",
       "items": [
@@ -1577,6 +2150,32 @@
       "is_additional": false
     },
     {
+      "_id": "hnd-1788086188440",
+      "items": [
+        {
+          "notes": "50 pack awal",
+          "sku_id": "sku-1788085594766",
+          "quantity": 50
+        }
+      ],
+      "notes": "Serah terima stok pagi awal",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-30T10:36:28.440Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-30T10:36:28.440Z",
+      "prepared_at": "2026-08-30T10:36:28.440Z",
+      "prepared_by": "usr-owner",
+      "salesman_id": "usr-1788086187277",
+      "confirmed_at": "2026-08-30T10:36:28.440Z",
+      "confirmed_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "handover_code": "HND-20260830-004",
+      "handover_time": "17.36",
+      "handover_type": "INITIAL_HANDOVER",
+      "is_additional": false
+    },
+    {
       "_id": "hnd-1788086189444",
       "items": [
         {
@@ -1601,29 +2200,394 @@
       "handover_time": "17.36",
       "handover_type": "ADDITIONAL_HANDOVER",
       "is_additional": true
+    },
+    {
+      "_id": "hnd-1788143331453",
+      "items": [
+        {
+          "notes": "Muatan Order Tempo",
+          "sku_id": "sku-1788085594766",
+          "quantity": 20
+        }
+      ],
+      "notes": "Handover untuk order toko baru",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T02:28:51.453Z",
+      "created_by": "usr-warehouse",
+      "updated_at": "2026-08-31T02:28:52.008Z",
+      "prepared_at": "2026-08-31T02:28:51.453Z",
+      "prepared_by": "usr-warehouse",
+      "salesman_id": "usr-sales1",
+      "confirmed_at": "2026-08-31T02:28:52.008Z",
+      "confirmed_by": "usr-warehouse",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "handover_code": "HND-ADD-20260831-011",
+      "handover_time": "09.28",
+      "handover_type": "ADDITIONAL_HANDOVER",
+      "is_additional": true
+    },
+    {
+      "_id": "hnd-1788140830018",
+      "items": [
+        {
+          "notes": "",
+          "sku_id": "sku-1788085594766",
+          "quantity": 725
+        }
+      ],
+      "notes": "Serah terima pagi reguler",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T01:47:10.018Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-31T01:47:10.018Z",
+      "prepared_at": "2026-08-31T01:47:10.018Z",
+      "prepared_by": "usr-owner",
+      "salesman_id": "usr-1788086058443",
+      "confirmed_at": "2026-08-31T01:47:10.018Z",
+      "confirmed_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "handover_code": "HND-20260831-006",
+      "handover_time": "08.46",
+      "handover_type": "INITIAL_HANDOVER",
+      "is_additional": false
+    },
+    {
+      "_id": "hnd-1788143345934",
+      "items": [
+        {
+          "notes": "Muatan Order Tempo",
+          "sku_id": "sku-1788085594766",
+          "quantity": 20
+        }
+      ],
+      "notes": "Handover untuk order toko baru",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T02:29:05.934Z",
+      "created_by": "usr-warehouse",
+      "updated_at": "2026-08-31T02:29:06.605Z",
+      "prepared_at": "2026-08-31T02:29:05.934Z",
+      "prepared_by": "usr-warehouse",
+      "salesman_id": "usr-sales1",
+      "confirmed_at": "2026-08-31T02:29:06.605Z",
+      "confirmed_by": "usr-warehouse",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "handover_code": "HND-ADD-20260831-012",
+      "handover_time": "09.29",
+      "handover_type": "ADDITIONAL_HANDOVER",
+      "is_additional": true
+    },
+    {
+      "_id": "hnd-1788086062449",
+      "items": [
+        {
+          "notes": "20 pack tambahan",
+          "sku_id": "sku-1788085594766",
+          "quantity": 20
+        }
+      ],
+      "notes": "Restock siang tambahan",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-30T10:34:22.449Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-30T10:34:22.449Z",
+      "prepared_at": "2026-08-30T10:34:22.449Z",
+      "prepared_by": "usr-owner",
+      "salesman_id": "usr-1788086058443",
+      "confirmed_at": "2026-08-30T10:34:22.449Z",
+      "confirmed_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30",
+      "handover_code": "HND-ADD-20260830-003",
+      "handover_time": "17.34",
+      "handover_type": "ADDITIONAL_HANDOVER",
+      "is_additional": true
+    },
+    {
+      "_id": "hnd-1788142620226",
+      "items": [
+        {
+          "notes": "",
+          "sku_id": "sku-1788085594766",
+          "quantity": 100
+        }
+      ],
+      "notes": "Serah terima pagi reguler",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T02:17:00.226Z",
+      "created_by": "usr-admin",
+      "updated_at": "2026-08-31T02:17:00.226Z",
+      "prepared_at": "2026-08-31T02:17:00.226Z",
+      "prepared_by": "usr-admin",
+      "salesman_id": "usr-1788086187277",
+      "confirmed_at": "2026-08-31T02:17:00.226Z",
+      "confirmed_by": "usr-admin",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "handover_code": "HND-20260831-008",
+      "handover_time": "09.16",
+      "handover_type": "INITIAL_HANDOVER",
+      "is_additional": false
+    },
+    {
+      "_id": "hnd-1788141585397",
+      "items": [
+        {
+          "notes": "",
+          "sku_id": "sku-1788085594766",
+          "quantity": 800
+        }
+      ],
+      "notes": "Serah terima pagi reguler",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T01:59:45.397Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-31T01:59:45.397Z",
+      "prepared_at": "2026-08-31T01:59:45.397Z",
+      "prepared_by": "usr-owner",
+      "salesman_id": "usr-1788085594775",
+      "confirmed_at": "2026-08-31T01:59:45.397Z",
+      "confirmed_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "handover_code": "HND-20260831-007",
+      "handover_time": "08.59",
+      "handover_type": "INITIAL_HANDOVER",
+      "is_additional": false
+    },
+    {
+      "_id": "hnd-1788143065151",
+      "items": [
+        {
+          "notes": "Muatan Pagi Motoris",
+          "sku_id": "sku-1788085594766",
+          "quantity": 25
+        }
+      ],
+      "notes": "Serah terima muatan awal hari",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T02:24:25.151Z",
+      "created_by": "usr-warehouse",
+      "updated_at": "2026-08-31T02:24:25.765Z",
+      "prepared_at": "2026-08-31T02:24:25.151Z",
+      "prepared_by": "usr-warehouse",
+      "salesman_id": "usr-sales1",
+      "confirmed_at": "2026-08-31T02:24:25.765Z",
+      "confirmed_by": "usr-warehouse",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "handover_code": "HND-20260831-009",
+      "handover_time": "09.24",
+      "handover_type": "INITIAL_HANDOVER",
+      "is_additional": false
+    },
+    {
+      "_id": "hnd-1788143134685",
+      "items": [
+        {
+          "notes": "Muatan Motoris",
+          "sku_id": "sku-1788085594766",
+          "quantity": 25
+        }
+      ],
+      "notes": "Serah terima muatan harian",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T02:25:34.685Z",
+      "created_by": "usr-warehouse",
+      "updated_at": "2026-08-31T02:25:35.288Z",
+      "prepared_at": "2026-08-31T02:25:34.685Z",
+      "prepared_by": "usr-warehouse",
+      "salesman_id": "usr-sales1",
+      "confirmed_at": "2026-08-31T02:25:35.288Z",
+      "confirmed_by": "usr-warehouse",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31",
+      "handover_code": "HND-ADD-20260831-010",
+      "handover_time": "09.25",
+      "handover_type": "ADDITIONAL_HANDOVER",
+      "is_additional": true
+    },
+    {
+      "_id": "hnd-1788184194802",
+      "handover_code": "HND-ADD-20260831-013",
+      "business_date": "2026-08-31",
+      "warehouse_id": "off-1",
+      "salesman_id": "usr-1788086187277",
+      "status": "CONFIRMED",
+      "is_additional": true,
+      "items": [
+        {
+          "sku_id": "sku-1788085594766",
+          "quantity": 15,
+          "notes": ""
+        }
+      ],
+      "notes": "Uji coba serah terima pagi",
+      "prepared_by": "usr-owner",
+      "prepared_at": "2026-08-31T13:49:54.802Z",
+      "confirmed_by": "usr-owner",
+      "confirmed_at": "2026-08-31T13:49:54.802Z",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:49:54.802Z",
+      "updated_at": "2026-08-31T13:49:54.802Z",
+      "handover_type": "ADDITIONAL_HANDOVER",
+      "handover_time": "20.49"
+    },
+    {
+      "_id": "hnd-1788184420165",
+      "handover_code": "HND-ADD-20260831-014",
+      "business_date": "2026-08-31",
+      "warehouse_id": "off-1",
+      "salesman_id": "usr-1788086187277",
+      "status": "CONFIRMED",
+      "is_additional": true,
+      "items": [
+        {
+          "sku_id": "sku-1788085594766",
+          "quantity": 10,
+          "notes": ""
+        }
+      ],
+      "notes": "Uji coba serah terima pagi",
+      "prepared_by": "usr-owner",
+      "prepared_at": "2026-08-31T13:53:40.165Z",
+      "confirmed_by": "usr-owner",
+      "confirmed_at": "2026-08-31T13:53:40.165Z",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:53:40.165Z",
+      "updated_at": "2026-08-31T13:53:40.165Z",
+      "handover_type": "ADDITIONAL_HANDOVER",
+      "handover_time": "20.53"
     }
   ],
   "stock_returns": [
     {
-      "_id": "ret-1788086063322",
+      "_id": "ret-1788140863979",
       "items": [
         {
-          "notes": "15 pack dikembalikan ke gudang",
+          "notes": "",
+          "sku_id": "sku-1788085594766",
+          "quantity": 780
+        }
+      ],
+      "notes": "Pengembalian sisa stok sore hari",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T01:47:43.979Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-31T01:47:43.979Z",
+      "return_code": "RET-20260831-007",
+      "salesman_id": "usr-1788086058443",
+      "confirmed_at": "2026-08-31T01:47:43.979Z",
+      "confirmed_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31"
+    },
+    {
+      "_id": "ret-1788141246512",
+      "items": [
+        {
+          "notes": "",
+          "sku_id": "sku-1788085594766",
+          "quantity": 20
+        }
+      ],
+      "notes": "Pengembalian sisa stok sore hari",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T01:54:06.512Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-31T01:54:06.512Z",
+      "return_code": "RET-20260831-008",
+      "salesman_id": "usr-1788085594775",
+      "confirmed_at": "2026-08-31T01:54:06.512Z",
+      "confirmed_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31"
+    },
+    {
+      "_id": "ret-1788141606821",
+      "items": [
+        {
+          "notes": "",
+          "sku_id": "sku-1788085594766",
+          "quantity": 800
+        }
+      ],
+      "notes": "Pengembalian sisa stok sore hari",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T02:00:06.821Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-31T02:00:06.821Z",
+      "return_code": "RET-20260831-009",
+      "salesman_id": "usr-1788085594775",
+      "confirmed_at": "2026-08-31T02:00:06.821Z",
+      "confirmed_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31"
+    },
+    {
+      "_id": "ret-1788142649946",
+      "items": [
+        {
+          "notes": "",
+          "sku_id": "sku-1788085594766",
+          "quantity": 100
+        }
+      ],
+      "notes": "Pengembalian sisa stok sore hari",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-31T02:17:29.946Z",
+      "created_by": "usr-admin",
+      "updated_at": "2026-08-31T02:17:29.946Z",
+      "return_code": "RET-20260831-010",
+      "salesman_id": "usr-1788086187277",
+      "confirmed_at": "2026-08-31T02:17:29.946Z",
+      "confirmed_by": "usr-admin",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31"
+    },
+    {
+      "_id": "ret-1788085597291",
+      "items": [
+        {
+          "notes": "10 pack sisa belum terjual",
+          "sku_id": "sku-1788085594766",
+          "quantity": 10
+        }
+      ],
+      "notes": "Pengembalian sisa stok sore",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-30T10:26:37.291Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-30T10:26:37.291Z",
+      "return_code": "RET-20260830-001",
+      "salesman_id": "usr-1788085594775",
+      "confirmed_at": "2026-08-30T10:26:37.291Z",
+      "confirmed_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30"
+    },
+    {
+      "_id": "ret-1788143135533",
+      "items": [
+        {
+          "notes": "Sisa muatan hari ini",
           "sku_id": "sku-1788085594766",
           "quantity": 15
         }
       ],
-      "notes": "Retur sisa stok sore",
+      "notes": "Pengembalian stok sore hari",
       "status": "CONFIRMED",
-      "created_at": "2026-08-30T10:34:23.322Z",
-      "created_by": "usr-owner",
-      "updated_at": "2026-08-30T10:34:23.322Z",
-      "return_code": "RET-20260830-004",
-      "salesman_id": "usr-1788086058443",
-      "confirmed_at": "2026-08-30T10:34:23.322Z",
-      "confirmed_by": "usr-owner",
+      "created_at": "2026-08-31T02:25:35.533Z",
+      "created_by": "usr-sales1",
+      "updated_at": "2026-08-31T02:25:36.130Z",
+      "return_code": "RET-20260831-012",
+      "salesman_id": "usr-sales1",
+      "confirmed_at": "2026-08-31T02:25:36.130Z",
+      "confirmed_by": "usr-warehouse",
       "warehouse_id": "off-1",
-      "business_date": "2026-08-30"
+      "business_date": "2026-08-31"
     },
     {
       "_id": "ret-1788085782697",
@@ -1668,6 +2632,27 @@
       "business_date": "2026-08-30"
     },
     {
+      "_id": "ret-1788086063322",
+      "items": [
+        {
+          "notes": "15 pack dikembalikan ke gudang",
+          "sku_id": "sku-1788085594766",
+          "quantity": 15
+        }
+      ],
+      "notes": "Retur sisa stok sore",
+      "status": "CONFIRMED",
+      "created_at": "2026-08-30T10:34:23.322Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-30T10:34:23.322Z",
+      "return_code": "RET-20260830-004",
+      "salesman_id": "usr-1788086058443",
+      "confirmed_at": "2026-08-30T10:34:23.322Z",
+      "confirmed_by": "usr-owner",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-30"
+    },
+    {
       "_id": "ret-1788086190389",
       "items": [
         {
@@ -1689,25 +2674,86 @@
       "business_date": "2026-08-30"
     },
     {
-      "_id": "ret-1788085597291",
+      "_id": "ret-1788143066333",
       "items": [
         {
-          "notes": "10 pack sisa belum terjual",
+          "notes": "Sisa muatan hari ini",
           "sku_id": "sku-1788085594766",
-          "quantity": 10
+          "quantity": 15
         }
       ],
-      "notes": "Pengembalian sisa stok sore",
+      "notes": "Pengembalian stok sore hari",
+      "status": "DRAFT",
+      "created_at": "2026-08-31T02:24:26.333Z",
+      "created_by": "usr-sales1",
+      "updated_at": "2026-08-31T02:24:26.333Z",
+      "return_code": "RET-20260831-011",
+      "salesman_id": "usr-sales1",
+      "warehouse_id": "off-1",
+      "business_date": "2026-08-31"
+    },
+    {
+      "_id": "ret-1788140762237",
+      "items": [
+        {
+          "notes": "",
+          "sku_id": "sku-1788085594766",
+          "quantity": 55
+        }
+      ],
+      "notes": "Pengembalian sisa stok sore hari",
       "status": "CONFIRMED",
-      "created_at": "2026-08-30T10:26:37.291Z",
+      "created_at": "2026-08-31T01:46:02.237Z",
       "created_by": "usr-owner",
-      "updated_at": "2026-08-30T10:26:37.291Z",
-      "return_code": "RET-20260830-001",
-      "salesman_id": "usr-1788085594775",
-      "confirmed_at": "2026-08-30T10:26:37.291Z",
+      "updated_at": "2026-08-31T01:46:02.237Z",
+      "return_code": "RET-20260831-006",
+      "salesman_id": "usr-1788086187277",
+      "confirmed_at": "2026-08-31T01:46:02.237Z",
       "confirmed_by": "usr-owner",
       "warehouse_id": "off-1",
-      "business_date": "2026-08-30"
+      "business_date": "2026-08-31"
+    },
+    {
+      "_id": "ret-1788184195519",
+      "return_code": "RET-20260831-013",
+      "business_date": "2026-08-31",
+      "warehouse_id": "off-1",
+      "salesman_id": "usr-1788086187277",
+      "status": "CONFIRMED",
+      "items": [
+        {
+          "sku_id": "sku-1788085594766",
+          "quantity": 5,
+          "notes": "Kondisi baik"
+        }
+      ],
+      "notes": "Uji coba retur stok sore",
+      "confirmed_by": "usr-owner",
+      "confirmed_at": "2026-08-31T13:49:55.519Z",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:49:55.519Z",
+      "updated_at": "2026-08-31T13:49:55.519Z"
+    },
+    {
+      "_id": "ret-1788184420866",
+      "return_code": "RET-20260831-014",
+      "business_date": "2026-08-31",
+      "warehouse_id": "off-1",
+      "salesman_id": "usr-1788086187277",
+      "status": "CONFIRMED",
+      "items": [
+        {
+          "sku_id": "sku-1788085594766",
+          "quantity": 3,
+          "notes": "Kondisi baik"
+        }
+      ],
+      "notes": "Uji coba retur stok sore",
+      "confirmed_by": "usr-owner",
+      "confirmed_at": "2026-08-31T13:53:40.866Z",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:53:40.866Z",
+      "updated_at": "2026-08-31T13:53:40.866Z"
     }
   ],
   "stock_receivings": [
@@ -1734,6 +2780,110 @@
       "warehouse_id": "off-1",
       "supplier_name": "PT Pabrik Mahameru Sentosa",
       "receiving_code": "RCV-20260830-003",
+      "receiving_date": "2026-08-30",
+      "total_quantity": 100
+    },
+    {
+      "_id": "rcv-1788143109108",
+      "items": [
+        {
+          "notes": "Inbound Batch Segar",
+          "sku_id": "sku-1788085594766",
+          "quantity": 100,
+          "unit_price": 25000
+        }
+      ],
+      "notes": "Penerimaan stok harian gudang",
+      "status": "POSTED",
+      "po_number": "PO-SUP-1788143109104",
+      "posted_at": "2026-08-31T02:25:09.162Z",
+      "posted_by": "usr-warehouse",
+      "created_at": "2026-08-31T02:25:09.108Z",
+      "created_by": "usr-warehouse",
+      "updated_at": "2026-08-31T02:25:09.162Z",
+      "received_by": "usr-warehouse",
+      "total_value": 2500000,
+      "warehouse_id": "off-1",
+      "supplier_name": "PT Sumber Pangan Nusantara",
+      "receiving_code": "RCV-20260831-009",
+      "receiving_date": "2026-08-31",
+      "total_quantity": 100
+    },
+    {
+      "_id": "rcv-1788143100387",
+      "items": [
+        {
+          "notes": "Inbound Batch Segar",
+          "sku_id": "sku-1788085594766",
+          "quantity": 100,
+          "unit_price": 25000
+        }
+      ],
+      "notes": "Penerimaan stok harian gudang",
+      "status": "POSTED",
+      "po_number": "PO-SUP-1788143100385",
+      "posted_at": "2026-08-31T02:25:00.445Z",
+      "posted_by": "usr-warehouse",
+      "created_at": "2026-08-31T02:25:00.387Z",
+      "created_by": "usr-warehouse",
+      "updated_at": "2026-08-31T02:25:00.445Z",
+      "received_by": "usr-warehouse",
+      "total_value": 2500000,
+      "warehouse_id": "off-1",
+      "supplier_name": "PT Sumber Pangan Nusantara",
+      "receiving_code": "RCV-20260831-008",
+      "receiving_date": "2026-08-31",
+      "total_quantity": 100
+    },
+    {
+      "_id": "rcv-1788086187382",
+      "items": [
+        {
+          "notes": "200 pack baru masuk",
+          "sku_id": "sku-1788085594766",
+          "quantity": 200,
+          "unit_price": 20000
+        }
+      ],
+      "notes": "Penerimaan batch fresh",
+      "status": "POSTED",
+      "po_number": "PO-CYC-7273",
+      "posted_at": "2026-08-30T10:36:27.382Z",
+      "posted_by": "usr-owner",
+      "created_at": "2026-08-30T10:36:27.382Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-30T10:36:27.382Z",
+      "received_by": "usr-owner",
+      "total_value": 4000000,
+      "warehouse_id": "off-1",
+      "supplier_name": "PT Pabrik Mahameru Sentosa",
+      "receiving_code": "RCV-20260830-006",
+      "receiving_date": "2026-08-30",
+      "total_quantity": 200
+    },
+    {
+      "_id": "rcv-1788085594892",
+      "items": [
+        {
+          "notes": "Good quality",
+          "sku_id": "sku-1788085594766",
+          "quantity": 100,
+          "unit_price": 20000
+        }
+      ],
+      "notes": "Penerimaan batch uji coba",
+      "status": "POSTED",
+      "po_number": "PO-TEST-1788085594887",
+      "posted_at": "2026-08-30T10:26:34.902Z",
+      "posted_by": "usr-owner",
+      "created_at": "2026-08-30T10:26:34.892Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-30T10:26:34.902Z",
+      "received_by": "usr-owner",
+      "total_value": 2000000,
+      "warehouse_id": "off-1",
+      "supplier_name": "PT Pabrik Mahameru Sentosa",
+      "receiving_code": "RCV-20260830-001",
       "receiving_date": "2026-08-30",
       "total_quantity": 100
     },
@@ -1790,30 +2940,82 @@
       "total_quantity": 100
     },
     {
-      "_id": "rcv-1788085594892",
+      "_id": "rcv-1788143063773",
       "items": [
         {
-          "notes": "Good quality",
+          "notes": "Inbound Batch Segar",
           "sku_id": "sku-1788085594766",
           "quantity": 100,
-          "unit_price": 20000
+          "unit_price": 25000
         }
       ],
-      "notes": "Penerimaan batch uji coba",
+      "notes": "Penerimaan stok harian gudang",
       "status": "POSTED",
-      "po_number": "PO-TEST-1788085594887",
-      "posted_at": "2026-08-30T10:26:34.902Z",
-      "posted_by": "usr-owner",
-      "created_at": "2026-08-30T10:26:34.892Z",
-      "created_by": "usr-owner",
-      "updated_at": "2026-08-30T10:26:34.902Z",
-      "received_by": "usr-owner",
-      "total_value": 2000000,
+      "po_number": "PO-SUP-1788143063769",
+      "posted_at": "2026-08-31T02:24:24.268Z",
+      "posted_by": "usr-warehouse",
+      "created_at": "2026-08-31T02:24:23.773Z",
+      "created_by": "usr-warehouse",
+      "updated_at": "2026-08-31T02:24:24.268Z",
+      "received_by": "usr-warehouse",
+      "total_value": 2500000,
       "warehouse_id": "off-1",
-      "supplier_name": "PT Pabrik Mahameru Sentosa",
-      "receiving_code": "RCV-20260830-001",
-      "receiving_date": "2026-08-30",
+      "supplier_name": "PT Sumber Pangan Nusantara",
+      "receiving_code": "RCV-20260831-007",
+      "receiving_date": "2026-08-31",
       "total_quantity": 100
+    },
+    {
+      "_id": "rcv-1788143131396",
+      "items": [
+        {
+          "notes": "Inbound Batch Segar",
+          "sku_id": "sku-1788085594766",
+          "quantity": 100,
+          "unit_price": 25000
+        }
+      ],
+      "notes": "Penerimaan stok harian gudang",
+      "status": "POSTED",
+      "po_number": "PO-SUP-1788143131392",
+      "posted_at": "2026-08-31T02:25:31.457Z",
+      "posted_by": "usr-warehouse",
+      "created_at": "2026-08-31T02:25:31.396Z",
+      "created_by": "usr-warehouse",
+      "updated_at": "2026-08-31T02:25:31.457Z",
+      "received_by": "usr-warehouse",
+      "total_value": 2500000,
+      "warehouse_id": "off-1",
+      "supplier_name": "PT Sumber Pangan Nusantara",
+      "receiving_code": "RCV-20260831-010",
+      "receiving_date": "2026-08-31",
+      "total_quantity": 100
+    },
+    {
+      "_id": "rcv-1788183074355",
+      "items": [
+        {
+          "notes": "",
+          "sku_id": "sku-1788085594766",
+          "quantity": 10,
+          "unit_price": 25000
+        }
+      ],
+      "notes": "Test notes",
+      "status": "POSTED",
+      "po_number": "PO-123",
+      "posted_at": "2026-08-31T13:31:14.355Z",
+      "posted_by": "usr-owner",
+      "created_at": "2026-08-31T13:31:14.355Z",
+      "created_by": "usr-owner",
+      "updated_at": "2026-08-31T13:31:14.355Z",
+      "received_by": "usr-owner",
+      "total_value": 250000,
+      "warehouse_id": "off-1",
+      "supplier_name": "Test Supplier",
+      "receiving_code": "RCV-20260831-011",
+      "receiving_date": "2026-08-31",
+      "total_quantity": 10
     },
     {
       "_id": "rcv-1788086058545",
@@ -1842,50 +3044,59 @@
       "total_quantity": 200
     },
     {
-      "_id": "rcv-1788086187382",
+      "_id": "rcv-1788184193811",
+      "receiving_code": "RCV-20260831-012",
+      "po_number": "PO-TEST-193805",
+      "supplier_name": "PT Mitra Pemasok Mandiri",
+      "warehouse_id": "off-1",
+      "receiving_date": "2026-08-31",
+      "status": "POSTED",
       "items": [
         {
-          "notes": "200 pack baru masuk",
           "sku_id": "sku-1788085594766",
-          "quantity": 200,
-          "unit_price": 20000
+          "quantity": 50,
+          "unit_price": 25000,
+          "notes": ""
         }
       ],
-      "notes": "Penerimaan batch fresh",
-      "status": "POSTED",
-      "po_number": "PO-CYC-7273",
-      "posted_at": "2026-08-30T10:36:27.382Z",
-      "posted_by": "usr-owner",
-      "created_at": "2026-08-30T10:36:27.382Z",
-      "created_by": "usr-owner",
-      "updated_at": "2026-08-30T10:36:27.382Z",
+      "total_quantity": 50,
+      "total_value": 1250000,
+      "notes": "Uji coba otomatis penerimaan barang",
       "received_by": "usr-owner",
-      "total_value": 4000000,
+      "posted_by": "usr-owner",
+      "posted_at": "2026-08-31T13:49:53.811Z",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:49:53.811Z",
+      "updated_at": "2026-08-31T13:49:53.811Z"
+    },
+    {
+      "_id": "rcv-1788184419469",
+      "receiving_code": "RCV-20260831-013",
+      "po_number": "PO-TEST-419466",
+      "supplier_name": "PT Mitra Pemasok Mandiri",
       "warehouse_id": "off-1",
-      "supplier_name": "PT Pabrik Mahameru Sentosa",
-      "receiving_code": "RCV-20260830-006",
-      "receiving_date": "2026-08-30",
-      "total_quantity": 200
+      "receiving_date": "2026-08-31",
+      "status": "POSTED",
+      "items": [
+        {
+          "sku_id": "sku-1788085594766",
+          "quantity": 40,
+          "unit_price": 25000,
+          "notes": ""
+        }
+      ],
+      "total_quantity": 40,
+      "total_value": 1000000,
+      "notes": "Uji coba otomatis penerimaan barang",
+      "received_by": "usr-owner",
+      "posted_by": "usr-owner",
+      "posted_at": "2026-08-31T13:53:39.469Z",
+      "created_by": "usr-owner",
+      "created_at": "2026-08-31T13:53:39.469Z",
+      "updated_at": "2026-08-31T13:53:39.469Z"
     }
   ],
   "sales_stock_ledgers": [
-    {
-      "_id": "ssl-usr-1788086058443-2026-08-30-sku-1788085594766",
-      "notes": "Sinkronisasi Buku Stok per 2026-08-30",
-      "sku_id": "sku-1788085594766",
-      "status": "BALANCED",
-      "sales_out": 0,
-      "updated_at": "2026-08-30T10:34:24.189Z",
-      "discrepancy": 0,
-      "returns_out": 15,
-      "salesman_id": "usr-1788086058443",
-      "transfers_in": 70,
-      "business_date": "2026-08-30",
-      "closing_balance": 55,
-      "opening_balance": 0,
-      "expected_balance": 55,
-      "last_movement_id": "mvt-1788086063642-52"
-    },
     {
       "_id": "ssl-usr-1788085594775-2026-08-30-sku-1788085594766",
       "notes": "Sinkronisasi Buku Stok per 2026-08-30",
@@ -1919,239 +3130,217 @@
       "opening_balance": 0,
       "expected_balance": 55,
       "last_movement_id": "mvt-1788086190708-187"
+    },
+    {
+      "_id": "ssl-usr-1788086058443-2026-08-31-sku-1788085594766",
+      "sku_id": "sku-1788085594766",
+      "status": "BALANCED",
+      "sales_out": 0,
+      "updated_at": "2026-08-31T01:47:44.530Z",
+      "discrepancy": 0,
+      "returns_out": 780,
+      "salesman_id": "usr-1788086058443",
+      "transfers_in": 725,
+      "business_date": "2026-08-31",
+      "closing_balance": 0,
+      "opening_balance": 0,
+      "expected_balance": 0,
+      "last_movement_id": "mvt-1788140864329-30501"
+    },
+    {
+      "_id": "ssl-usr-1788085594775-2026-08-31-sku-1788085594766",
+      "sku_id": "sku-1788085594766",
+      "status": "BALANCED",
+      "sales_out": 0,
+      "updated_at": "2026-08-31T02:00:07.787Z",
+      "discrepancy": 0,
+      "returns_out": 820,
+      "salesman_id": "usr-1788085594775",
+      "transfers_in": 800,
+      "business_date": "2026-08-31",
+      "closing_balance": 0,
+      "opening_balance": 0,
+      "expected_balance": 0,
+      "last_movement_id": "mvt-1788141607174-26532"
+    },
+    {
+      "_id": "ssl-usr-1788086187277-2026-08-31-sku-1788085594766",
+      "sku_id": "sku-1788085594766",
+      "status": "SURPLUS",
+      "sales_out": 0,
+      "updated_at": "2026-08-31T13:53:41.515Z",
+      "discrepancy": 17,
+      "returns_out": 163,
+      "salesman_id": "usr-1788086187277",
+      "transfers_in": 125,
+      "business_date": "2026-08-31",
+      "closing_balance": 17,
+      "opening_balance": 0,
+      "expected_balance": 0,
+      "last_movement_id": "mvt-1788184421222-614939"
+    },
+    {
+      "_id": "ssl-usr-1788086058443-2026-08-30-sku-1788085594766",
+      "notes": "Sinkronisasi Buku Stok per 2026-08-30",
+      "sku_id": "sku-1788085594766",
+      "status": "BALANCED",
+      "sales_out": 0,
+      "updated_at": "2026-08-30T10:34:24.189Z",
+      "discrepancy": 0,
+      "returns_out": 15,
+      "salesman_id": "usr-1788086058443",
+      "transfers_in": 70,
+      "business_date": "2026-08-30",
+      "closing_balance": 55,
+      "opening_balance": 0,
+      "expected_balance": 55,
+      "last_movement_id": "mvt-1788086063642-52"
+    },
+    {
+      "_id": "ssl-usr-sales1-2026-08-31-sku-1788085594766",
+      "sku_id": "sku-1788085594766",
+      "status": "BALANCED",
+      "sales_out": 0,
+      "updated_at": "2026-08-31T02:29:06.272Z",
+      "discrepancy": 0,
+      "returns_out": 15,
+      "salesman_id": "usr-sales1",
+      "transfers_in": 90,
+      "business_date": "2026-08-31",
+      "closing_balance": 75,
+      "opening_balance": 0,
+      "expected_balance": 75
     }
   ],
   "targets": [],
-  "cash_deposits": [],
+  "cash_deposits": [
+    {
+      "_id": "dep-1788143136387",
+      "notes": "Setoran tunai klir sesuai penjualan faktur | Uang fisik pas sesuai faktur",
+      "status": "VERIFIED",
+      "created_at": "2026-08-31T02:25:36.387Z",
+      "updated_at": "2026-08-31T02:25:36.395Z",
+      "salesman_id": "usr-sales1",
+      "verified_at": "2026-08-31T02:25:36.395Z",
+      "verified_by": "usr-warehouse",
+      "deposit_code": "DEP/20260831/001",
+      "business_date": "2026-08-31",
+      "variance_amount": 250000,
+      "expected_cash_amount": 0,
+      "actual_deposit_amount": 250000
+    }
+  ],
   "receivables": [],
   "daily_reconciliations": [],
   "audit_logs": [
     {
-      "_id": "aud-1788085594894-685",
+      "_id": "aud-1788184421584-397",
+      "user_id": "usr-owner",
+      "action": "STOCK_OPNAME_BATCH",
+      "entity": "inventory",
+      "entity_id": "off-1",
+      "details": {
+        "location_type": "WAREHOUSE",
+        "location_id": "off-1",
+        "reason": "Opname Rutin",
+        "total_items_checked": 1,
+        "total_items_adjusted": 0,
+        "adjusted_items": [],
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "timestamp": "2026-08-31T13:53:41.584Z"
+      },
+      "created_at": "2026-08-31T13:53:41.584Z"
+    },
+    {
+      "_id": "aud-1788184421516-513",
+      "user_id": "usr-owner",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "entity_id": "ret-1788184420866",
+      "details": {
+        "return_code": "RET-20260831-014",
+        "salesman": "Salesman Tester 7273",
+        "total_items": 1,
+        "status": "CONFIRMED",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "timestamp": "2026-08-31T13:53:41.516Z"
+      },
+      "created_at": "2026-08-31T13:53:41.516Z"
+    },
+    {
+      "_id": "aud-1788184420055-379",
+      "user_id": "usr-owner",
       "action": "CREATE_STOCK_RECEIVING",
       "entity": "stock_receivings",
+      "entity_id": "rcv-1788184419469",
       "details": {
-        "timestamp": "2026-08-30T10:26:34.894Z",
+        "receiving_code": "RCV-20260831-013",
+        "supplier_name": "PT Mitra Pemasok Mandiri",
+        "total_quantity": 40,
         "user_name": "Andis Moch Solihin",
         "user_role": "OWNER",
-        "supplier_name": "PT Pabrik Mahameru Sentosa",
-        "receiving_code": "RCV-20260830-001",
-        "total_quantity": 100
+        "timestamp": "2026-08-31T13:53:40.055Z"
       },
-      "user_id": "usr-owner",
-      "entity_id": "rcv-1788085594892",
-      "created_at": "2026-08-30T10:26:34.894Z"
+      "created_at": "2026-08-31T13:53:40.055Z"
     },
     {
-      "_id": "aud-1787984218208-755",
-      "action": "LOGIN",
-      "entity": "auth",
-      "details": {
-        "role": "OWNER",
-        "email": "andismochsolihin@gmail.com",
-        "login_at": "2026-08-29T06:16:58.208Z",
-        "timestamp": "2026-08-29T06:16:58.208Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER"
-      },
+      "_id": "aud-1788184196244-887",
       "user_id": "usr-owner",
-      "entity_id": "usr-owner",
-      "created_at": "2026-08-29T06:16:58.208Z",
-      "ip_address": "127.0.0.1"
-    },
-    {
-      "_id": "aud-1788086191369-123",
-      "action": "STOCK_OPNAME_BATCH",
-      "entity": "inventory",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "entity_id": "ret-1788184195519",
       "details": {
-        "reason": "Audit Sisa Stok Sales",
-        "timestamp": "2026-08-30T10:36:31.369Z",
+        "return_code": "RET-20260831-013",
+        "salesman": "Salesman Tester 7273",
+        "total_items": 1,
+        "status": "CONFIRMED",
         "user_name": "Andis Moch Solihin",
         "user_role": "OWNER",
-        "location_id": "usr-1788086187277",
-        "location_type": "SALES",
-        "adjusted_items": [],
-        "total_items_checked": 1,
-        "total_items_adjusted": 0
+        "timestamp": "2026-08-31T13:49:56.244Z"
       },
-      "user_id": "usr-owner",
-      "entity_id": "usr-1788086187277",
-      "created_at": "2026-08-30T10:36:31.369Z"
+      "created_at": "2026-08-31T13:49:56.244Z"
     },
     {
-      "_id": "aud-1788085817594-760",
-      "action": "STOCK_OPNAME_BATCH",
-      "entity": "inventory",
+      "_id": "aud-1788184194666-550",
+      "user_id": "usr-owner",
+      "action": "CREATE_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "entity_id": "rcv-1788184193811",
       "details": {
-        "reason": "Opname Fisik Rutin Akhir Bulan",
-        "timestamp": "2026-08-30T10:30:17.594Z",
+        "receiving_code": "RCV-20260831-012",
+        "supplier_name": "PT Mitra Pemasok Mandiri",
+        "total_quantity": 50,
         "user_name": "Andis Moch Solihin",
         "user_role": "OWNER",
-        "location_id": "off-1",
-        "location_type": "WAREHOUSE",
-        "adjusted_items": [
-          {
-            "notes": "Hasil hitung fisik 85",
-            "sku_id": "sku-1788085594766",
-            "sku_code": "SKU-KOP-250",
-            "sku_name": "Mahameru Kopi Tubruk 250g Pack",
-            "variance": -188,
-            "system_qty": 273,
-            "physical_qty": 85
-          }
-        ],
-        "total_items_checked": 1,
-        "total_items_adjusted": 1
+        "timestamp": "2026-08-31T13:49:54.666Z"
       },
-      "user_id": "usr-owner",
-      "entity_id": "off-1",
-      "created_at": "2026-08-30T10:30:17.594Z"
+      "created_at": "2026-08-31T13:49:54.666Z"
     },
     {
-      "_id": "aud-1788086191349-519",
+      "_id": "aud-1788085597293-57",
       "action": "CONFIRM_STOCK_RETURN",
       "entity": "stock_returns",
       "details": {
         "status": "CONFIRMED",
-        "salesman": "Salesman Tester 7273",
-        "timestamp": "2026-08-30T10:36:31.349Z",
+        "salesman": "Budi Salesman Test",
+        "timestamp": "2026-08-30T10:26:37.293Z",
         "user_name": "Andis Moch Solihin",
         "user_role": "OWNER",
-        "return_code": "RET-20260830-005",
+        "return_code": "RET-20260830-001",
         "total_items": 1
       },
       "user_id": "usr-owner",
-      "entity_id": "ret-1788086190389",
-      "created_at": "2026-08-30T10:36:31.349Z"
+      "entity_id": "ret-1788085597291",
+      "created_at": "2026-08-30T10:26:37.293Z"
     },
     {
-      "_id": "aud-1788086191358-532",
-      "action": "STOCK_ADJUSTMENT",
-      "entity": "inventory",
-      "details": {
-        "sku": "Mahameru Kopi Tubruk 250g Pack",
-        "reason": "Koreksi Bonus Pabrik",
-        "quantity": 10,
-        "timestamp": "2026-08-30T10:36:31.358Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "location_id": "off-1",
-        "location_type": "WAREHOUSE",
-        "adjustment_type": "IN"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "inv-1788085595547-678677",
-      "created_at": "2026-08-30T10:36:31.358Z"
-    },
-    {
-      "_id": "aud-1788086188410-481",
+      "_id": "aud-1788085816526-444",
       "action": "CREATE_STOCK_RECEIVING",
       "entity": "stock_receivings",
       "details": {
-        "timestamp": "2026-08-30T10:36:28.410Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "supplier_name": "PT Pabrik Mahameru Sentosa",
-        "receiving_code": "RCV-20260830-006",
-        "total_quantity": 200
-      },
-      "user_id": "usr-owner",
-      "entity_id": "rcv-1788086187382",
-      "created_at": "2026-08-30T10:36:28.410Z"
-    },
-    {
-      "_id": "aud-1788086187374-28",
-      "action": "CREATE_USER",
-      "entity": "users",
-      "details": {
-        "name": "Salesman Tester 7273",
-        "role": "SALES",
-        "email": "sales.cycle.7273@mahameru.id",
-        "phone": "08123457273",
-        "area_id": "area-1",
-        "office_id": "off-1",
-        "timestamp": "2026-08-30T10:36:27.374Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "usr-1788086187277",
-      "created_at": "2026-08-30T10:36:27.374Z"
-    },
-    {
-      "_id": "aud-1787984501976-104",
-      "action": "LOGIN",
-      "entity": "auth",
-      "details": {
-        "role": "OWNER",
-        "email": "andismochsolihin@gmail.com",
-        "login_at": "2026-08-29T06:21:41.976Z",
-        "timestamp": "2026-08-29T06:21:41.976Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "usr-owner",
-      "created_at": "2026-08-29T06:21:41.976Z",
-      "ip_address": "127.0.0.1"
-    },
-    {
-      "_id": "aud-1787984319668-328",
-      "action": "LOGIN",
-      "entity": "auth",
-      "details": {
-        "role": "OWNER",
-        "email": "andismochsolihin@gmail.com",
-        "login_at": "2026-08-29T06:18:39.668Z",
-        "timestamp": "2026-08-29T06:18:39.668Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "usr-owner",
-      "created_at": "2026-08-29T06:18:39.668Z",
-      "ip_address": "127.0.0.1"
-    },
-    {
-      "_id": "aud-1788084821996-310",
-      "action": "DOWNLOAD_DATABASE_BACKUP",
-      "entity": "SYSTEM",
-      "details": {
-        "role": "OWNER",
-        "timestamp": "2026-08-30T10:13:41.996Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "downloaded_by": "Andis Moch Solihin"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "ALL_DATA",
-      "created_at": "2026-08-30T10:13:41.996Z"
-    },
-    {
-      "_id": "aud-1788085817585-648",
-      "action": "STOCK_ADJUSTMENT",
-      "entity": "inventory",
-      "details": {
-        "sku": "Mahameru Kopi Tubruk 250g Pack",
-        "reason": "Koreksi sampel bonus",
-        "quantity": 5,
-        "timestamp": "2026-08-30T10:30:17.585Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "location_id": "off-1",
-        "location_type": "WAREHOUSE",
-        "adjustment_type": "IN"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "inv-1788085595547-678677",
-      "created_at": "2026-08-30T10:30:17.585Z"
-    },
-    {
-      "_id": "aud-1788085817525-578",
-      "action": "POST_STOCK_RECEIVING",
-      "entity": "stock_receivings",
-      "details": {
-        "timestamp": "2026-08-30T10:30:17.525Z",
+        "timestamp": "2026-08-30T10:30:16.526Z",
         "user_name": "Andis Moch Solihin",
         "user_role": "OWNER",
         "supplier_name": "PT Pabrik Mahameru Sentosa",
@@ -2160,113 +3349,7 @@
       },
       "user_id": "usr-owner",
       "entity_id": "rcv-1788085816525",
-      "created_at": "2026-08-30T10:30:17.525Z"
-    },
-    {
-      "_id": "aud-1788085817588-55",
-      "action": "STOCK_ADJUSTMENT",
-      "entity": "inventory",
-      "details": {
-        "sku": "Mahameru Kopi Tubruk 250g Pack",
-        "reason": "Kemasan rusak saat display",
-        "quantity": 2,
-        "timestamp": "2026-08-30T10:30:17.588Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "location_id": "off-1",
-        "location_type": "WAREHOUSE",
-        "adjustment_type": "OUT"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "inv-1788085595547-678677",
-      "created_at": "2026-08-30T10:30:17.588Z"
-    },
-    {
-      "_id": "aud-1788086064198-939",
-      "action": "STOCK_ADJUSTMENT",
-      "entity": "inventory",
-      "details": {
-        "sku": "Mahameru Kopi Tubruk 250g Pack",
-        "reason": "Koreksi Bonus Pabrik",
-        "quantity": 10,
-        "timestamp": "2026-08-30T10:34:24.198Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "location_id": "off-1",
-        "location_type": "WAREHOUSE",
-        "adjustment_type": "IN"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "inv-1788085595547-678677",
-      "created_at": "2026-08-30T10:34:24.198Z"
-    },
-    {
-      "_id": "aud-1788086064189-711",
-      "action": "CONFIRM_STOCK_RETURN",
-      "entity": "stock_returns",
-      "details": {
-        "status": "CONFIRMED",
-        "salesman": "Salesman Tester 8440",
-        "timestamp": "2026-08-30T10:34:24.189Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "return_code": "RET-20260830-004",
-        "total_items": 1
-      },
-      "user_id": "usr-owner",
-      "entity_id": "ret-1788086063322",
-      "created_at": "2026-08-30T10:34:24.189Z"
-    },
-    {
-      "_id": "aud-1788086047214-736",
-      "action": "POST_STOCK_RECEIVING",
-      "entity": "stock_receivings",
-      "details": {
-        "timestamp": "2026-08-30T10:34:07.214Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "supplier_name": "PT Pabrik Mahameru Sentosa",
-        "receiving_code": "RCV-20260830-004",
-        "total_quantity": 100
-      },
-      "user_id": "usr-owner",
-      "entity_id": "rcv-1788086046197",
-      "created_at": "2026-08-30T10:34:07.214Z"
-    },
-    {
-      "_id": "aud-1788086061442-433",
-      "action": "CREATE_STOCK_RECEIVING",
-      "entity": "stock_receivings",
-      "details": {
-        "timestamp": "2026-08-30T10:34:21.442Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "supplier_name": "PT Pabrik Mahameru Sentosa",
-        "receiving_code": "RCV-20260830-005",
-        "total_quantity": 200
-      },
-      "user_id": "usr-owner",
-      "entity_id": "rcv-1788086058545",
-      "created_at": "2026-08-30T10:34:21.442Z"
-    },
-    {
-      "_id": "aud-1788086058540-802",
-      "action": "CREATE_USER",
-      "entity": "users",
-      "details": {
-        "name": "Salesman Tester 8440",
-        "role": "SALES",
-        "email": "sales.cycle.8440@mahameru.id",
-        "phone": "08123458440",
-        "area_id": "area-1",
-        "office_id": "off-1",
-        "timestamp": "2026-08-30T10:34:18.540Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "usr-1788086058443",
-      "created_at": "2026-08-30T10:34:18.540Z"
+      "created_at": "2026-08-30T10:30:16.526Z"
     },
     {
       "_id": "aud-1788086048219-41",
@@ -2298,23 +3381,21 @@
       "created_at": "2026-08-30T10:34:08.219Z"
     },
     {
-      "_id": "aud-1788086064203-654",
-      "action": "STOCK_ADJUSTMENT",
-      "entity": "inventory",
+      "_id": "aud-1788086191349-519",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
       "details": {
-        "sku": "Mahameru Kopi Tubruk 250g Pack",
-        "reason": "Kemasan Rusak",
-        "quantity": 4,
-        "timestamp": "2026-08-30T10:34:24.203Z",
+        "status": "CONFIRMED",
+        "salesman": "Salesman Tester 7273",
+        "timestamp": "2026-08-30T10:36:31.349Z",
         "user_name": "Andis Moch Solihin",
         "user_role": "OWNER",
-        "location_id": "off-1",
-        "location_type": "WAREHOUSE",
-        "adjustment_type": "OUT"
+        "return_code": "RET-20260830-005",
+        "total_items": 1
       },
       "user_id": "usr-owner",
-      "entity_id": "inv-1788085595547-678677",
-      "created_at": "2026-08-30T10:34:24.203Z"
+      "entity_id": "ret-1788086190389",
+      "created_at": "2026-08-30T10:36:31.349Z"
     },
     {
       "_id": "aud-1788086064208-171",
@@ -2336,111 +3417,58 @@
       "created_at": "2026-08-30T10:34:24.208Z"
     },
     {
-      "_id": "aud-1788086048213-27",
+      "_id": "aud-1788143346745-946",
       "action": "STOCK_ADJUSTMENT",
       "entity": "inventory",
       "details": {
         "sku": "Mahameru Kopi Tubruk 250g Pack",
-        "reason": "Kemasan rusak saat display",
-        "quantity": 2,
-        "timestamp": "2026-08-30T10:34:08.213Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "location_id": "off-1",
-        "location_type": "WAREHOUSE",
-        "adjustment_type": "OUT"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "inv-1788085595547-678677",
-      "created_at": "2026-08-30T10:34:08.213Z"
-    },
-    {
-      "_id": "aud-1788086048208-297",
-      "action": "STOCK_ADJUSTMENT",
-      "entity": "inventory",
-      "details": {
-        "sku": "Mahameru Kopi Tubruk 250g Pack",
-        "reason": "Koreksi sampel bonus",
+        "reason": "Hasil audit stok fisik opname harian gudang",
         "quantity": 5,
-        "timestamp": "2026-08-30T10:34:08.208Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "location_id": "off-1",
+        "timestamp": "2026-08-31T02:29:06.745Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "location_id": "wh-main",
         "location_type": "WAREHOUSE",
         "adjustment_type": "IN"
       },
-      "user_id": "usr-owner",
-      "entity_id": "inv-1788085595547-678677",
-      "created_at": "2026-08-30T10:34:08.208Z"
+      "user_id": "usr-warehouse",
+      "entity_id": "inv-wh-1788143346745-cr2f",
+      "created_at": "2026-08-31T02:29:06.745Z"
     },
     {
-      "_id": "aud-1787984345160-981",
-      "action": "LOGIN",
-      "entity": "auth",
-      "details": {
-        "role": "OWNER",
-        "email": "andismochsolihin@gmail.com",
-        "login_at": "2026-08-29T06:19:05.160Z",
-        "timestamp": "2026-08-29T06:19:05.160Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER"
-      },
-      "user_id": "usr-owner",
-      "entity_id": "usr-owner",
-      "created_at": "2026-08-29T06:19:05.160Z",
-      "ip_address": "127.0.0.1"
-    },
-    {
-      "_id": "aud-1788086048195-651",
-      "action": "CONFIRM_STOCK_RETURN",
-      "entity": "stock_returns",
-      "details": {
-        "status": "CONFIRMED",
-        "salesman": "Budi Salesman Test",
-        "timestamp": "2026-08-30T10:34:08.195Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "return_code": "RET-20260830-003",
-        "total_items": 1
-      },
-      "user_id": "usr-owner",
-      "entity_id": "ret-1788086047259",
-      "created_at": "2026-08-30T10:34:08.195Z"
-    },
-    {
-      "_id": "aud-1788086046198-114",
+      "_id": "aud-1788143064254-701",
       "action": "CREATE_STOCK_RECEIVING",
       "entity": "stock_receivings",
       "details": {
-        "timestamp": "2026-08-30T10:34:06.198Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "supplier_name": "PT Pabrik Mahameru Sentosa",
-        "receiving_code": "RCV-20260830-004",
+        "timestamp": "2026-08-31T02:24:24.254Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "supplier_name": "PT Sumber Pangan Nusantara",
+        "receiving_code": "RCV-20260831-007",
         "total_quantity": 100
       },
-      "user_id": "usr-owner",
-      "entity_id": "rcv-1788086046197",
-      "created_at": "2026-08-30T10:34:06.198Z"
+      "user_id": "usr-warehouse",
+      "entity_id": "rcv-1788143063773",
+      "created_at": "2026-08-31T02:24:24.254Z"
     },
     {
-      "_id": "aud-1788086191364-17",
-      "action": "STOCK_ADJUSTMENT",
-      "entity": "inventory",
+      "_id": "aud-1788143331195-245",
+      "action": "AUTO_ASSIGN_NOO",
+      "entity": "sales_outlets",
       "details": {
-        "sku": "Mahameru Kopi Tubruk 250g Pack",
-        "reason": "Kemasan Rusak",
-        "quantity": 4,
-        "timestamp": "2026-08-30T10:36:31.364Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "location_id": "off-1",
-        "location_type": "WAREHOUSE",
-        "adjustment_type": "OUT"
+        "sales_id": "usr-sales1",
+        "outlet_id": "out-1788143330535",
+        "timestamp": "2026-08-31T02:28:51.195Z",
+        "user_name": "Rian Hidayat (Salesman)",
+        "user_role": "SALES",
+        "sales_name": "Rian Hidayat (Salesman)",
+        "action_type": "AUTO_ASSIGNMENT",
+        "outlet_code": "OUT-002",
+        "outlet_name": "Toko Sembako Maju Jaya 0529"
       },
-      "user_id": "usr-owner",
-      "entity_id": "inv-1788085595547-678677",
-      "created_at": "2026-08-30T10:36:31.364Z"
+      "user_id": "usr-sales1",
+      "entity_id": "so-1788143330758-811",
+      "created_at": "2026-08-31T02:28:51.195Z"
     },
     {
       "_id": "aud-1787984133448-786",
@@ -2475,6 +3503,23 @@
       "created_at": "2026-08-30T10:14:41.990Z"
     },
     {
+      "_id": "aud-1788085782698-610",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "status": "CONFIRMED",
+        "salesman": "Budi Salesman Test",
+        "timestamp": "2026-08-30T10:29:42.698Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "return_code": "RET-20260830-002",
+        "total_items": 1
+      },
+      "user_id": "usr-owner",
+      "entity_id": "ret-1788085782697",
+      "created_at": "2026-08-30T10:29:42.698Z"
+    },
+    {
       "_id": "aud-1788011332039-337",
       "action": "DELETE_MASTER_ITEM",
       "entity": "channels",
@@ -2488,6 +3533,418 @@
       "user_id": "usr-owner",
       "entity_id": "ch-1",
       "created_at": "2026-08-29T13:48:52.039Z"
+    },
+    {
+      "_id": "aud-1788085782518-55",
+      "action": "POST_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-30T10:29:42.519Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "supplier_name": "PT Pabrik Mahameru Sentosa",
+        "receiving_code": "RCV-20260830-002",
+        "total_quantity": 100
+      },
+      "user_id": "usr-owner",
+      "entity_id": "rcv-1788085781666",
+      "created_at": "2026-08-30T10:29:42.519Z"
+    },
+    {
+      "_id": "aud-1788086048208-297",
+      "action": "STOCK_ADJUSTMENT",
+      "entity": "inventory",
+      "details": {
+        "sku": "Mahameru Kopi Tubruk 250g Pack",
+        "reason": "Koreksi sampel bonus",
+        "quantity": 5,
+        "timestamp": "2026-08-30T10:34:08.208Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "location_id": "off-1",
+        "location_type": "WAREHOUSE",
+        "adjustment_type": "IN"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "inv-1788085595547-678677",
+      "created_at": "2026-08-30T10:34:08.208Z"
+    },
+    {
+      "_id": "aud-1787984521317-505",
+      "action": "LOGIN",
+      "entity": "auth",
+      "details": {
+        "role": "OWNER",
+        "email": "andismochsolihin@gmail.com",
+        "login_at": "2026-08-29T06:22:01.317Z",
+        "timestamp": "2026-08-29T06:22:01.317Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "usr-owner",
+      "created_at": "2026-08-29T06:22:01.317Z",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "_id": "aud-1788086046198-114",
+      "action": "CREATE_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-30T10:34:06.198Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "supplier_name": "PT Pabrik Mahameru Sentosa",
+        "receiving_code": "RCV-20260830-004",
+        "total_quantity": 100
+      },
+      "user_id": "usr-owner",
+      "entity_id": "rcv-1788086046197",
+      "created_at": "2026-08-30T10:34:06.198Z"
+    },
+    {
+      "_id": "aud-1788140864530-103",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "status": "CONFIRMED",
+        "salesman": "Salesman Tester 8440",
+        "timestamp": "2026-08-31T01:47:44.530Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "return_code": "RET-20260831-007",
+        "total_items": 1
+      },
+      "user_id": "usr-owner",
+      "entity_id": "ret-1788140863979",
+      "created_at": "2026-08-31T01:47:44.530Z"
+    },
+    {
+      "_id": "aud-1788086048195-651",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "status": "CONFIRMED",
+        "salesman": "Budi Salesman Test",
+        "timestamp": "2026-08-30T10:34:08.195Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "return_code": "RET-20260830-003",
+        "total_items": 1
+      },
+      "user_id": "usr-owner",
+      "entity_id": "ret-1788086047259",
+      "created_at": "2026-08-30T10:34:08.195Z"
+    },
+    {
+      "_id": "aud-1788086047214-736",
+      "action": "POST_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-30T10:34:07.214Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "supplier_name": "PT Pabrik Mahameru Sentosa",
+        "receiving_code": "RCV-20260830-004",
+        "total_quantity": 100
+      },
+      "user_id": "usr-owner",
+      "entity_id": "rcv-1788086046197",
+      "created_at": "2026-08-30T10:34:07.214Z"
+    },
+    {
+      "_id": "aud-1788086064189-711",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "status": "CONFIRMED",
+        "salesman": "Salesman Tester 8440",
+        "timestamp": "2026-08-30T10:34:24.189Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "return_code": "RET-20260830-004",
+        "total_items": 1
+      },
+      "user_id": "usr-owner",
+      "entity_id": "ret-1788086063322",
+      "created_at": "2026-08-30T10:34:24.189Z"
+    },
+    {
+      "_id": "aud-1788086064198-939",
+      "action": "STOCK_ADJUSTMENT",
+      "entity": "inventory",
+      "details": {
+        "sku": "Mahameru Kopi Tubruk 250g Pack",
+        "reason": "Koreksi Bonus Pabrik",
+        "quantity": 10,
+        "timestamp": "2026-08-30T10:34:24.198Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "location_id": "off-1",
+        "location_type": "WAREHOUSE",
+        "adjustment_type": "IN"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "inv-1788085595547-678677",
+      "created_at": "2026-08-30T10:34:24.198Z"
+    },
+    {
+      "_id": "aud-1788086191364-17",
+      "action": "STOCK_ADJUSTMENT",
+      "entity": "inventory",
+      "details": {
+        "sku": "Mahameru Kopi Tubruk 250g Pack",
+        "reason": "Kemasan Rusak",
+        "quantity": 4,
+        "timestamp": "2026-08-30T10:36:31.364Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "location_id": "off-1",
+        "location_type": "WAREHOUSE",
+        "adjustment_type": "OUT"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "inv-1788085595547-678677",
+      "created_at": "2026-08-30T10:36:31.364Z"
+    },
+    {
+      "_id": "aud-1788085594894-685",
+      "action": "CREATE_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-30T10:26:34.894Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "supplier_name": "PT Pabrik Mahameru Sentosa",
+        "receiving_code": "RCV-20260830-001",
+        "total_quantity": 100
+      },
+      "user_id": "usr-owner",
+      "entity_id": "rcv-1788085594892",
+      "created_at": "2026-08-30T10:26:34.894Z"
+    },
+    {
+      "_id": "aud-1788142671619-629",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "status": "CONFIRMED",
+        "salesman": "Salesman Tester 7273",
+        "timestamp": "2026-08-31T02:17:51.619Z",
+        "user_name": "Super Administrator",
+        "user_role": "ADMIN",
+        "return_code": "RET-20260831-010",
+        "total_items": 1
+      },
+      "user_id": "usr-admin",
+      "entity_id": "ret-1788142649946",
+      "created_at": "2026-08-31T02:17:51.619Z"
+    },
+    {
+      "_id": "aud-1787984319668-328",
+      "action": "LOGIN",
+      "entity": "auth",
+      "details": {
+        "role": "OWNER",
+        "email": "andismochsolihin@gmail.com",
+        "login_at": "2026-08-29T06:18:39.668Z",
+        "timestamp": "2026-08-29T06:18:39.668Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "usr-owner",
+      "created_at": "2026-08-29T06:18:39.668Z",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "_id": "aud-1787984501976-104",
+      "action": "LOGIN",
+      "entity": "auth",
+      "details": {
+        "role": "OWNER",
+        "email": "andismochsolihin@gmail.com",
+        "login_at": "2026-08-29T06:21:41.976Z",
+        "timestamp": "2026-08-29T06:21:41.976Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "usr-owner",
+      "created_at": "2026-08-29T06:21:41.976Z",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "_id": "aud-1788086187374-28",
+      "action": "CREATE_USER",
+      "entity": "users",
+      "details": {
+        "name": "Salesman Tester 7273",
+        "role": "SALES",
+        "email": "sales.cycle.7273@mahameru.id",
+        "phone": "08123457273",
+        "area_id": "area-1",
+        "office_id": "off-1",
+        "timestamp": "2026-08-30T10:36:27.374Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "usr-1788086187277",
+      "created_at": "2026-08-30T10:36:27.374Z"
+    },
+    {
+      "_id": "aud-1788086191369-123",
+      "action": "STOCK_OPNAME_BATCH",
+      "entity": "inventory",
+      "details": {
+        "reason": "Audit Sisa Stok Sales",
+        "timestamp": "2026-08-30T10:36:31.369Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "location_id": "usr-1788086187277",
+        "location_type": "SALES",
+        "adjusted_items": [],
+        "total_items_checked": 1,
+        "total_items_adjusted": 0
+      },
+      "user_id": "usr-owner",
+      "entity_id": "usr-1788086187277",
+      "created_at": "2026-08-30T10:36:31.369Z"
+    },
+    {
+      "_id": "aud-1788143065993-216",
+      "action": "AUTO_ASSIGN_NOO",
+      "entity": "sales_outlets",
+      "details": {
+        "sales_id": "usr-sales1",
+        "outlet_id": "out-1788143065887",
+        "timestamp": "2026-08-31T02:24:25.993Z",
+        "user_name": "Rian Hidayat (Salesman)",
+        "user_role": "SALES",
+        "sales_name": "Rian Hidayat (Salesman)",
+        "action_type": "AUTO_ASSIGNMENT",
+        "outlet_code": "OUT-001",
+        "outlet_name": "Toko Kelontong Berkah Mandiri"
+      },
+      "user_id": "usr-sales1",
+      "entity_id": "so-1788143065941-509",
+      "created_at": "2026-08-31T02:24:25.993Z"
+    },
+    {
+      "_id": "aud-1788143065993-735",
+      "action": "CREATE_OUTLET",
+      "entity": "outlets",
+      "details": {
+        "code": "OUT-001",
+        "status": "PROSPECT",
+        "area_id": "area-1",
+        "timestamp": "2026-08-31T02:24:25.993Z",
+        "user_name": "Rian Hidayat (Salesman)",
+        "user_role": "SALES",
+        "outlet_name": "Toko Kelontong Berkah Mandiri"
+      },
+      "user_id": "usr-sales1",
+      "entity_id": "out-1788143065887",
+      "created_at": "2026-08-31T02:24:25.993Z"
+    },
+    {
+      "_id": "aud-1788143136395-436",
+      "action": "VERIFY_CASH_DEPOSIT",
+      "entity": "cash_deposits",
+      "details": {
+        "notes": "Uang fisik pas sesuai faktur",
+        "status": "VERIFIED",
+        "timestamp": "2026-08-31T02:25:36.395Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "deposit_code": "DEP/20260831/001"
+      },
+      "user_id": "usr-warehouse",
+      "entity_id": "dep-1788143136387",
+      "created_at": "2026-08-31T02:25:36.395Z"
+    },
+    {
+      "_id": "aud-1788143136387-182",
+      "action": "CREATE_CASH_DEPOSIT",
+      "entity": "cash_deposits",
+      "details": {
+        "actual": 250000,
+        "expected": 0,
+        "variance": 250000,
+        "timestamp": "2026-08-31T02:25:36.387Z",
+        "user_name": "Rian Hidayat (Salesman)",
+        "user_role": "SALES",
+        "salesman_id": "usr-sales1",
+        "deposit_code": "DEP/20260831/001"
+      },
+      "user_id": "usr-sales1",
+      "entity_id": "dep-1788143136387",
+      "created_at": "2026-08-31T02:25:36.387Z"
+    },
+    {
+      "_id": "aud-1788143136382-415",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "salesman": "Rian Hidayat (Salesman)",
+        "timestamp": "2026-08-31T02:25:36.382Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "return_code": "RET-20260831-012"
+      },
+      "user_id": "usr-warehouse",
+      "entity_id": "ret-1788143135533",
+      "created_at": "2026-08-31T02:25:36.382Z"
+    },
+    {
+      "_id": "aud-1788143135585-84",
+      "action": "CREATE_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "status": "DRAFT",
+        "salesman": "Rian Hidayat (Salesman)",
+        "timestamp": "2026-08-31T02:25:35.585Z",
+        "user_name": "Rian Hidayat (Salesman)",
+        "user_role": "SALES",
+        "return_code": "RET-20260831-012",
+        "total_items": 1
+      },
+      "user_id": "usr-sales1",
+      "entity_id": "ret-1788143135533",
+      "created_at": "2026-08-31T02:25:35.585Z"
+    },
+    {
+      "_id": "aud-1788143131453-312",
+      "action": "CREATE_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-31T02:25:31.453Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "supplier_name": "PT Sumber Pangan Nusantara",
+        "receiving_code": "RCV-20260831-010",
+        "total_quantity": 100
+      },
+      "user_id": "usr-warehouse",
+      "entity_id": "rcv-1788143131396",
+      "created_at": "2026-08-31T02:25:31.453Z"
+    },
+    {
+      "_id": "aud-1788143110722-373",
+      "action": "POST_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-31T02:25:10.722Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "supplier_name": "PT Sumber Pangan Nusantara",
+        "receiving_code": "RCV-20260831-009",
+        "total_quantity": 100
+      },
+      "user_id": "usr-warehouse",
+      "entity_id": "rcv-1788143109108",
+      "created_at": "2026-08-31T02:25:10.722Z"
     },
     {
       "_id": "aud-1788084860577-38",
@@ -2505,36 +3962,153 @@
       "created_at": "2026-08-30T10:14:20.577Z"
     },
     {
-      "_id": "aud-1788085816526-444",
+      "_id": "aud-1788086188410-481",
       "action": "CREATE_STOCK_RECEIVING",
       "entity": "stock_receivings",
       "details": {
-        "timestamp": "2026-08-30T10:30:16.526Z",
+        "timestamp": "2026-08-30T10:36:28.410Z",
         "user_name": "Andis Moch Solihin",
         "user_role": "OWNER",
         "supplier_name": "PT Pabrik Mahameru Sentosa",
-        "receiving_code": "RCV-20260830-003",
+        "receiving_code": "RCV-20260830-006",
+        "total_quantity": 200
+      },
+      "user_id": "usr-owner",
+      "entity_id": "rcv-1788086187382",
+      "created_at": "2026-08-30T10:36:28.410Z"
+    },
+    {
+      "_id": "aud-1788140762810-56",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "status": "CONFIRMED",
+        "salesman": "Salesman Tester 7273",
+        "timestamp": "2026-08-31T01:46:02.810Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "return_code": "RET-20260831-006",
+        "total_items": 1
+      },
+      "user_id": "usr-owner",
+      "entity_id": "ret-1788140762237",
+      "created_at": "2026-08-31T01:46:02.810Z"
+    },
+    {
+      "_id": "aud-1788086061442-433",
+      "action": "CREATE_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-30T10:34:21.442Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "supplier_name": "PT Pabrik Mahameru Sentosa",
+        "receiving_code": "RCV-20260830-005",
+        "total_quantity": 200
+      },
+      "user_id": "usr-owner",
+      "entity_id": "rcv-1788086058545",
+      "created_at": "2026-08-30T10:34:21.442Z"
+    },
+    {
+      "_id": "aud-1788085781667-337",
+      "action": "CREATE_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-30T10:29:41.667Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "supplier_name": "PT Pabrik Mahameru Sentosa",
+        "receiving_code": "RCV-20260830-002",
         "total_quantity": 100
       },
       "user_id": "usr-owner",
-      "entity_id": "rcv-1788085816525",
-      "created_at": "2026-08-30T10:30:16.526Z"
+      "entity_id": "rcv-1788085781666",
+      "created_at": "2026-08-30T10:29:41.667Z"
     },
     {
-      "_id": "aud-1788085596279-308",
+      "_id": "aud-1788085817585-648",
+      "action": "STOCK_ADJUSTMENT",
+      "entity": "inventory",
+      "details": {
+        "sku": "Mahameru Kopi Tubruk 250g Pack",
+        "reason": "Koreksi sampel bonus",
+        "quantity": 5,
+        "timestamp": "2026-08-30T10:30:17.585Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "location_id": "off-1",
+        "location_type": "WAREHOUSE",
+        "adjustment_type": "IN"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "inv-1788085595547-678677",
+      "created_at": "2026-08-30T10:30:17.585Z"
+    },
+    {
+      "_id": "aud-1788143109157-79",
+      "action": "CREATE_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-31T02:25:09.157Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "supplier_name": "PT Sumber Pangan Nusantara",
+        "receiving_code": "RCV-20260831-009",
+        "total_quantity": 100
+      },
+      "user_id": "usr-warehouse",
+      "entity_id": "rcv-1788143109108",
+      "created_at": "2026-08-31T02:25:09.157Z"
+    },
+    {
+      "_id": "aud-1788143100919-984",
       "action": "POST_STOCK_RECEIVING",
       "entity": "stock_receivings",
       "details": {
-        "timestamp": "2026-08-30T10:26:36.279Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "supplier_name": "PT Pabrik Mahameru Sentosa",
-        "receiving_code": "RCV-20260830-001",
+        "timestamp": "2026-08-31T02:25:00.919Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "supplier_name": "PT Sumber Pangan Nusantara",
+        "receiving_code": "RCV-20260831-008",
         "total_quantity": 100
       },
+      "user_id": "usr-warehouse",
+      "entity_id": "rcv-1788143100387",
+      "created_at": "2026-08-31T02:25:00.919Z"
+    },
+    {
+      "_id": "aud-1788143066386-276",
+      "action": "CREATE_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "status": "DRAFT",
+        "salesman": "Rian Hidayat (Salesman)",
+        "timestamp": "2026-08-31T02:24:26.386Z",
+        "user_name": "Rian Hidayat (Salesman)",
+        "user_role": "SALES",
+        "return_code": "RET-20260831-011",
+        "total_items": 1
+      },
+      "user_id": "usr-sales1",
+      "entity_id": "ret-1788143066333",
+      "created_at": "2026-08-31T02:24:26.386Z"
+    },
+    {
+      "_id": "aud-1788183075249-143",
+      "action": "CREATE_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-31T13:31:15.249Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "supplier_name": "Test Supplier",
+        "receiving_code": "RCV-20260831-011",
+        "total_quantity": 10
+      },
       "user_id": "usr-owner",
-      "entity_id": "rcv-1788085594892",
-      "created_at": "2026-08-30T10:26:36.279Z"
+      "entity_id": "rcv-1788183074355",
+      "created_at": "2026-08-31T13:31:15.249Z"
     },
     {
       "_id": "aud-1788085594876-70",
@@ -2556,6 +4130,83 @@
       "created_at": "2026-08-30T10:26:34.876Z"
     },
     {
+      "_id": "aud-1788143331314-185",
+      "action": "APPROVE_OUTLET_NOO",
+      "entity": "outlets",
+      "details": {
+        "timestamp": "2026-08-31T02:28:51.314Z",
+        "user_name": "Budi Santoso (Supervisor)",
+        "user_role": "SUPERVISOR",
+        "outlet_code": "OUT-002",
+        "outlet_name": "Toko Sembako Maju Jaya 0529"
+      },
+      "user_id": "usr-spv",
+      "entity_id": "out-1788143330535",
+      "created_at": "2026-08-31T02:28:51.314Z"
+    },
+    {
+      "_id": "aud-1788141607788-551",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "status": "CONFIRMED",
+        "salesman": "Budi Salesman Test",
+        "timestamp": "2026-08-31T02:00:07.788Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "return_code": "RET-20260831-009",
+        "total_items": 1
+      },
+      "user_id": "usr-owner",
+      "entity_id": "ret-1788141606821",
+      "created_at": "2026-08-31T02:00:07.788Z"
+    },
+    {
+      "_id": "aud-1788085596279-308",
+      "action": "POST_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-30T10:26:36.279Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "supplier_name": "PT Pabrik Mahameru Sentosa",
+        "receiving_code": "RCV-20260830-001",
+        "total_quantity": 100
+      },
+      "user_id": "usr-owner",
+      "entity_id": "rcv-1788085594892",
+      "created_at": "2026-08-30T10:26:36.279Z"
+    },
+    {
+      "_id": "aud-1788085817594-760",
+      "action": "STOCK_OPNAME_BATCH",
+      "entity": "inventory",
+      "details": {
+        "reason": "Opname Fisik Rutin Akhir Bulan",
+        "timestamp": "2026-08-30T10:30:17.594Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "location_id": "off-1",
+        "location_type": "WAREHOUSE",
+        "adjusted_items": [
+          {
+            "notes": "Hasil hitung fisik 85",
+            "sku_id": "sku-1788085594766",
+            "sku_code": "SKU-KOP-250",
+            "sku_name": "Mahameru Kopi Tubruk 250g Pack",
+            "variance": -188,
+            "system_qty": 273,
+            "physical_qty": 85
+          }
+        ],
+        "total_items_checked": 1,
+        "total_items_adjusted": 1
+      },
+      "user_id": "usr-owner",
+      "entity_id": "off-1",
+      "created_at": "2026-08-30T10:30:17.594Z"
+    },
+    {
       "_id": "aud-1787849847261-998",
       "action": "LOGIN",
       "entity": "auth",
@@ -2573,87 +4224,246 @@
       "ip_address": "140.213.43.56, 169.254.169.126"
     },
     {
-      "_id": "aud-1788085782518-55",
-      "action": "POST_STOCK_RECEIVING",
-      "entity": "stock_receivings",
+      "_id": "aud-1788084821996-310",
+      "action": "DOWNLOAD_DATABASE_BACKUP",
+      "entity": "SYSTEM",
       "details": {
-        "timestamp": "2026-08-30T10:29:42.519Z",
+        "role": "OWNER",
+        "timestamp": "2026-08-30T10:13:41.996Z",
         "user_name": "Andis Moch Solihin",
         "user_role": "OWNER",
-        "supplier_name": "PT Pabrik Mahameru Sentosa",
-        "receiving_code": "RCV-20260830-002",
-        "total_quantity": 100
+        "downloaded_by": "Andis Moch Solihin"
       },
       "user_id": "usr-owner",
-      "entity_id": "rcv-1788085781666",
-      "created_at": "2026-08-30T10:29:42.519Z"
+      "entity_id": "ALL_DATA",
+      "created_at": "2026-08-30T10:13:41.996Z"
     },
     {
-      "_id": "aud-1788085781667-337",
-      "action": "CREATE_STOCK_RECEIVING",
-      "entity": "stock_receivings",
-      "details": {
-        "timestamp": "2026-08-30T10:29:41.667Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "supplier_name": "PT Pabrik Mahameru Sentosa",
-        "receiving_code": "RCV-20260830-002",
-        "total_quantity": 100
-      },
-      "user_id": "usr-owner",
-      "entity_id": "rcv-1788085781666",
-      "created_at": "2026-08-30T10:29:41.667Z"
-    },
-    {
-      "_id": "aud-1788085782698-610",
-      "action": "CONFIRM_STOCK_RETURN",
-      "entity": "stock_returns",
-      "details": {
-        "status": "CONFIRMED",
-        "salesman": "Budi Salesman Test",
-        "timestamp": "2026-08-30T10:29:42.698Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "return_code": "RET-20260830-002",
-        "total_items": 1
-      },
-      "user_id": "usr-owner",
-      "entity_id": "ret-1788085782697",
-      "created_at": "2026-08-30T10:29:42.698Z"
-    },
-    {
-      "_id": "aud-1788085597293-57",
-      "action": "CONFIRM_STOCK_RETURN",
-      "entity": "stock_returns",
-      "details": {
-        "status": "CONFIRMED",
-        "salesman": "Budi Salesman Test",
-        "timestamp": "2026-08-30T10:26:37.293Z",
-        "user_name": "Andis Moch Solihin",
-        "user_role": "OWNER",
-        "return_code": "RET-20260830-001",
-        "total_items": 1
-      },
-      "user_id": "usr-owner",
-      "entity_id": "ret-1788085597291",
-      "created_at": "2026-08-30T10:26:37.293Z"
-    },
-    {
-      "_id": "aud-1787984521317-505",
+      "_id": "aud-1787984218208-755",
       "action": "LOGIN",
       "entity": "auth",
       "details": {
         "role": "OWNER",
         "email": "andismochsolihin@gmail.com",
-        "login_at": "2026-08-29T06:22:01.317Z",
-        "timestamp": "2026-08-29T06:22:01.317Z",
+        "login_at": "2026-08-29T06:16:58.208Z",
+        "timestamp": "2026-08-29T06:16:58.208Z",
         "user_name": "Andis Moch Solihin",
         "user_role": "OWNER"
       },
       "user_id": "usr-owner",
       "entity_id": "usr-owner",
-      "created_at": "2026-08-29T06:22:01.317Z",
+      "created_at": "2026-08-29T06:16:58.208Z",
       "ip_address": "127.0.0.1"
+    },
+    {
+      "_id": "aud-1788143134571-388",
+      "action": "POST_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-31T02:25:34.571Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "supplier_name": "PT Sumber Pangan Nusantara",
+        "receiving_code": "RCV-20260831-010",
+        "total_quantity": 100
+      },
+      "user_id": "usr-warehouse",
+      "entity_id": "rcv-1788143131396",
+      "created_at": "2026-08-31T02:25:34.571Z"
+    },
+    {
+      "_id": "aud-1788143065020-730",
+      "action": "POST_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-31T02:24:25.020Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "supplier_name": "PT Sumber Pangan Nusantara",
+        "receiving_code": "RCV-20260831-007",
+        "total_quantity": 100
+      },
+      "user_id": "usr-warehouse",
+      "entity_id": "rcv-1788143063773",
+      "created_at": "2026-08-31T02:24:25.020Z"
+    },
+    {
+      "_id": "aud-1788086191358-532",
+      "action": "STOCK_ADJUSTMENT",
+      "entity": "inventory",
+      "details": {
+        "sku": "Mahameru Kopi Tubruk 250g Pack",
+        "reason": "Koreksi Bonus Pabrik",
+        "quantity": 10,
+        "timestamp": "2026-08-30T10:36:31.358Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "location_id": "off-1",
+        "location_type": "WAREHOUSE",
+        "adjustment_type": "IN"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "inv-1788085595547-678677",
+      "created_at": "2026-08-30T10:36:31.358Z"
+    },
+    {
+      "_id": "aud-1788143331196-757",
+      "action": "CREATE_OUTLET",
+      "entity": "outlets",
+      "details": {
+        "code": "OUT-002",
+        "status": "PROSPECT",
+        "area_id": "area-1",
+        "timestamp": "2026-08-31T02:28:51.196Z",
+        "user_name": "Rian Hidayat (Salesman)",
+        "user_role": "SALES",
+        "outlet_name": "Toko Sembako Maju Jaya 0529"
+      },
+      "user_id": "usr-sales1",
+      "entity_id": "out-1788143330535",
+      "created_at": "2026-08-31T02:28:51.196Z"
+    },
+    {
+      "_id": "aud-1788086058540-802",
+      "action": "CREATE_USER",
+      "entity": "users",
+      "details": {
+        "name": "Salesman Tester 8440",
+        "role": "SALES",
+        "email": "sales.cycle.8440@mahameru.id",
+        "phone": "08123458440",
+        "area_id": "area-1",
+        "office_id": "off-1",
+        "timestamp": "2026-08-30T10:34:18.540Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "usr-1788086058443",
+      "created_at": "2026-08-30T10:34:18.540Z"
+    },
+    {
+      "_id": "aud-1788086048213-27",
+      "action": "STOCK_ADJUSTMENT",
+      "entity": "inventory",
+      "details": {
+        "sku": "Mahameru Kopi Tubruk 250g Pack",
+        "reason": "Kemasan rusak saat display",
+        "quantity": 2,
+        "timestamp": "2026-08-30T10:34:08.213Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "location_id": "off-1",
+        "location_type": "WAREHOUSE",
+        "adjustment_type": "OUT"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "inv-1788085595547-678677",
+      "created_at": "2026-08-30T10:34:08.213Z"
+    },
+    {
+      "_id": "aud-1788086064203-654",
+      "action": "STOCK_ADJUSTMENT",
+      "entity": "inventory",
+      "details": {
+        "sku": "Mahameru Kopi Tubruk 250g Pack",
+        "reason": "Kemasan Rusak",
+        "quantity": 4,
+        "timestamp": "2026-08-30T10:34:24.203Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "location_id": "off-1",
+        "location_type": "WAREHOUSE",
+        "adjustment_type": "OUT"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "inv-1788085595547-678677",
+      "created_at": "2026-08-30T10:34:24.203Z"
+    },
+    {
+      "_id": "aud-1787984345160-981",
+      "action": "LOGIN",
+      "entity": "auth",
+      "details": {
+        "role": "OWNER",
+        "email": "andismochsolihin@gmail.com",
+        "login_at": "2026-08-29T06:19:05.160Z",
+        "timestamp": "2026-08-29T06:19:05.160Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "usr-owner",
+      "created_at": "2026-08-29T06:19:05.160Z",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "_id": "aud-1788085817588-55",
+      "action": "STOCK_ADJUSTMENT",
+      "entity": "inventory",
+      "details": {
+        "sku": "Mahameru Kopi Tubruk 250g Pack",
+        "reason": "Kemasan rusak saat display",
+        "quantity": 2,
+        "timestamp": "2026-08-30T10:30:17.588Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "location_id": "off-1",
+        "location_type": "WAREHOUSE",
+        "adjustment_type": "OUT"
+      },
+      "user_id": "usr-owner",
+      "entity_id": "inv-1788085595547-678677",
+      "created_at": "2026-08-30T10:30:17.588Z"
+    },
+    {
+      "_id": "aud-1788141247077-113",
+      "action": "CONFIRM_STOCK_RETURN",
+      "entity": "stock_returns",
+      "details": {
+        "status": "CONFIRMED",
+        "salesman": "Budi Salesman Test",
+        "timestamp": "2026-08-31T01:54:07.077Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "return_code": "RET-20260831-008",
+        "total_items": 1
+      },
+      "user_id": "usr-owner",
+      "entity_id": "ret-1788141246512",
+      "created_at": "2026-08-31T01:54:07.077Z"
+    },
+    {
+      "_id": "aud-1788143100441-814",
+      "action": "CREATE_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-31T02:25:00.441Z",
+        "user_name": "Dedi Supriyadi (Gudang)",
+        "user_role": "WAREHOUSE",
+        "supplier_name": "PT Sumber Pangan Nusantara",
+        "receiving_code": "RCV-20260831-008",
+        "total_quantity": 100
+      },
+      "user_id": "usr-warehouse",
+      "entity_id": "rcv-1788143100387",
+      "created_at": "2026-08-31T02:25:00.441Z"
+    },
+    {
+      "_id": "aud-1788085817525-578",
+      "action": "POST_STOCK_RECEIVING",
+      "entity": "stock_receivings",
+      "details": {
+        "timestamp": "2026-08-30T10:30:17.525Z",
+        "user_name": "Andis Moch Solihin",
+        "user_role": "OWNER",
+        "supplier_name": "PT Pabrik Mahameru Sentosa",
+        "receiving_code": "RCV-20260830-003",
+        "total_quantity": 100
+      },
+      "user_id": "usr-owner",
+      "entity_id": "rcv-1788085816525",
+      "created_at": "2026-08-30T10:30:17.525Z"
     }
   ],
   "settings": {

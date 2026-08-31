@@ -46,7 +46,7 @@ export class ErrorBoundary extends React.Component {
               </p>
             </div>
 
-            {process.env.NODE_ENV !== "production" && this.state.error && (
+            {(import.meta.env?.DEV || typeof process !== "undefined") && this.state.error && (
               <div className="text-left bg-slate-900 text-amber-300 p-3 rounded-lg text-[11px] font-mono overflow-auto max-h-32 leading-tight">
                 {this.state.error.toString()}
               </div>

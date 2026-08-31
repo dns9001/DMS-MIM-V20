@@ -32,7 +32,7 @@ function NavItems({ onNavigate }) {
         <NavLink
           key={m.to}
           to={m.to}
-          onClick={onNavigate}
+          onClick={() => onNavigate()}
           data-testid={m.testid}
           className={({ isActive }) =>
             `flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold transition-all duration-150 min-h-[44px] ${
@@ -83,7 +83,7 @@ export default function DesktopLayout({ children, title }) {
           </div>
           <button
             data-testid="logout-button"
-            onClick={doLogout}
+            onClick={() => doLogout()}
             className="text-slate-400 hover:text-rose-300 hover:bg-white/10 rounded-lg transition-colors p-2 shrink-0 ml-1 min-h-[36px] min-w-[36px] flex items-center justify-center"
             title="Keluar"
           >
@@ -120,7 +120,7 @@ export default function DesktopLayout({ children, title }) {
                     </div>
                   </div>
                   <button
-                    onClick={doLogout}
+                    onClick={() => doLogout()}
                     className="text-slate-400 hover:text-rose-300 hover:bg-white/10 rounded-lg p-2 transition-colors shrink-0 ml-1"
                     title="Keluar"
                   >
