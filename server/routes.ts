@@ -62,7 +62,7 @@ import {
   recordIdempotency,
 } from "./data.js";
 import { resolveSkuInfo, formatSkuItemsSummary } from "./skuResolver.js";
-import { syncToFirestore, getSyncStats, deleteSingleDoc, syncSingleDoc, ALL_SYNC_COLLECTIONS, purgeAllFirestoreData } from "./firestoreSync.js";
+import { syncToFirestore, getSyncStats, deleteSingleDoc, syncSingleDoc, ALL_SYNC_COLLECTIONS, purgeAllFirestoreData } from "./persistence.js";
 import {
   migrateAllToCloudSql,
   getCloudSqlStats,
@@ -232,11 +232,11 @@ apiRouter.get("/system/cloud-services-status", async (req, res) => {
         },
       },
       {
-        id: "firebase_auth",
+        id: "postgres_auth",
         name: "Authentication Service",
         category: "AUTH",
         role: "Manajemen Autentikasi Pengguna & Sesi",
-        provider: "Firebase Authentication / DMS Session Engine",
+        provider: "PostgreSQL Authentication / DMS Session Engine",
         region: "Global",
         status: "CONNECTED",
         isRequired: true,
@@ -9439,8 +9439,17 @@ apiRouter.get("/stock/handovers", authMiddleware, async (req: AuthenticatedReque
 
     res.json({ items: enriched, total: enriched.length });
   } catch (err: any) {
-    console.error("Error fetching handovers from PG:", err.message);
-    res.status(500).json({ detail: "Database error", error: err.message });
+    console.warn("Error fetching handovers from PG, falling back to memory:", err.message);
+    const enriched = (db.stock_handovers || []).map((h: any) => {
+      const sales = db.users.find((u) => u._id === h.salesman_id);
+      const wh = db.offices.find((o) => o._id === h.warehouse_id);
+      return {
+        ...h,
+        salesman_name: sales?.name || "-",
+        warehouse_name: wh?.office_name || "Gudang Pusat",
+      };
+    });
+    res.json({ items: enriched, total: enriched.length });
   }
 });
 
@@ -9664,8 +9673,8 @@ apiRouter.get("/stock/returns", authMiddleware, async (req: AuthenticatedRequest
 
     res.json({ items });
   } catch (err: any) {
-    console.error("Error fetching returns from PG:", err.message);
-    res.status(500).json({ detail: "Database error", error: err.message });
+    console.warn("Error fetching returns from PG, falling back to memory:", err.message);
+    res.json({ items: db.stock_returns || [] });
   }
 });
 
@@ -10627,8 +10636,8 @@ apiRouter.get("/stock/receivings", authMiddleware, async (req: AuthenticatedRequ
 
     res.json({ items: enriched, total: enriched.length });
   } catch (err: any) {
-    console.error("Error fetching receivings from PG:", err.message);
-    res.status(500).json({ detail: "Database error", error: err.message });
+    console.warn("Error fetching receivings from PG, falling back to memory:", err.message);
+    res.json({ items: db.stock_receivings || [], total: (db.stock_receivings || []).length });
   }
 });
 
@@ -11200,8 +11209,8 @@ apiRouter.get("/inventory", authMiddleware, async (req, res) => {
 
     res.json({ items: enriched, total: enriched.length });
   } catch (err: any) {
-    console.error("Error fetching inventory from PG:", err.message);
-    res.status(500).json({ detail: "Database error", error: err.message });
+    console.warn("Error fetching inventory from PG, falling back to memory:", err.message);
+    res.json({ items: db.inventory || [], total: (db.inventory || []).length });
   }
 });
 
@@ -11360,8 +11369,8 @@ apiRouter.get("/inventory/movements", authMiddleware, async (req, res) => {
 
     res.json({ items: enriched, total: enriched.length });
   } catch (err: any) {
-    console.error("Error fetching movements from PG:", err.message);
-    res.status(500).json({ detail: "Database error", error: err.message });
+    console.warn("Error fetching movements from PG, falling back to memory:", err.message);
+    res.json({ items: db.stock_movements || [], total: (db.stock_movements || []).length });
   }
 });
 

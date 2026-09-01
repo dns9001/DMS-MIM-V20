@@ -1,6 +1,6 @@
 import { pool, sqlDb } from "../src/db/index.js";
-import { db, ensureDefaultUsers, ensureDefaultMasterData } from "./data.js";
-import { ALL_SYNC_COLLECTIONS } from "./firestoreSync.js";
+import { db, ensureDefaultUsers, ensureDefaultMasterData, auditAndRepairDatabase } from "./data.js";
+import { ALL_SYNC_COLLECTIONS } from "./persistence.js";
 
 export let isCloudSqlConnected = false;
 let lastCloudSqlSyncTimestamp: string | null = null;
@@ -490,7 +490,9 @@ export async function loadAllFromPostgres(targetDb: any): Promise<boolean> {
       console.log("[Cloud SQL] Loading operational data from Google Cloud SQL PostgreSQL (Single Source of Truth)...");
       const res = await client.query("SELECT collection_name, doc_id, data FROM dms_document_store ORDER BY collection_name");
       
-      // Reset all collection arrays in targetDb so PostgreSQL is the single source of truth
+      // Reset all collection arrays and singletons in targetDb so PostgreSQL is the single source of truth
+      targetDb.company_profile = undefined;
+      targetDb.settings = undefined;
       for (const { key } of ALL_SYNC_COLLECTIONS) {
         targetDb[key] = [];
       }
@@ -524,6 +526,13 @@ export async function loadAllFromPostgres(targetDb: any): Promise<boolean> {
 
       ensureDefaultUsers();
       ensureDefaultMasterData();
+      const auditResult = auditAndRepairDatabase();
+
+      // If PostgreSQL was completely empty, or if repairs/defaults were generated, persist them back immediately
+      if (res.rows.length === 0 || auditResult.fixedIssues.length > 0) {
+        console.log(`[Cloud SQL] Database was empty or missing defaults. Persisting generated baseline data to PostgreSQL... (Fixed ${auditResult.fixedIssues.length} issues)`);
+        await migrateAllToCloudSql();
+      }
 
       isCloudSqlConnected = true;
       lastCloudSqlSyncTimestamp = new Date().toISOString();

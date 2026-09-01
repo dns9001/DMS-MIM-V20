@@ -32,7 +32,7 @@ function NavItems({ onNavigate }) {
         <NavLink
           key={m.to}
           to={m.to}
-          onClick={() => onNavigate()}
+          onClick={() => onNavigate?.()}
           data-testid={m.testid}
           className={({ isActive }) =>
             `flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold transition-all duration-150 min-h-[44px] ${

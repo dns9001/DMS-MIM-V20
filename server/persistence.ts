@@ -1,6 +1,4 @@
-import { db, saveDatabaseToDisk } from "./data.js";
-import { getFirestoreDB } from "./firebase.js";
-import { doc, setDoc, deleteDoc } from "firebase/firestore";
+import { db } from "./data.js";
 import { syncDocToPostgres, deleteDocFromPostgres } from "./cloudsqlSync.js";
 
 let isRestoring = false;
@@ -37,7 +35,7 @@ export function getSyncStats() {
   return {
     databaseEngine: "Google Cloud SQL (PostgreSQL)",
     isCloudConnected: !!process.env.SQL_HOST && !!process.env.SQL_USER,
-    isFirestoreReady: !!getFirestoreDB(),
+    isFirestoreReady: false,
     isQuotaPaused: false,
     lastSyncTimestamp,
     lastSyncStatus,
@@ -60,24 +58,15 @@ export async function syncSingleDoc(colName: string, docId: string, data: any): 
   lastSyncStatus = "SYNCING";
   lastSyncError = null;
   try {
-    if (!(await syncDocToPostgres(colName, String(docId), data))) {
+    const pgSuccess = await syncDocToPostgres(colName, String(docId), data);
+    if (!pgSuccess) {
       lastSyncStatus = "ERROR";
       lastSyncError = "PostgreSQL persistence failed";
-      return false;
     }
 
-    // Optional secondary replica only; PostgreSQL remains authoritative.
-    try {
-      const fdb = getFirestoreDB();
-      if (fdb) await setDoc(doc(fdb, colName, String(docId)), JSON.parse(JSON.stringify(data)), { merge: true });
-    } catch (err: any) {
-      if (process.env.DEBUG_SYNC) console.warn(`[Firestore secondary sync ${colName}/${docId}]:`, err?.message);
-    }
-
-    saveDatabaseToDisk();
     lastSyncTimestamp = new Date().toISOString();
-    lastSyncStatus = "SUCCESS";
-    return true;
+    lastSyncStatus = pgSuccess ? "SUCCESS" : "ERROR";
+    return pgSuccess;
   } catch (err: any) {
     lastSyncStatus = "ERROR";
     lastSyncError = err?.message || String(err);
@@ -89,46 +78,20 @@ export async function deleteSingleDoc(colName: string, docId: string): Promise<b
   if (isRestoring || !docId) return false;
   lastSyncStatus = "SYNCING";
   try {
-    if (!(await deleteDocFromPostgres(colName, String(docId)))) {
+    const pgSuccess = await deleteDocFromPostgres(colName, String(docId));
+    if (!pgSuccess) {
       lastSyncStatus = "ERROR";
       lastSyncError = "PostgreSQL deletion failed";
-      return false;
     }
-    try {
-      const fdb = getFirestoreDB();
-      if (fdb) await deleteDoc(doc(fdb, colName, String(docId)));
-    } catch (err: any) {
-      if (process.env.DEBUG_SYNC) console.warn(`[Firestore secondary delete ${colName}/${docId}]:`, err?.message);
-    }
-    saveDatabaseToDisk();
+    
     lastSyncTimestamp = new Date().toISOString();
-    lastSyncStatus = "SUCCESS";
-    return true;
+    lastSyncStatus = pgSuccess ? "SUCCESS" : "ERROR";
+    return pgSuccess;
   } catch (err: any) {
     lastSyncStatus = "ERROR";
     lastSyncError = err?.message || String(err);
     return false;
   }
-}
-
-/** One-time snapshot migration helper. Normal writes must use syncSingleDoc. */
-export async function migrateAllToCloudSql() {
-  const hasSql = !!process.env.SQL_HOST && !!process.env.SQL_USER;
-  if (!hasSql) return { success: false, totalRecords: 0, collectionCounts: {}, message: "Kredensial PostgreSQL belum dikonfigurasi." };
-  let totalRecords = 0;
-  const collectionCounts: Record<string, number> = {};
-  for (const { key, colName } of ALL_SYNC_COLLECTIONS) {
-    const records = (db as any)[key];
-    if (!Array.isArray(records)) continue;
-    collectionCounts[colName] = records.length;
-    for (const item of records) {
-      const id = String(item?._id || item?.id || "");
-      if (id && await syncDocToPostgres(colName, id, item)) totalRecords++;
-    }
-  }
-  if (db.settings) await syncDocToPostgres("system_settings", "global", db.settings);
-  if (db.company_profile) await syncDocToPostgres("company_profile", "main", db.company_profile);
-  return { success: true, totalRecords, collectionCounts, message: `Snapshot berhasil dipersist ke PostgreSQL: ${totalRecords} record.` };
 }
 
 export async function syncToFirestore(_forceAll = false, _skipCache = false): Promise<void> {

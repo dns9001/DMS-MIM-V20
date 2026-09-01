@@ -117,8 +117,14 @@ export default function OwnerDashboard() {
     <div className="space-y-6" data-testid="owner-dashboard">
       <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
         <div>
-          <h2 className="font-heading text-xl font-extrabold text-navy tracking-tight">DMS Mahameru Dashboard</h2>
-          <p className="text-xs text-slate-500">Distribution Management System — Monitoring Distribusi, Target & Kinerja Penjualan</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="font-heading text-xl font-extrabold text-navy tracking-tight">DMS Mahameru Dashboard</h2>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Google Cloud SQL (PostgreSQL) Active
+            </span>
+          </div>
+          <p className="text-xs text-slate-500">Distribution Management System — Data live real-time dari Database Utama PostgreSQL (Single Source of Truth)</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-2.5">

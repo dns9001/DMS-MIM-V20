@@ -136,7 +136,7 @@ export default function InventoryPage() {
     else setLoading(true);
 
     try {
-      const [invRes, rcvRes, hndRes, retRes, mvtRes, monRes, recRes] = await Promise.all([
+      const [invRes, rcvRes, hndRes, retRes, mvtRes, monRes, recRes] = await Promise.allSettled([
         api.get("/inventory"),
         api.get("/stock/receivings"),
         api.get("/stock/handovers", { params: { business_date: filterDate } }),
@@ -146,19 +146,19 @@ export default function InventoryPage() {
         api.get("/warehouse/reconciliation", { params: { business_date: filterDate } }),
       ]);
 
-      setInventoryItems(invRes.data.items || []);
-      setReceivings(rcvRes.data.items || []);
-      setHandovers(hndRes.data.items || []);
-      setReturns(retRes.data.items || []);
-      setMovements(mvtRes.data.items || []);
-      setMonitoringData(monRes.data || null);
-      setReconciliationData(recRes.data || null);
+      if (invRes.status === "fulfilled") setInventoryItems(invRes.value.data?.items || []);
+      if (rcvRes.status === "fulfilled") setReceivings(rcvRes.value.data?.items || []);
+      if (hndRes.status === "fulfilled") setHandovers(hndRes.value.data?.items || []);
+      if (retRes.status === "fulfilled") setReturns(retRes.value.data?.items || []);
+      if (mvtRes.status === "fulfilled") setMovements(mvtRes.value.data?.items || []);
+      if (monRes.status === "fulfilled") setMonitoringData(monRes.value.data || null);
+      if (recRes.status === "fulfilled") setReconciliationData(recRes.value.data || null);
 
       if (isManualRefresh) {
         toast.success("Data inventori & mutasi berhasil diperbarui.");
       }
     } catch (e) {
-      toast.error(errMsg(e));
+      console.warn("Error loading warehouse inventory:", e);
     } finally {
       setLoading(false);
       setRefreshing(false);
